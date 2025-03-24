@@ -1,44 +1,136 @@
 {% extends 'base.html' %}
 
-{% block title %}Trilhas de Aprendizado - VelozAcademy{% endblock %}
+{% block title %}Trilhas de Aprendizado | VelozAcademy{% endblock %}
 
 {% block content %}
-<!-- Trilhas Header -->
-<section class="py-5 bg-primary bg-gradient text-white">
+<!-- Hero Section -->
+<section class="py-5 bg-dark border-bottom">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-8 mx-auto text-center">
+            <div class="col-lg-6 mb-4 mb-lg-0">
                 <h1 class="display-5 fw-bold mb-3">Trilhas de Aprendizado</h1>
-                <p class="lead mb-0">Escolha uma trilha de aprendizado e desenvolva suas habilidades de forma estruturada e eficiente</p>
+                <p class="lead mb-4">Escolha uma trilha de aprendizado e desenvolva suas habilidades de forma estruturada e eficiente.</p>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="/static/images/cursos-hero.svg" alt="Trilhas VelozAcademy" class="img-fluid">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Trilhas Listing -->
-<section class="py-5">
+<!-- Stats Section -->
+<section class="bg-dark-subtle py-4 border-bottom border-secondary">
     <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                <div class="d-flex flex-column align-items-center">
+                    <h3 class="fw-bold text-primary mb-1">7+</h3>
+                    <p class="mb-0">Trilhas</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
+                <div class="d-flex flex-column align-items-center">
+                    <h3 class="fw-bold text-primary mb-1">40+</h3>
+                    <p class="mb-0">Cursos incluídos</p>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="d-flex flex-column align-items-center">
+                    <h3 class="fw-bold text-primary mb-1">1.200+</h3>
+                    <p class="mb-0">Alunos certificados</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filters Section -->
+<section id="filtros" class="py-5 bg-dark">
+    <div class="container">
+        <h2 class="fw-bold mb-4">Encontre a trilha ideal</h2>
+        
+        <div class="card bg-dark-subtle border-0 shadow-sm mb-5">
+            <div class="card-body p-4">
+                <form method="get" action="#trilhas" class="row g-3">
+                    <div class="col-lg-6 col-md-6">
+                        <label for="search" class="form-label">Nome da trilha</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-dark border-secondary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                </svg>
+                            </span>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="search" name="search" value="{{ search }}" placeholder="Ex: Python, IA, Data Science...">
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 col-md-6">
+                        <label for="area" class="form-label">Área de conhecimento</label>
+                        <select class="form-select bg-dark text-light border-secondary" id="area" name="area">
+                            <option value="">Todas as áreas</option>
+                            <option value="dados" {% if area_selecionada == 'dados' %}selected{% endif %}>Ciência de Dados</option>
+                            <option value="dev" {% if area_selecionada == 'dev' %}selected{% endif %}>Desenvolvimento de Software</option>
+                            <option value="automacao" {% if area_selecionada == 'automacao' %}selected{% endif %}>Automação</option>
+                            <option value="ia" {% if area_selecionada == 'ia' %}selected{% endif %}>Inteligência Artificial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12 mt-4 d-flex justify-content-between align-items-center">
+                        <a href="{% url 'cursos:lista_trilhas' %}" class="text-decoration-none">Limpar filtros</a>
+                        <button type="submit" class="btn btn-primary px-4">Filtrar Resultados</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Trilhas Section -->
+<section id="trilhas" class="py-5 bg-dark">
+    <div class="container">
+        {% if search or area_selecionada %}
+        <div class="alert bg-dark-subtle border-0 shadow-sm mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-1">Resultados da busca</h4>
+                    <p class="mb-0">
+                        {% if search %}Termo: <strong>{{ search }}</strong>{% endif %}
+                        {% if area_selecionada %}| Área: <strong>{{ area_selecionada|title }}</strong>{% endif %}
+                    </p>
+                </div>
+                <a href="{% url 'cursos:lista_trilhas' %}" class="btn btn-outline-primary">Limpar Filtros</a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <h2 class="fw-bold mb-4">{% if trilhas %}Trilhas disponíveis{% else %}Nenhuma trilha encontrada{% endif %}</h2>
+        
         <div class="row g-4">
             {% for trilha in trilhas %}
             <div class="col-lg-4 col-md-6">
-                <div class="card h-100 bg-dark border border-secondary">
-                    <div class="card-img-top" style="height: 180px; background: #2c3e50; overflow: hidden;">
+                <div class="card h-100 bg-dark-subtle border-0 shadow-sm hover-zoom">
+                    <div class="position-relative">
                         {% if trilha.imagem %}
-                        <img src="{{ trilha.imagem }}" alt="{{ trilha.nome }}" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                        <img src="{{ trilha.imagem }}" class="card-img-top" alt="{{ trilha.nome }}" style="height: 200px; object-fit: cover;">
                         {% else %}
-                        <div class="d-flex align-items-center justify-content-center h-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-bezier text-light" viewBox="0 0 16 16">
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-bezier" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M0 10.5A1.5 1.5 0 0 1 1.5 9h1A1.5 1.5 0 0 1 4 10.5v1A1.5 1.5 0 0 1 2.5 13h-1A1.5 1.5 0 0 1 0 11.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zm10.5.5A1.5 1.5 0 0 1 13.5 9h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5v-1zm1.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM6 4.5A1.5 1.5 0 0 1 7.5 3h1A1.5 1.5 0 0 1 10 4.5v1A1.5 1.5 0 0 1 8.5 7h-1A1.5 1.5 0 0 1 6 5.5v-1zM7.5 4a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1z"/>
                                 <path d="M6 4.5H1.866a1 1 0 1 0 0 1h2.668A6.517 6.517 0 0 0 1.814 9H2.5c.123 0 .244.015.358.043a5.517 5.517 0 0 1 3.185-3.185A1.503 1.503 0 0 1 6 5.5v-1zm3.957 1.358A1.5 1.5 0 0 0 10 5.5v-1H14.134a1 1 0 1 1 0 1h-2.668a6.517 6.517 0 0 1 2.72 3.5H13.5c-.123 0-.243.015-.358.043a5.517 5.517 0 0 0-3.185-3.185z"/>
                             </svg>
                         </div>
                         {% endif %}
                     </div>
-                    <div class="card-body">
-                        <h3 class="card-title h5 fw-bold mb-3">{{ trilha.nome }}</h3>
-                        <p class="card-text text-secondary mb-4">{{ trilha.descricao }}</p>
+                    <div class="card-body p-4">
+                        <h5 class="card-title fw-bold mb-3">{{ trilha.nome }}</h5>
+                        <p class="card-text text-muted mb-4" style="height: 4.5rem; overflow: hidden;">{{ trilha.descricao|truncatechars:120 }}</p>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-primary me-2">{{ trilha.total_cursos|default:"5" }} cursos</span>
+                            <span class="badge bg-secondary me-2">{{ trilha.total_horas|default:"30" }} horas</span>
+                        </div>
                     </div>
-                    <div class="card-footer bg-dark border-top border-secondary">
+                    <div class="card-footer bg-dark-subtle border-0 pt-0">
                         <div class="d-grid">
                             <a href="{% url 'cursos:trilha' trilha.slug %}" class="btn btn-primary">
                                 Ver Trilha
@@ -56,7 +148,7 @@
 </section>
 
 <!-- Benefits Section -->
-<section class="py-5 bg-dark">
+<section class="py-5 bg-dark-subtle border-top border-secondary">
     <div class="container">
         <div class="row mb-5">
             <div class="col-lg-8 mx-auto text-center">
@@ -66,8 +158,8 @@
         </div>
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card h-100 bg-dark border border-secondary">
-                    <div class="card-body">
+                <div class="card h-100 bg-dark border-0 shadow-sm">
+                    <div class="card-body p-4 text-light">
                         <div class="text-primary mb-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-signpost-2" viewBox="0 0 16 16">
                                 <path d="M7 1.414V2H2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h5v1H2.5a1 1 0 0 0-.8.4L.725 8.7a.5.5 0 0 0 0 .6l.975 1.3a1 1 0 0 0 .8.4H7v5h2v-5h5a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1H9V6h4.5a1 1 0 0 0 .8-.4l.975-1.3a.5.5 0 0 0 0-.6L14.3 2.4a1 1 0 0 0-.8-.4H9v-.586a1 1 0 0 0-2 0zM13.5 3l.75 1-.75 1H2V3h11.5zm.5 5v2H2V8h12z"/>
@@ -79,8 +171,8 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card h-100 bg-dark border border-secondary">
-                    <div class="card-body">
+                <div class="card h-100 bg-dark border-0 shadow-sm">
+                    <div class="card-body p-4 text-light">
                         <div class="text-primary mb-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-layers" viewBox="0 0 16 16">
                                 <path d="M8.235 1.559a.5.5 0 0 0-.47 0l-7.5 4a.5.5 0 0 0 0 .882L3.188 8 .765 9.559a.5.5 0 0 0 0 .882l7.5 4a.5.5 0 0 0 .47 0l7.5-4a.5.5 0 0 0 0-.882L12.813 8l2.922-1.559a.5.5 0 0 0 0-.882l-7.5-4zm3.515 7.008L14.438 10 8 13.433 1.562 10 4.25 8.567l3.515 1.874a.5.5 0 0 0 .47 0l3.515-1.874zM8 9.433 1.562 6 8 2.567 14.438 6 8 9.433z"/>
@@ -92,8 +184,8 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card h-100 bg-dark border border-secondary">
-                    <div class="card-body">
+                <div class="card h-100 bg-dark border-0 shadow-sm">
+                    <div class="card-body p-4 text-light">
                         <div class="text-primary mb-3">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-trophy" viewBox="0 0 16 16">
                                 <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935zM3.504 1c.007.517.026 1.006.056 1.469.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.501.501 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667.03-.463.049-.952.056-1.469H3.504z"/>

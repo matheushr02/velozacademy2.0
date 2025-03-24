@@ -121,50 +121,95 @@ def trilha_cursos(request, trilha_slug):
     })
 
 def lista_trilhas(request):
+    # Obter parâmetros de filtro
+    search = request.GET.get('search', '')
+    area = request.GET.get('area', '')
+    
     # Lista de todas as trilhas disponíveis
     trilhas = [
         {
             'slug': 'aplicacoes-ia',
             'nome': 'Aplicações IA com Python',
             'descricao': 'Aprenda a desenvolver aplicações práticas utilizando inteligência artificial e Python.',
-            'imagem': '/static/images/trilhas/ia.jpg'
+            'imagem': '/static/images/trilhas/ia.jpg',
+            'area': 'ia',
+            'total_cursos': 7,
+            'total_horas': 42
         },
         {
             'slug': 'dashboards',
             'nome': 'Dashboards Interativos com Python',
             'descricao': 'Crie visualizações de dados impressionantes e painéis interativos com Python.',
-            'imagem': '/static/images/trilhas/dashboards.jpg'
+            'imagem': '/static/images/trilhas/dashboards.jpg',
+            'area': 'dados',
+            'total_cursos': 5,
+            'total_horas': 35
         },
         {
             'slug': 'python-office',
             'nome': 'Python Office',
             'descricao': 'Automatize tarefas de escritório e aumente sua produtividade com Python.',
-            'imagem': '/static/images/trilhas/office.jpg'
+            'imagem': '/static/images/trilhas/office.jpg',
+            'area': 'automacao',
+            'total_cursos': 4,
+            'total_horas': 28
         },
         {
             'slug': 'visao-computacional',
             'nome': 'Visão Computacional',
             'descricao': 'Desenvolva sistemas que podem ver e interpretar o mundo visual.',
-            'imagem': '/static/images/trilhas/visao.jpg'
+            'imagem': '/static/images/trilhas/visao.jpg',
+            'area': 'ia',
+            'total_cursos': 6,
+            'total_horas': 38
         },
         {
             'slug': 'data-science',
             'nome': 'Data Science e Machine Learning',
-            'descricao': 'Aprenda a extrair conhecimento e insights de dados usando algoritmos avançados.',
-            'imagem': '/static/images/trilhas/datascience.jpg'
+            'descricao': 'Do básico ao avançado em ciência de dados e aprendizado de máquina.',
+            'imagem': '/static/images/trilhas/data-science.jpg',
+            'area': 'dados',
+            'total_cursos': 8,
+            'total_horas': 45
         },
         {
             'slug': 'analise-dados',
             'nome': 'Análise e Visualização de Dados',
-            'descricao': 'Transforme dados brutos em informações úteis através de visualizações poderosas.',
-            'imagem': '/static/images/trilhas/dados.jpg'
+            'descricao': 'Aprenda a extrair insights valiosos de conjuntos de dados e apresentá-los visualmente.',
+            'imagem': '/static/images/trilhas/analise-dados.jpg',
+            'area': 'dados',
+            'total_cursos': 6,
+            'total_horas': 32
         },
         {
             'slug': 'trading',
             'nome': 'Trading Quantitativo',
-            'descricao': 'Crie estratégias de investimento automatizadas baseadas em dados e algoritmos.',
-            'imagem': '/static/images/trilhas/trading.jpg'
+            'descricao': 'Desenvolva estratégias de trading algorítmico e análise de mercado com Python.',
+            'imagem': '/static/images/trilhas/trading.jpg',
+            'area': 'dados',
+            'total_cursos': 5,
+            'total_horas': 30
         },
+        {
+            'slug': 'desenvolvimento-web',
+            'nome': 'Desenvolvimento Web Fullstack',
+            'descricao': 'Do front-end ao back-end, aprenda a construir aplicações web completas e modernas.',
+            'imagem': '/static/images/trilhas/web.jpg',
+            'area': 'dev',
+            'total_cursos': 9,
+            'total_horas': 48
+        }
     ]
     
-    return render(request, 'cursos/lista_trilhas.html', {'trilhas': trilhas})
+    # Aplicar filtros
+    if search:
+        trilhas = [t for t in trilhas if search.lower() in t['nome'].lower() or search.lower() in t['descricao'].lower()]
+    
+    if area:
+        trilhas = [t for t in trilhas if t.get('area') == area]
+    
+    return render(request, 'cursos/lista_trilhas.html', {
+        'trilhas': trilhas,
+        'search': search,
+        'area_selecionada': area
+    })
