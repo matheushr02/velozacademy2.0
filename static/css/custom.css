@@ -1,0 +1,180 @@
+/* Custom Theme Styles */
+
+/* Estilos específicos para cada tema */
+.theme-dark {
+    background-color: #121212 !important;
+    color: #f8f9fa !important;
+}
+
+.theme-light {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+/* Força transição suave ao trocar temas */
+html, body, header, main, footer,
+.card, .navbar, .dropdown-menu, .btn {
+    transition: background-color 0.4s ease, 
+                color 0.4s ease, 
+                border-color 0.4s ease !important;
+}
+
+/* Animação para entrada de cards */
+.card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* Card Styles - Ensuring legibility in both themes */
+[data-bs-theme="dark"] .card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+[data-bs-theme="dark"] .card-body {
+    color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .card-header {
+    background-color: #262626 !important;
+    border-color: #333 !important;
+}
+
+[data-bs-theme="dark"] .card-text,
+[data-bs-theme="dark"] .card-title,
+[data-bs-theme="dark"] .card p {
+    color: #f8f9fa !important;
+}
+
+/* Fix for backgrounds */
+[data-bs-theme="dark"] .bg-dark-subtle {
+    background-color: #1e1e1e !important;
+}
+
+[data-bs-theme="light"] .bg-dark-subtle {
+    background-color: #f8f9fa !important;
+}
+
+/* Fix for dropdown menus */
+[data-bs-theme="light"] .dropdown-menu {
+    background-color: #fff !important;
+    border-color: rgba(0,0,0,0.15) !important;
+}
+
+[data-bs-theme="light"] .dropdown-menu .dropdown-item {
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .dropdown-menu .dropdown-item:hover {
+    background-color: #f8f9fa !important;
+    color: #16181b !important;
+}
+
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: #343a40 !important;
+    border-color: rgba(255,255,255,0.15) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item {
+    color: #f8f9fa !important;
+}
+
+[data-bs-theme="dark"] .dropdown-menu .dropdown-item:hover {
+    background-color: #495057 !important;
+}
+
+/* Ensure text in alert is visible */
+[data-bs-theme="dark"] .alert {
+    color: #f8f9fa;
+}
+
+/* Theme transition */
+body, .card, .navbar, .dropdown-menu, .btn, .form-control {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hover animations */
+.hover-zoom {
+    transition: transform 0.3s ease;
+}
+
+.hover-zoom:hover {
+    transform: translateY(-5px);
+}
+
+.hover-shadow:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Fix for text in forms */
+[data-bs-theme="dark"] .form-control:focus {
+    background-color: #1e1e1e;
+    color: #f8f9fa;
+    border-color: #0d6efd;
+}
+
+/* Fix for link colors */
+[data-bs-theme="dark"] .link-body-emphasis {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+[data-bs-theme="dark"] .link-body-emphasis:hover {
+    color: #fff !important;
+}
+
+[data-bs-theme="light"] .link-body-emphasis {
+    color: rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-bs-theme="light"] .link-body-emphasis:hover {
+    color: #000 !important;
+}
+
+/* Ensure badge text is always visible */
+.badge {
+    color: #fff !important;
+}
+
+/* Ensure text in project details is visible in both themes */
+[data-bs-theme="light"] .text-light {
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .bg-dark {
+    background-color: #f8f9fa !important;
+}
+
+/* Fix for project detail borders */
+[data-bs-theme="light"] .border-secondary {
+    border-color: #dee2e6 !important;
+}
+
+/* Fix for login button in light mode */
+[data-bs-theme="light"] .btn-outline-light {
+    color: #212529 !important;
+    border-color: #6c757d !important;
+}
+
+[data-bs-theme="light"] .btn-outline-light:hover {
+    color: #fff !important;
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+/* Fix for outline buttons */
+[data-bs-theme="light"] .btn-outline-secondary {
+    color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+[data-bs-theme="light"] .btn-outline-secondary:hover {
+    color: #fff !important;
+    background-color: #6c757d !important;
+}
+
+/* Fix for navbar in light mode */
+[data-bs-theme="light"] .navbar {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+} 

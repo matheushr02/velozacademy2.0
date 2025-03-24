@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Recuperar Senha | VelozAcademy{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card p-4">
+                    <div class="text-center mb-4">
+                        <h1 class="fw-bold">Recuperar Senha</h1>
+                        <p>Enviaremos instruções para recuperar sua senha</p>
+                    </div>
+                    
+                    <!-- Messages -->
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="email" class="form-label">Seu Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="Digite o email cadastrado na sua conta">
+                        </div>
+                        <div class="d-grid mb-3">
+                            <button type="submit" class="btn btn-primary">Enviar Instruções</button>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <a href="{% url 'users:login' %}" class="text-primary">Voltar para o login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %} 

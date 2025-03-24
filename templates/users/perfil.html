@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Meu Perfil | VelozAcademy{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card p-4">
+                    <div class="row mb-4">
+                        <div class="col-md-12 mb-4">
+                            <h1 class="fw-bold">Meu Perfil</h1>
+                            <p class="lead">Gerencie suas informações pessoais e acompanhe seu progresso</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Messages -->
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-3 mb-4">
+                            <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                                <button class="nav-link active mb-2" id="profile-tab" data-bs-toggle="pill" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">Perfil</button>
+                                <button class="nav-link mb-2" id="courses-tab" data-bs-toggle="pill" data-bs-target="#courses" type="button" role="tab" aria-controls="courses" aria-selected="false">Meus Cursos</button>
+                                <button class="nav-link mb-2" id="projects-tab" data-bs-toggle="pill" data-bs-target="#projects" type="button" role="tab" aria-controls="projects" aria-selected="false">Meus Projetos</button>
+                                <button class="nav-link mb-2" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Configurações</button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-9">
+                            <div class="tab-content">
+                                <!-- Perfil Tab -->
+                                <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                                    <form method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="card mb-4">
+                                            <div class="card-body">
+                                                <div class="text-center mb-4">
+                                                    <div class="mb-3">
+                                                        {% if user.perfil.avatar %}
+                                                        <img src="{{ user.perfil.avatar.url }}" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                                        {% else %}
+                                                        <img src="/static/images/default-avatar.jpg" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                                        {% endif %}
+                                                    </div>
+                                                    <div>
+                                                        <label for="avatar" class="btn btn-outline-primary">Alterar foto</label>
+                                                        <input type="file" id="avatar" name="avatar" class="d-none">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="first_name" class="form-label">Nome</label>
+                                                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label for="last_name" class="form-label">Sobrenome</label>
+                                                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="bio" class="form-label">Biografia</label>
+                                                    <textarea class="form-control" id="bio" name="bio" rows="4">{{ user.perfil.bio }}</textarea>
+                                                </div>
+                                                
+                                                <div class="d-grid">
+                                                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- Cursos Tab -->
+                                <div class="tab-pane fade" id="courses" role="tabpanel" aria-labelledby="courses-tab">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h3 class="card-title fw-bold mb-4">Meus Cursos</h3>
+                                            
+                                            {% if user.inscricoes.all %}
+                                            <div class="row g-4">
+                                                {% for inscricao in user.inscricoes.all %}
+                                                <div class="col-md-6">
+                                                    <div class="card h-100">
+                                                        {% if inscricao.curso.imagem %}
+                                                        <img src="{{ inscricao.curso.imagem.url }}" class="card-img-top" alt="{{ inscricao.curso.titulo }}">
+                                                        {% else %}
+                                                        <img src="/static/images/course-placeholder.jpg" class="card-img-top" alt="{{ inscricao.curso.titulo }}">
+                                                        {% endif %}
+                                                        <div class="card-body">
+                                                            <h5 class="card-title">{{ inscricao.curso.titulo }}</h5>
+                                                            <div class="progress mb-3">
+                                                                <div class="progress-bar" role="progressbar" style="width: {{ inscricao.progresso }}%%" aria-valuenow="{{ inscricao.progresso }}" aria-valuemin="0" aria-valuemax="100">{{ inscricao.progresso }}%</div>
+                                                            </div>
+                                                            <a href="{{ inscricao.curso.get_absolute_url }}" class="btn btn-outline-primary">Continuar</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% else %}
+                                            <div class="text-center">
+                                                <p>Você ainda não está inscrito em nenhum curso.</p>
+                                                <a href="{% url 'cursos:lista' %}" class="btn btn-primary">Explorar Cursos</a>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Projetos Tab -->
+                                <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h3 class="card-title fw-bold mb-4">Meus Projetos</h3>
+                                            
+                                            <div class="text-center">
+                                                <p>Você ainda não iniciou nenhum projeto.</p>
+                                                <a href="{% url 'projetos:lista' %}" class="btn btn-primary">Explorar Projetos</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Configurações Tab -->
+                                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h3 class="card-title fw-bold mb-4">Configurações da Conta</h3>
+                                            
+                                            <div class="mb-4">
+                                                <h5>Alterar Senha</h5>
+                                                <form>
+                                                    <div class="mb-3">
+                                                        <label for="current_password" class="form-label">Senha Atual</label>
+                                                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="new_password" class="form-label">Nova Senha</label>
+                                                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="confirm_password" class="form-label">Confirmar Nova Senha</label>
+                                                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">Atualizar Senha</button>
+                                                </form>
+                                            </div>
+                                            
+                                            <hr>
+                                            
+                                            <div>
+                                                <h5 class="text-danger">Zona de Perigo</h5>
+                                                <p>Cuidado! As ações abaixo são irreversíveis.</p>
+                                                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Excluir minha conta</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de Exclusão de Conta -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountModalLabel">Confirmar exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.</p>
+                <p>Todos os seus dados serão permanentemente removidos.</p>
+                
+                <form>
+                    <div class="mb-3">
+                        <label for="confirm_delete" class="form-label">Digite "excluir" para confirmar</label>
+                        <input type="text" class="form-control" id="confirm_delete" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" disabled>Excluir Permanentemente</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Script para habilitar o botão de exclusão somente quando o usuário digitar "excluir"
+    document.addEventListener('DOMContentLoaded', function() {
+        const confirmInput = document.getElementById('confirm_delete');
+        const deleteButton = document.querySelector('.modal-footer .btn-danger');
+        
+        confirmInput.addEventListener('input', function() {
+            deleteButton.disabled = this.value !== 'excluir';
+        });
+    });
+    
+    // Preview da imagem de perfil quando um arquivo é selecionado
+    document.getElementById('avatar').addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.querySelector('#profile .rounded-circle');
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+</script>
+{% endblock %} 

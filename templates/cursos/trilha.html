@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ trilha_nome }} | VelozAcademy{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <header class="text-center mb-5">
+            <h1 class="fw-bold mb-3">{{ trilha_nome }}</h1>
+            <p class="lead">Comece sua jornada de aprendizado com esta trilha completa de conhecimento.</p>
+        </header>
+        
+        <!-- Trilha Info -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-10">
+                <div class="card bg-dark-subtle border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h2 class="fw-bold mb-3">O que você vai aprender</h2>
+                                
+                                {% if trilha_slug == 'aplicacoes-ia' %}
+                                <p>Do zero a seus primeiros agentes IA usando apenas Python. Aprenda a desenvolver aplicações inteligentes e integrar modelos de IA em seus projetos.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">49h</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                
+                                {% elif trilha_slug == 'dashboards' %}
+                                <p>Crie dashboards interativos e dinâmicos com Python. Aprenda a visualizar dados de forma eficiente e a construir interfaces intuitivas para análise.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">39h</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                
+                                {% elif trilha_slug == 'python-office' %}
+                                <p>Aprenda a criar automações com Python do zero. Automatize tarefas repetitivas, trabalhe com planilhas, documentos e apresentações de forma eficiente.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">47h</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                
+                                {% elif trilha_slug == 'visao-computacional' %}
+                                <p>Aprenda a criar sistemas inteligentes com imagens e vídeos. Desenvolva aplicações de reconhecimento facial, detecção de objetos e análise de imagens.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">22h</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                
+                                {% elif trilha_slug == 'data-science' %}
+                                <p>Domine a ciência de dados usando Python e Machine Learning. Aprenda a coletar, limpar, analisar e interpretar dados para obter insights valiosos.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">29h</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                
+                                {% elif trilha_slug == 'analise-dados' %}
+                                <p>Analise dados profissionalmente usando Python. Aprenda técnicas avançadas de visualização e manipulação de dados para tomada de decisões baseadas em dados.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">24h</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                
+                                {% elif trilha_slug == 'trading' %}
+                                <p>Construa estratégias de trading usando o Método Científico. Aprenda a analisar o mercado financeiro, desenvolver modelos quantitativos e automatizar operações.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">24h</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                
+                                {% else %}
+                                <p>Explore esta trilha de conhecimento e desenvolva novas habilidades com Python.</p>
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="me-3">
+                                        <span class="badge bg-primary">40h+</span>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted">Duração total dos cursos</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <a href="#" class="btn btn-primary btn-lg">Matricule-se nesta Trilha</a>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <img src="/static/images/trilhas/{{ trilha_slug }}.svg" alt="{{ trilha_nome }}" class="img-fluid" style="max-height: 200px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cursos da Trilha -->
+        <h2 class="fw-bold text-center mb-4">Cursos Nesta Trilha</h2>
+        
+        <div class="row g-4">
+            {% if cursos %}
+                {% for curso in cursos %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 bg-dark border border-secondary hover-shadow">
+                        {% if curso.imagem %}
+                        <img src="{{ curso.imagem.url }}" class="card-img-top" alt="{{ curso.titulo }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 180px;">
+                            <i class="bi bi-code-square" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <span class="badge bg-{{ curso.nivel|default:'primary' }} mb-2">{{ curso.get_nivel_display }}</span>
+                            <h5 class="card-title fw-bold">{{ curso.titulo }}</h5>
+                            <p class="card-text text-truncate">{{ curso.descricao }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="small text-muted">
+                                    <i class="bi bi-clock me-1"></i> 
+                                    {% with total_aulas=curso.modulos.count %}
+                                    {{ total_aulas }} módulo{{ total_aulas|pluralize }}
+                                    {% endwith %}
+                                </div>
+                                <a href="{% url 'cursos:detalhe' curso.id %}" class="btn btn-sm btn-outline-primary">Ver curso</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center py-4">
+                        <h4 class="alert-heading mb-3">Nenhum curso disponível!</h4>
+                        <p>Em breve teremos cursos disponíveis nesta trilha.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Next Steps -->
+        <div class="mt-5 text-center">
+            <h3 class="fw-bold mb-4">Próximos Passos</h3>
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="card bg-dark border border-secondary h-100">
+                        <div class="card-body text-center p-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-play-circle text-primary mb-3" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                            </svg>
+                            <h4 class="fw-bold mb-3">Comece Agora</h4>
+                            <p>Inicie sua jornada com o primeiro curso da trilha e comece a aprender.</p>
+                            <a href="#" class="btn btn-outline-primary">Começar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-dark border border-secondary h-100">
+                        <div class="card-body text-center p-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-chat-dots text-primary mb-3" viewBox="0 0 16 16">
+                                <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+                            </svg>
+                            <h4 class="fw-bold mb-3">Comunidade</h4>
+                            <p>Participe da nossa comunidade e conecte-se com outros estudantes.</p>
+                            <a href="#" class="btn btn-outline-primary">Participar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-dark border border-secondary h-100">
+                        <div class="card-body text-center p-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-folder-check text-primary mb-3" viewBox="0 0 16 16">
+                                <path d="m.5 3 .04.87a1.99 1.99 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14H9v-1H2.826a1 1 0 0 1-.995-.91l-.637-7A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09L14.54 8h1.005l.256-2.819A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2zm5.672-1a1 1 0 0 1 .707.293L7.586 3H2.19c-.24 0-.47.042-.683.12L1.5 2.98a1 1 0 0 1 1-.98h3.672z"/>
+                                <path d="M15.854 10.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.707 0l-1.5-1.5a.5.5 0 0 1 .707-.708l1.146 1.147 2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                            <h4 class="fw-bold mb-3">Projetos</h4>
+                            <p>Explore projetos práticos relacionados a esta trilha de conhecimento.</p>
+                            <a href="{% url 'projetos:lista' %}" class="btn btn-outline-primary">Ver Projetos</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

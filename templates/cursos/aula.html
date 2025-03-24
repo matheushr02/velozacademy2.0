@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ aula.titulo }} | {{ curso.titulo }} | VelozAcademy{% endblock %}
+
+{% block content %}
+<section class="py-4">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Course Content Sidebar -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="card bg-dark border border-secondary sticky-top" style="top: 80px; max-height: calc(100vh - 100px); overflow-y: auto;">
+                    <div class="card-header bg-dark border-bottom border-secondary">
+                        <h5 class="card-title mb-0 fw-bold">{{ curso.titulo }}</h5>
+                        <div class="progress mt-2" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progresso }}%%" aria-valuenow="{{ progresso }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="accordion" id="accordionModulos">
+                            {% for modulo in curso.modulos.all %}
+                            <div class="accordion-item bg-dark border-0">
+                                <h2 class="accordion-header" id="heading{{ modulo.id }}">
+                                    <button class="accordion-button bg-dark text-light {% if modulo == aula.modulo %}{% else %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ modulo.id }}" aria-expanded="{% if modulo == aula.modulo %}true{% else %}false{% endif %}" aria-controls="collapse{{ modulo.id }}">
+                                        <div>
+                                            <small class="text-muted d-block">Módulo {{ forloop.counter }}</small>
+                                            <span>{{ modulo.titulo }}</span>
+                                        </div>
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ modulo.id }}" class="accordion-collapse collapse {% if modulo == aula.modulo %}show{% endif %}" aria-labelledby="heading{{ modulo.id }}" data-bs-parent="#accordionModulos">
+                                    <div class="accordion-body p-0">
+                                        <ul class="list-group list-group-flush">
+                                            {% for aula_item in modulo.aulas.all %}
+                                            <li class="list-group-item bg-dark text-light border-secondary {% if aula_item == aula %}bg-dark-lighter{% endif %}">
+                                                <a href="{% url 'cursos:aula' curso.slug aula_item.ordem %}" class="d-flex justify-content-between align-items-center text-decoration-none {% if aula_item == aula %}text-primary{% else %}text-light{% endif %}">
+                                                    <div class="d-flex align-items-center">
+                                                        {% if aula_concluida %}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                                        </svg>
+                                                        {% else %}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle me-2" viewBox="0 0 16 16">
+                                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                            <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                                                        </svg>
+                                                        {% endif %}
+                                                        <span>{{ aula_item.titulo }}</span>
+                                                    </div>
+                                                    <span class="badge bg-dark text-secondary border border-secondary">{{ aula_item.duracao }} min</span>
+                                                </a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content Area -->
+            <div class="col-lg-9">
+                <div class="card bg-dark border border-secondary mb-4">
+                    <div class="card-body">
+                        <nav aria-label="breadcrumb" class="mb-4">
+                            <ol class="breadcrumb mb-0">
+                                <li class="breadcrumb-item"><a href="{% url 'cursos:lista' %}" class="text-primary">Cursos</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'cursos:detalhe' curso.slug %}" class="text-primary">{{ curso.titulo }}</a></li>
+                                <li class="breadcrumb-item"><span class="text-secondary">{{ aula.modulo.titulo }}</span></li>
+                                <li class="breadcrumb-item active" aria-current="page">{{ aula.titulo }}</li>
+                            </ol>
+                        </nav>
+                        
+                        <h1 class="fw-bold mb-4">{{ aula.titulo }}</h1>
+                        
+                        <!-- Video Player -->
+                        <div class="ratio ratio-16x9 mb-4">
+                            {% if aula.video_url %}
+                            <iframe src="{{ aula.video_url }}" title="{{ aula.titulo }}" allowfullscreen></iframe>
+                            {% else %}
+                            <div class="d-flex align-items-center justify-content-center bg-dark-lighter">
+                                <div class="text-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-film text-secondary mb-3" viewBox="0 0 16 16">
+                                        <path d="M0 1a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm4 0v6h8V1H4zm8 8H4v6h8V9zM1 1v2h2V1H1zm2 3H1v2h2V4zM1 7v2h2V7H1zm2 3H1v2h2v-2zm-2 3v2h2v-2H1zM15 1h-2v2h2V1zm-2 3v2h2V4h-2zm2 3h-2v2h2V7zm-2 3v2h2v-2h-2zm2 3h-2v2h2v-2z"/>
+                                    </svg>
+                                    <p>Nenhum vídeo disponível para esta aula.</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Video Controls -->
+                        <div class="d-flex justify-content-between mb-5">
+                            <div>
+                                {% if aula_anterior %}
+                                <a href="{% url 'cursos:aula' curso.slug aula_anterior.ordem %}" class="btn btn-outline-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                                    </svg>
+                                    Aula Anterior
+                                </a>
+                                {% endif %}
+                            </div>
+                            
+                            <form method="post" action="{% url 'cursos:marcar_concluida' aula.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn {% if aula_concluida %}btn-success{% else %}btn-primary{% endif %}">
+                                    {% if aula_concluida %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-2" viewBox="0 0 16 16">
+                                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                    </svg>
+                                    Aula Concluída
+                                    {% else %}
+                                    Marcar como Concluída
+                                    {% endif %}
+                                </button>
+                            </form>
+                            
+                            <div>
+                                {% if proxima_aula %}
+                                <a href="{% url 'cursos:aula' curso.slug proxima_aula.ordem %}" class="btn btn-primary">
+                                    Próxima Aula
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                    </svg>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Aula Content -->
+                        <div class="mb-5">
+                            <h3 class="fw-bold mb-3">Descrição da Aula</h3>
+                            <div class="content">
+                                {{ aula.conteudo|safe }}
+                            </div>
+                        </div>
+                        
+                        <!-- Material Complementar -->
+                        {% if aula.arquivos.all %}
+                        <div class="mb-5">
+                            <h3 class="fw-bold mb-3">Material Complementar</h3>
+                            <div class="list-group">
+                                {% for arquivo in aula.arquivos.all %}
+                                <a href="{{ arquivo.arquivo.url }}" class="list-group-item list-group-item-action bg-dark border-secondary d-flex justify-content-between align-items-center" download>
+                                    <div class="d-flex align-items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text me-3 text-primary" viewBox="0 0 16 16">
+                                            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
+                                            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                                        </svg>
+                                        {{ arquivo.titulo }}
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <small class="text-secondary me-3">{{ arquivo.get_extensao_display }}</small>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download text-primary" viewBox="0 0 16 16">
+                                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                                        </svg>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Atividades -->
+                        {% if aula.atividades.all %}
+                        <div class="mb-5">
+                            <h3 class="fw-bold mb-3">Atividades Práticas</h3>
+                            <div class="accordion" id="accordionAtividades">
+                                {% for atividade in aula.atividades.all %}
+                                <div class="accordion-item bg-dark border border-secondary mb-3">
+                                    <h2 class="accordion-header" id="headingAtv{{ atividade.id }}">
+                                        <button class="accordion-button bg-dark text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAtv{{ atividade.id }}" aria-expanded="false" aria-controls="collapseAtv{{ atividade.id }}">
+                                            <div class="d-flex justify-content-between align-items-center w-100">
+                                                <span>{{ atividade.titulo }}</span>
+                                                <span class="badge bg-primary ms-2">{{ atividade.tipo_display }}</span>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapseAtv{{ atividade.id }}" class="accordion-collapse collapse" aria-labelledby="headingAtv{{ atividade.id }}" data-bs-parent="#accordionAtividades">
+                                        <div class="accordion-body">
+                                            <div class="mb-3">
+                                                <p>{{ atividade.descricao }}</p>
+                                            </div>
+                                            
+                                            {% if atividade.tipo == 'quiz' %}
+                                            <form method="post" action="{% url 'cursos:responder_quiz' atividade.id %}">
+                                                {% csrf_token %}
+                                                {% for questao in atividade.questoes.all %}
+                                                <div class="card bg-dark-lighter border-secondary mb-3">
+                                                    <div class="card-body">
+                                                        <h5 class="card-title mb-3">{{ questao.pergunta }}</h5>
+                                                        {% for alternativa in questao.alternativas.all %}
+                                                        <div class="form-check mb-2">
+                                                            <input class="form-check-input" type="radio" name="questao_{{ questao.id }}" id="alternativa_{{ alternativa.id }}" value="{{ alternativa.id }}" {% if alternativa.id == resposta_usuario %} checked {% endif %}>
+                                                            <label class="form-check-label" for="alternativa_{{ alternativa.id }}">
+                                                                {{ alternativa.texto }}
+                                                            </label>
+                                                        </div>
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                                <button type="submit" class="btn btn-primary">Enviar Respostas</button>
+                                            </form>
+                                            {% endif %}
+                                            
+                                            {% if atividade.tipo == 'projeto' %}
+                                            <div class="mb-3">
+                                                <h5 class="fw-bold mb-2">Instruções:</h5>
+                                                <div class="content mb-4">
+                                                    {{ atividade.instrucoes|safe }}
+                                                </div>
+                                                
+                                                <h5 class="fw-bold mb-2">Prazo:</h5>
+                                                <p>{{ atividade.prazo_entrega|date:"d/m/Y" }}</p>
+                                                
+                                                {% if atividade.entregue %}
+                                                <div class="alert alert-success">
+                                                    <h5 class="alert-heading">Projeto entregue!</h5>
+                                                    <p>Você já entregou este projeto em {{ atividade.data_entrega|date:"d/m/Y" }}.</p>
+                                                    <hr>
+                                                    <p class="mb-0">Feedback do instrutor: {{ atividade.feedback|default:"Aguardando feedback do instrutor." }}</p>
+                                                </div>
+                                                {% else %}
+                                                <form method="post" action="{% url 'cursos:entregar_projeto' atividade.id %}" enctype="multipart/form-data">
+                                                    {% csrf_token %}
+                                                    <div class="mb-3">
+                                                        <label for="projeto_url" class="form-label">URL do Projeto (GitHub, CodePen, etc)</label>
+                                                        <input type="url" class="form-control bg-dark text-light border-secondary" id="projeto_url" name="projeto_url" placeholder="https://github.com/seu-usuario/seu-projeto">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="arquivo_projeto" class="form-label">Ou envie os arquivos do projeto</label>
+                                                        <input class="form-control bg-dark text-light border-secondary" type="file" id="arquivo_projeto" name="arquivo_projeto">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="comentarios" class="form-label">Comentários adicionais</label>
+                                                        <textarea class="form-control bg-dark text-light border-secondary" id="comentarios" name="comentarios" rows="3" placeholder="Explique seu processo, dificuldades encontradas ou qualquer informação relevante sobre o projeto."></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">Entregar Projeto</button>
+                                                </form>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Comentários -->
+                        <div class="mb-4">
+                            <h3 class="fw-bold mb-4">Comentários e Dúvidas</h3>
+                            
+                            <form method="post" action="{% url 'cursos:comentar_aula' aula.id %}" class="mb-4">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <textarea class="form-control bg-dark text-light border-secondary" id="comentario" name="comentario" rows="3" placeholder="Compartilhe sua dúvida ou comentário sobre esta aula..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Enviar Comentário</button>
+                            </form>
+                            
+                            {% if comentarios %}
+                            <div class="comentarios">
+                                {% for comentario in comentarios %}
+                                <div class="card bg-dark border-secondary mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex mb-3">
+                                            <div class="me-3">
+                                                {% if comentario.usuario.foto_perfil %}
+                                                <img src="{{ comentario.usuario.foto_perfil.url }}" class="rounded-circle" width="40" height="40" alt="{{ comentario.usuario.nome }}">
+                                                {% else %}
+                                                <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                                                    </svg>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title mb-1">{{ comentario.usuario.get_full_name }}</h5>
+                                                <p class="text-secondary small mb-0">{{ comentario.criado_em|date:"d/m/Y H:i" }}</p>
+                                            </div>
+                                        </div>
+                                        <p class="card-text">{{ comentario.texto }}</p>
+                                        
+                                        {% if comentario.respostas.all %}
+                                        <div class="ms-5 mt-3">
+                                            {% for resposta in comentario.respostas.all %}
+                                            <div class="card bg-dark-lighter border-secondary mb-2">
+                                                <div class="card-body py-3">
+                                                    <div class="d-flex mb-2">
+                                                        <div class="me-3">
+                                                            {% if resposta.usuario.foto_perfil %}
+                                                            <img src="{{ resposta.usuario.foto_perfil.url }}" class="rounded-circle" width="30" height="30" alt="{{ resposta.usuario.nome }}">
+                                                            {% else %}
+                                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+                                                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4Zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10Z"/>
+                                                                </svg>
+                                                            </div>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div>
+                                                            <h6 class="card-title mb-0">{{ resposta.usuario.get_full_name }}</h6>
+                                                            <p class="text-secondary small mb-1">{{ resposta.criado_em|date:"d/m/Y H:i" }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="card-text mb-0">{{ resposta.texto }}</p>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        
+                                        <button class="btn btn-sm btn-link text-primary mt-2 responder-btn" data-bs-toggle="collapse" data-bs-target="#responder-{{ comentario.id }}">Responder</button>
+                                        
+                                        <div class="collapse mt-3" id="responder-{{ comentario.id }}">
+                                            <form method="post" action="{% url 'cursos:responder_comentario' comentario.id %}">
+                                                {% csrf_token %}
+                                                <div class="mb-3">
+                                                    <textarea class="form-control bg-dark text-light border-secondary" id="resposta" name="resposta" rows="2" placeholder="Escreva sua resposta..."></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-sm btn-primary">Enviar Resposta</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-chat-dots text-secondary mb-3" viewBox="0 0 16 16">
+                                    <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                    <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+                                </svg>
+                                <p class="text-secondary">Seja o primeiro a comentar nesta aula!</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mobile Course Navigation -->
+<div class="d-block d-lg-none fixed-bottom bg-dark border-top border-secondary p-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavigation" aria-controls="offcanvasNavigation">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-list me-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+            Conteúdo do Curso
+        </button>
+        <div>
+            {% if proxima_aula %}
+            <a href="{% url 'cursos:aula' curso.slug proxima_aula.ordem %}" class="btn btn-primary btn-sm">Próxima Aula</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Navigation Sidebar -->
+<div class="offcanvas offcanvas-start bg-dark text-light" tabindex="-1" id="offcanvasNavigation" aria-labelledby="offcanvasNavigationLabel">
+    <div class="offcanvas-header border-bottom border-secondary">
+        <h5 class="offcanvas-title" id="offcanvasNavigationLabel">{{ curso.titulo }}</h5>
+        <button type="button" class="btn-close btn-close-white text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+        <div class="progress mx-3 my-3" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progresso }}%%" aria-valuenow="{{ progresso }}" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div class="accordion" id="accordionMobileModulos">
+            {% for modulo in curso.modulos.all %}
+            <div class="accordion-item bg-dark border-0">
+                <h2 class="accordion-header" id="headingMobile{{ modulo.id }}">
+                    <button class="accordion-button bg-dark text-light {% if modulo == aula.modulo %}{% else %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMobile{{ modulo.id }}" aria-expanded="{% if modulo == aula.modulo %}true{% else %}false{% endif %}" aria-controls="collapseMobile{{ modulo.id }}">
+                        <div>
+                            <small class="text-muted d-block">Módulo {{ forloop.counter }}</small>
+                            <span>{{ modulo.titulo }}</span>
+                        </div>
+                    </button>
+                </h2>
+                <div id="collapseMobile{{ modulo.id }}" class="accordion-collapse collapse {% if modulo == aula.modulo %}show{% endif %}" aria-labelledby="headingMobile{{ modulo.id }}" data-bs-parent="#accordionMobileModulos">
+                    <div class="accordion-body p-0">
+                        <ul class="list-group list-group-flush">
+                            {% for aula_item in modulo.aulas.all %}
+                            <li class="list-group-item bg-dark text-light border-secondary {% if aula_item == aula %}bg-dark-lighter{% endif %}">
+                                <a href="{% url 'cursos:aula' curso.slug aula_item.ordem %}" class="d-flex justify-content-between align-items-center text-decoration-none {% if aula_item == aula %}text-primary{% else %}text-light{% endif %}">
+                                    <div class="d-flex align-items-center">
+                                        {% if aula_concluida %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill text-success me-2" viewBox="0 0 16 16">
+                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                        </svg>
+                                        {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle me-2" viewBox="0 0 16 16">
+                                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                            <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+                                        </svg>
+                                        {% endif %}
+                                        <span>{{ aula_item.titulo }}</span>
+                                    </div>
+                                    <span class="badge bg-dark text-secondary border border-secondary">{{ aula_item.duracao }} min</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

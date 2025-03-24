@@ -1,0 +1,104 @@
+/* Main Styles for VelozAcademy */
+
+:root {
+    --veloz-primary: #61aaa7;
+    --veloz-background: #080b0c;
+    --veloz-accent: #c1d3c9;
+    --veloz-secondary: #545150;
+    --veloz-text: #dee1df;
+    --veloz-purple: #65509c;
+    --veloz-blue: #3d3cac;
+    --veloz-dark: #2d2b2e;
+    --veloz-darkteal: #2f4f4f;
+    --veloz-red: #985a55;
+    --veloz-navyblue: #2b3049;
+}
+
+body {
+    background-color: var(--veloz-background);
+    color: var(--veloz-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.bg-dark {
+    background-color: var(--veloz-background) !important;
+}
+
+.bg-secondary {
+    background-color: var(--veloz-dark) !important;
+}
+
+.text-primary {
+    color: var(--veloz-primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--veloz-primary);
+    border-color: var(--veloz-primary);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.12);
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #4e8a88;
+    border-color: #4e8a88;
+}
+
+.card {
+    background-color: var(--veloz-dark);
+    border: 1px solid var(--veloz-darkteal);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-section {
+    padding: 100px 0;
+    background: linear-gradient(to bottom, rgba(8, 11, 12, 0.95), rgba(8, 11, 12, 0.7)), url('/static/images/hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+}
+
+.feature-card {
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.course-card img, .project-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+.price-card {
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.price-card:hover {
+    transform: translateY(-10px);
+}
+
+.price-highlight {
+    border: 2px solid var(--veloz-primary);
+}
+
+.nav-link {
+    color: var(--veloz-text) !important;
+}
+
+.nav-link:hover {
+    color: var(--veloz-primary) !important;
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: var(--veloz-text) !important;
+    font-weight: 500;
+} 
