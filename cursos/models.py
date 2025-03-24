@@ -32,6 +32,46 @@ class Curso(models.Model):
     def preco_com_desconto(self):
         return self.preco - self.desconto
 
+class Trilha(models.Model):
+    AREA_CHOICES = (
+        ('dados', 'Ciência de Dados'),
+        ('dev', 'Desenvolvimento de Software'),
+        ('automacao', 'Automação'),
+        ('ia', 'Inteligência Artificial'),
+    )
+    
+    nome = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=200, unique=True)
+    descricao = models.TextField()
+    imagem = models.ImageField(upload_to='trilhas/', blank=True, null=True)
+    area = models.CharField(max_length=15, choices=AREA_CHOICES)
+    total_cursos = models.PositiveIntegerField(default=0)
+    total_horas = models.PositiveIntegerField(default=0)
+    cursos = models.ManyToManyField(Curso, related_name='trilhas', blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['nome']
+        verbose_name = 'Trilha'
+        verbose_name_plural = 'Trilhas'
+        
+    def __str__(self):
+        return self.nome
+        
+    def get_absolute_url(self):
+        return reverse('cursos:trilha', args=[self.slug])
+        
+    def atualizar_totais(self):
+        """Atualiza os totais de cursos e horas com base nos cursos relacionados."""
+        self.total_cursos = self.cursos.count()
+        total_horas = 0
+        for curso in self.cursos.all():
+            for modulo in curso.modulos.all():
+                total_horas += modulo.aulas.aggregate(models.Sum('duracao_minutos'))['duracao_minutos__sum'] or 0
+        self.total_horas = total_horas // 60  # Converter minutos para horas
+        self.save()
+
 class Modulo(models.Model):
     curso = models.ForeignKey(Curso, related_name='modulos', on_delete=models.CASCADE)
     titulo = models.CharField(max_length=200)

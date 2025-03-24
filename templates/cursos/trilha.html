@@ -3,236 +3,142 @@
 {% block title %}{{ trilha_nome }} | VelozAcademy{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="py-5 bg-dark">
+<section class="py-5 bg-dark border-bottom">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="col-lg-6 mb-4 mb-lg-0">
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-3">
-                        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-light">Home</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'cursos:lista_trilhas' %}" class="text-light">Trilhas</a></li>
-                        <li class="breadcrumb-item active text-light" aria-current="page">{{ trilha_nome }}</li>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'cursos:lista_trilhas' %}" class="text-decoration-none">Trilhas</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ trilha_nome }}</li>
                     </ol>
                 </nav>
                 <h1 class="display-5 fw-bold mb-3">{{ trilha_nome }}</h1>
-                
-                {% if trilha_slug == 'aplicacoes-ia' %}
-                <p class="lead mb-4">Do zero a seus primeiros agentes IA usando apenas Python. Aprenda a desenvolver aplicações inteligentes e integrar modelos de IA em seus projetos.</p>
-                
-                {% elif trilha_slug == 'dashboards' %}
-                <p class="lead mb-4">Crie dashboards interativos e dinâmicos com Python. Aprenda a visualizar dados de forma eficiente e a construir interfaces intuitivas para análise.</p>
-                
-                {% elif trilha_slug == 'python-office' %}
-                <p class="lead mb-4">Aprenda a criar automações com Python do zero. Automatize tarefas repetitivas, trabalhe com planilhas, documentos e apresentações de forma eficiente.</p>
-                
-                {% elif trilha_slug == 'visao-computacional' %}
-                <p class="lead mb-4">Aprenda a criar sistemas inteligentes com imagens e vídeos. Desenvolva aplicações de reconhecimento facial, detecção de objetos e análise de imagens.</p>
-                
-                {% elif trilha_slug == 'data-science' %}
-                <p class="lead mb-4">Domine a ciência de dados usando Python e Machine Learning. Aprenda a coletar, limpar, analisar e interpretar dados para obter insights valiosos.</p>
-                
-                {% elif trilha_slug == 'analise-dados' %}
-                <p class="lead mb-4">Analise dados profissionalmente usando Python. Aprenda técnicas avançadas de visualização e manipulação de dados para tomada de decisões baseadas em dados.</p>
-                
-                {% elif trilha_slug == 'trading' %}
-                <p class="lead mb-4">Construa estratégias de trading usando o Método Científico. Aprenda a analisar o mercado financeiro, desenvolver modelos quantitativos e automatizar operações.</p>
-                
-                {% elif trilha_slug == 'desenvolvimento-web' %}
-                <p class="lead mb-4">Do front-end ao back-end, aprenda a construir aplicações web completas e modernas com as tecnologias mais utilizadas no mercado.</p>
-                
-                {% else %}
-                <p class="lead mb-4">Explore esta trilha de conhecimento e desenvolva novas habilidades com Python.</p>
-                {% endif %}
-                
-                <div class="d-flex flex-wrap gap-3 mb-4">
-                    <div class="bg-dark-subtle px-3 py-2 rounded-3">
-                        <div class="d-flex align-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-collection me-2" viewBox="0 0 16 16">
-                                <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
-                            </svg>
-                            <span>{{ cursos|length }} cursos</span>
-                        </div>
+                <p class="lead mb-4">Desenvolva suas habilidades em {{ trilha_nome }} de forma estruturada e eficiente.</p>
+                <div class="d-inline-flex align-items-center">
+                    <div class="me-4">
+                        <span class="d-block fw-bold text-primary">{{ cursos.count }}</span>
+                        <small>Cursos</small>
                     </div>
-                    <div class="bg-dark-subtle px-3 py-2 rounded-3">
-                        <div class="d-flex align-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-clock me-2" viewBox="0 0 16 16">
-                                <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                            </svg>
-                            {% if trilha_slug == 'aplicacoes-ia' %}
-                            <span>49 horas</span>
-                            {% elif trilha_slug == 'dashboards' %}
-                            <span>39 horas</span>
-                            {% elif trilha_slug == 'python-office' %}
-                            <span>47 horas</span>
-                            {% elif trilha_slug == 'visao-computacional' %}
-                            <span>22 horas</span>
-                            {% elif trilha_slug == 'data-science' %}
-                            <span>29 horas</span>
-                            {% elif trilha_slug == 'analise-dados' %}
-                            <span>24 horas</span>
-                            {% elif trilha_slug == 'trading' %}
-                            <span>24 horas</span>
-                            {% elif trilha_slug == 'desenvolvimento-web' %}
-                            <span>48 horas</span>
-                            {% else %}
-                            <span>40+ horas</span>
-                            {% endif %}
-                        </div>
+                    <div class="me-4">
+                        <span class="d-block fw-bold text-primary">{{ cursos|length|multiply:10 }}</span>
+                        <small>Horas</small>
                     </div>
-                    <div class="bg-dark-subtle px-3 py-2 rounded-3">
-                        <div class="d-flex align-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-trophy me-2" viewBox="0 0 16 16">
-                                <path d="M2.5.5A.5.5 0 0 1 3 0h10a.5.5 0 0 1 .5.5c0 .538-.012 1.05-.034 1.536a3 3 0 1 1-1.133 5.89c-.79 1.865-1.878 2.777-2.833 3.011v2.173l1.425.356c.194.048.377.135.537.255L13.3 15.1a.5.5 0 0 1-.3.9H3a.5.5 0 0 1-.3-.9l1.838-1.379c.16-.12.343-.207.537-.255L6.5 13.11v-2.173c-.955-.234-2.043-1.146-2.833-3.012a3 3 0 1 1-1.132-5.89A33.076 33.076 0 0 1 2.5.5zm.099 2.54a2 2 0 0 0 .72 3.935c-.333-1.05-.588-2.346-.72-3.935zm10.083 3.935a2 2 0 0 0 .72-3.935c-.133 1.59-.388 2.885-.72 3.935zM3.504 1c.007.517.026 1.006.056 1.469.13 2.028.457 3.546.87 4.667C5.294 9.48 6.484 10 7 10a.5.5 0 0 1 .5.5v2.61a1 1 0 0 1-.757.97l-1.426.356a.5.5 0 0 0-.179.085L4.5 15h7l-.638-.479a.501.501 0 0 0-.18-.085l-1.425-.356a1 1 0 0 1-.757-.97V10.5A.5.5 0 0 1 9 10c.516 0 1.706-.52 2.57-2.864.413-1.12.74-2.64.87-4.667.03-.463.049-.952.056-1.469H3.504z"/>
-                            </svg>
-                            <span>Certificado</span>
-                        </div>
+                    <div>
+                        <span class="d-block fw-bold text-primary">47</span>
+                        <small>Alunos</small>
                     </div>
-                </div>
-                
-                <div class="mb-4">
-                    <a href="#" class="btn btn-primary btn-lg me-2">Matricular-se</a>
-                    <a href="#cursos" class="btn btn-outline-light btn-lg">Ver cursos</a>
                 </div>
             </div>
-            <div class="col-lg-4 text-center">
-                <img src="/static/images/trilhas/{{ trilha_slug }}.svg" alt="{{ trilha_nome }}" class="img-fluid" style="max-height: 300px;">
+            <div class="col-lg-6 text-center">
+                <img src="/static/images/cursos-hero.svg" alt="{{ trilha_nome }}" class="img-fluid">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Info Section -->
-<section class="py-5 bg-dark-subtle">
+<section id="trilha-info" class="py-5 bg-dark">
     <div class="container">
-        <div class="row mb-5">
-            <div class="col-lg-8 mx-auto text-center">
-                <h2 class="fw-bold mb-4">Sobre esta Trilha</h2>
-                <p class="lead mb-0">Esta trilha foi desenvolvida para fornecer uma experiência de aprendizado completa e estruturada, permitindo que você desenvolva suas habilidades de forma progressiva.</p>
-            </div>
-        </div>
-        
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 bg-dark border-0 shadow-sm">
-                    <div class="card-body p-4 text-light">
-                        <div class="text-primary mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-lightning-charge" viewBox="0 0 16 16">
-                                <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z"/>
-                            </svg>
-                        </div>
-                        <h4 class="fw-bold mb-3">Do Básico ao Avançado</h4>
-                        <p>A trilha é estruturada para acompanhar seu progresso, começando com conceitos fundamentais e avançando para técnicas mais sofisticadas.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 bg-dark border-0 shadow-sm">
-                    <div class="card-body p-4 text-light">
-                        <div class="text-primary mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-code-square" viewBox="0 0 16 16">
-                                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                                <path d="M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z"/>
-                            </svg>
-                        </div>
-                        <h4 class="fw-bold mb-3">Projetos Práticos</h4>
-                        <p>Cada curso inclui projetos práticos para consolidar o aprendizado e construir um portfólio de trabalhos reais.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 bg-dark border-0 shadow-sm">
-                    <div class="card-body p-4 text-light">
-                        <div class="text-primary mb-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-workspace" viewBox="0 0 16 16">
-                                <path d="M4 16s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H4Zm4-5.95a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
-                                <path d="M2 1a2 2 0 0 0-2 2v9.5A1.5 1.5 0 0 0 1.5 14h.653a5.373 5.373 0 0 1 1.066-2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9h-2.219c.554.654.89 1.373 1.066 2h.653a1.5 1.5 0 0 0 1.5-1.5V3a2 2 0 0 0-2-2H2Z"/>
-                            </svg>
-                        </div>
-                        <h4 class="fw-bold mb-3">Suporte Especializado</h4>
-                        <p>Tenha acesso a instrutores especializados e uma comunidade de alunos para ajudar em seu processo de aprendizado.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Cursos Section -->
-<section id="cursos" class="py-5 bg-dark">
-    <div class="container">
-        <h2 class="fw-bold text-center mb-5">Cursos Nesta Trilha</h2>
-        
-        <div class="row g-4">
-            {% if cursos %}
-                {% for curso in cursos %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 bg-dark-subtle border-0 shadow-sm hover-zoom">
-                        <div class="position-relative">
-                            {% if curso.imagem %}
-                            <img src="{{ curso.imagem.url }}" class="card-img-top" alt="{{ curso.titulo }}" style="height: 200px; object-fit: cover;">
-                            {% else %}
-                            <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-code-square" viewBox="0 0 16 16">
-                                    <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                                    <path d="M6.854 4.646a.5.5 0 0 1 0 .708L4.207 8l2.647 2.646a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0zm2.292 0a.5.5 0 0 0 0 .708L11.793 8l-2.647 2.646a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708 0z"/>
-                                </svg>
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-4">Cursos Incluídos na Trilha</h2>
+                
+                {% if cursos %}
+                <div class="card bg-dark-subtle border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <div>
+                                <h5 class="mb-1">Progresso Total</h5>
+                                <p class="text-muted mb-0">Conclua todos os cursos para receber seu certificado</p>
                             </div>
-                            {% endif %}
-                            <span class="position-absolute top-0 end-0 badge bg-{{ curso.nivel|default:'primary' }} m-2 px-3 py-2 rounded-pill">{{ curso.get_nivel_display }}</span>
+                            <div class="progress mt-2 mt-md-0" style="height: 10px; width: 200px;">
+                                <div class="progress-bar" role="progressbar" style="width: 15%;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
                         </div>
-                        <div class="card-body p-4">
-                            <h5 class="card-title fw-bold mb-3">{{ curso.titulo }}</h5>
-                            <p class="card-text text-muted mb-4" style="height: 4.5rem; overflow: hidden;">{{ curso.descricao|truncatechars:120 }}</p>
-                            
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="d-flex align-items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock me-2" viewBox="0 0 16 16">
-                                        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                                    </svg>
-                                    <span class="text-muted">
-                                        {% with total_aulas=curso.modulos.count %}
-                                        {{ total_aulas }} módulo{{ total_aulas|pluralize }}
-                                        {% endwith %}
-                                    </span>
+                    </div>
+                </div>
+                
+                <div class="list-group shadow-sm mb-4">
+                    {% for curso in cursos %}
+                    <a href="{% url 'cursos:detalhe' curso.id %}" class="list-group-item list-group-item-action bg-dark-subtle p-4 border-0 mb-3 d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 fs-4 text-primary fw-bold">{{ forloop.counter }}</div>
+                            <div>
+                                <h5 class="mb-1">{{ curso.titulo }}</h5>
+                                <p class="text-muted mb-0">{{ curso.descricao|truncatechars:120 }}</p>
+                                <div class="mt-2">
+                                    <span class="badge bg-primary me-2">{{ curso.nivel|title }}</span>
+                                    <span class="badge bg-secondary">10 horas</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer bg-dark-subtle border-0 pt-0">
-                            <div class="d-grid">
-                                <a href="{% url 'cursos:detalhe' curso.id %}" class="btn btn-primary">
-                                    Ver Curso
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                                    </svg>
-                                </a>
-                            </div>
+                        <div class="progress ms-3 d-none d-md-block" style="height: 10px; width: 100px;">
+                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                
+                {% else %}
+                <div class="alert bg-dark-subtle p-4 border-0 shadow-sm">
+                    <h5 class="mb-2">Nenhum curso disponível</h5>
+                    <p class="mb-0">No momento, não há cursos associados a esta trilha. Por favor, verifique novamente em breve.</p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card bg-dark-subtle border-0 shadow-sm sticky-top" style="top: 20px; z-index: 100;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Certificação da Trilha</h5>
+                        <p class="mb-4">Conclua todos os cursos para receber seu certificado da trilha {{ trilha_nome }}.</p>
+                        
+                        <div class="text-center py-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-award text-primary" viewBox="0 0 16 16">
+                                <path d="M9.669.864 8 0 6.331.864l-1.858.282-.842 1.68-1.337 1.32L2.6 6l-.306 1.854 1.337 1.32.842 1.68 1.858.282L8 12l1.669-.864 1.858-.282.842-1.68 1.337-1.32L13.4 6l.306-1.854-1.337-1.32-.842-1.68L9.669.864zm1.196 1.193.684 1.365 1.086 1.072L12.387 6l.248 1.506-1.086 1.072-.684 1.365-1.51.229L8 10.874l-1.355-.702-1.51-.229-.684-1.365-1.086-1.072L3.614 6l-.25-1.506 1.087-1.072.684-1.365 1.51-.229L8 1.126l1.356.702 1.509.229z"/>
+                                <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1 4 11.794z"/>
+                            </svg>
+                        </div>
+                        
+                        <div class="d-grid mb-4">
+                            <a href="{% url 'cursos:detalhe' cursos.first.id %}" class="btn btn-primary py-3">
+                                Iniciar Trilha
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                </svg>
+                            </a>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-3">O que você aprenderá</h6>
+                            <ul class="list-group list-group-flush">
+                                {% if trilha_slug == 'aplicacoes-ia' %}
+                                <li class="list-group-item bg-transparent ps-0 py-2">Conceitos de IA e Machine Learning</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Processamento de linguagem natural</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Desenvolvimento de apps de IA com Python</li>
+                                {% elif trilha_slug == 'python-office' %}
+                                <li class="list-group-item bg-transparent ps-0 py-2">Automação de planilhas Excel</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Manipulação de documentos Word e PDF</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Integração com e-mail e calendários</li>
+                                {% elif trilha_slug == 'data-science' %}
+                                <li class="list-group-item bg-transparent ps-0 py-2">Análise exploratória de dados</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Machine Learning com scikit-learn</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Visualização de dados avançada</li>
+                                {% else %}
+                                <li class="list-group-item bg-transparent ps-0 py-2">Fundamentos técnicos da área</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Aplicações práticas em projetos reais</li>
+                                <li class="list-group-item bg-transparent ps-0 py-2">Integração com ferramentas do mercado</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h6 class="fw-bold mb-3">Público Alvo</h6>
+                            <p class="mb-0">Esta trilha é recomendada para alunos com conhecimento básico de programação que queiram desenvolver suas habilidades técnicas na área.</p>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
-            {% else %}
-                <div class="col-12 text-center">
-                    <div class="alert bg-dark-subtle border-0 p-4">
-                        <h4 class="mb-3">Nenhum curso encontrado</h4>
-                        <p class="mb-0">Estamos trabalhando para adicionar cursos a esta trilha. Volte em breve!</p>
-                    </div>
-                </div>
-            {% endif %}
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-5 bg-primary">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8 mx-auto text-center text-white">
-                <h2 class="fw-bold mb-3">Pronto para começar sua jornada?</h2>
-                <p class="lead mb-4">Matricule-se na trilha completa e tenha acesso a todos os cursos, material de apoio e certificado.</p>
-                <a href="#" class="btn btn-light btn-lg px-5">Matricular-se Agora</a>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Curso
+from .models import Curso, Trilha
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -83,39 +83,14 @@ def detalhe_curso(request, curso_id):
     return render(request, 'cursos/detalhe.html', {'curso': curso})
 
 def trilha_cursos(request, trilha_slug):
-    trilhas = {
-        'aplicacoes-ia': 'Aplicações IA com Python',
-        'dashboards': 'Dashboards Interativos com Python',
-        'python-office': 'Python Office',
-        'visao-computacional': 'Visão Computacional',
-        'data-science': 'Data Science e Machine Learning',
-        'analise-dados': 'Análise e Visualização de Dados',
-        'trading': 'Trading Quantitativo'
-    }
+    # Buscar a trilha pelo slug
+    trilha = get_object_or_404(Trilha, slug=trilha_slug)
     
-    trilha_nome = trilhas.get(trilha_slug, 'Trilha não encontrada')
-    
-    # Filtrando cursos que pertencem à trilha (simulação)
-    # Em um ambiente real, você teria um modelo de Trilha relacionado a Curso
-    if trilha_slug == 'aplicacoes-ia':
-        cursos = Curso.objects.filter(Q(titulo__icontains='IA') | Q(descricao__icontains='Inteligência Artificial'))
-    elif trilha_slug == 'dashboards':
-        cursos = Curso.objects.filter(Q(titulo__icontains='Dashboard') | Q(descricao__icontains='Dashboard'))
-    elif trilha_slug == 'python-office':
-        cursos = Curso.objects.filter(Q(titulo__icontains='Office') | Q(descricao__icontains='Automação'))
-    elif trilha_slug == 'visao-computacional':
-        cursos = Curso.objects.filter(Q(titulo__icontains='Visão') | Q(descricao__icontains='Imagem'))
-    elif trilha_slug == 'data-science':
-        cursos = Curso.objects.filter(Q(titulo__icontains='Data') | Q(descricao__icontains='Machine Learning'))
-    elif trilha_slug == 'analise-dados':
-        cursos = Curso.objects.filter(Q(titulo__icontains='Análise') | Q(descricao__icontains='Dados'))
-    elif trilha_slug == 'trading':
-        cursos = Curso.objects.filter(Q(titulo__icontains='Trading') | Q(descricao__icontains='Financeiro'))
-    else:
-        cursos = Curso.objects.all()
+    # Obter os cursos associados à trilha
+    cursos = trilha.cursos.all()
     
     return render(request, 'cursos/trilha.html', {
-        'trilha_nome': trilha_nome,
+        'trilha_nome': trilha.nome,
         'trilha_slug': trilha_slug,
         'cursos': cursos
     })
@@ -125,88 +100,18 @@ def lista_trilhas(request):
     search = request.GET.get('search', '')
     area = request.GET.get('area', '')
     
-    # Lista de todas as trilhas disponíveis
-    trilhas = [
-        {
-            'slug': 'aplicacoes-ia',
-            'nome': 'Aplicações IA com Python',
-            'descricao': 'Aprenda a desenvolver aplicações práticas utilizando inteligência artificial e Python.',
-            'imagem': '/static/images/trilhas/ia.jpg',
-            'area': 'ia',
-            'total_cursos': 7,
-            'total_horas': 42
-        },
-        {
-            'slug': 'dashboards',
-            'nome': 'Dashboards Interativos com Python',
-            'descricao': 'Crie visualizações de dados impressionantes e painéis interativos com Python.',
-            'imagem': '/static/images/trilhas/dashboards.jpg',
-            'area': 'dados',
-            'total_cursos': 5,
-            'total_horas': 35
-        },
-        {
-            'slug': 'python-office',
-            'nome': 'Python Office',
-            'descricao': 'Automatize tarefas de escritório e aumente sua produtividade com Python.',
-            'imagem': '/static/images/trilhas/office.jpg',
-            'area': 'automacao',
-            'total_cursos': 4,
-            'total_horas': 28
-        },
-        {
-            'slug': 'visao-computacional',
-            'nome': 'Visão Computacional',
-            'descricao': 'Desenvolva sistemas que podem ver e interpretar o mundo visual.',
-            'imagem': '/static/images/trilhas/visao.jpg',
-            'area': 'ia',
-            'total_cursos': 6,
-            'total_horas': 38
-        },
-        {
-            'slug': 'data-science',
-            'nome': 'Data Science e Machine Learning',
-            'descricao': 'Do básico ao avançado em ciência de dados e aprendizado de máquina.',
-            'imagem': '/static/images/trilhas/data-science.jpg',
-            'area': 'dados',
-            'total_cursos': 8,
-            'total_horas': 45
-        },
-        {
-            'slug': 'analise-dados',
-            'nome': 'Análise e Visualização de Dados',
-            'descricao': 'Aprenda a extrair insights valiosos de conjuntos de dados e apresentá-los visualmente.',
-            'imagem': '/static/images/trilhas/analise-dados.jpg',
-            'area': 'dados',
-            'total_cursos': 6,
-            'total_horas': 32
-        },
-        {
-            'slug': 'trading',
-            'nome': 'Trading Quantitativo',
-            'descricao': 'Desenvolva estratégias de trading algorítmico e análise de mercado com Python.',
-            'imagem': '/static/images/trilhas/trading.jpg',
-            'area': 'dados',
-            'total_cursos': 5,
-            'total_horas': 30
-        },
-        {
-            'slug': 'desenvolvimento-web',
-            'nome': 'Desenvolvimento Web Fullstack',
-            'descricao': 'Do front-end ao back-end, aprenda a construir aplicações web completas e modernas.',
-            'imagem': '/static/images/trilhas/web.jpg',
-            'area': 'dev',
-            'total_cursos': 9,
-            'total_horas': 48
-        }
-    ]
+    # Iniciar queryset
+    trilhas = Trilha.objects.all()
     
     # Aplicar filtros
     if search:
-        trilhas = [t for t in trilhas if search.lower() in t['nome'].lower() or search.lower() in t['descricao'].lower()]
+        trilhas = trilhas.filter(
+            Q(nome__icontains=search) | 
+            Q(descricao__icontains=search)
+        )
     
     if area:
-        trilhas = [t for t in trilhas if t.get('area') == area]
+        trilhas = trilhas.filter(area=area)
     
     return render(request, 'cursos/lista_trilhas.html', {
         'trilhas': trilhas,

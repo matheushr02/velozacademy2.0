@@ -24,7 +24,7 @@
         <div class="row justify-content-center text-center">
             <div class="col-md-4 col-sm-6 mb-3 mb-md-0">
                 <div class="d-flex flex-column align-items-center">
-                    <h3 class="fw-bold text-primary mb-1">7+</h3>
+                    <h3 class="fw-bold text-primary mb-1">{{ trilhas|length }}+</h3>
                     <p class="mb-0">Trilhas</p>
                 </div>
             </div>
@@ -111,7 +111,7 @@
                 <div class="card h-100 bg-dark-subtle border-0 shadow-sm hover-zoom">
                     <div class="position-relative">
                         {% if trilha.imagem %}
-                        <img src="{{ trilha.imagem }}" class="card-img-top" alt="{{ trilha.nome }}" style="height: 200px; object-fit: cover;">
+                        <img src="{{ trilha.imagem.url }}" class="card-img-top" alt="{{ trilha.nome }}" style="height: 200px; object-fit: cover;">
                         {% else %}
                         <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-bezier" viewBox="0 0 16 16">
@@ -126,8 +126,8 @@
                         <p class="card-text text-muted mb-4" style="height: 4.5rem; overflow: hidden;">{{ trilha.descricao|truncatechars:120 }}</p>
                         
                         <div class="mb-3">
-                            <span class="badge bg-primary me-2">{{ trilha.total_cursos|default:"5" }} cursos</span>
-                            <span class="badge bg-secondary me-2">{{ trilha.total_horas|default:"30" }} horas</span>
+                            <span class="badge bg-primary me-2">{{ trilha.total_cursos }} cursos</span>
+                            <span class="badge bg-secondary me-2">{{ trilha.total_horas }} horas</span>
                         </div>
                     </div>
                     <div class="card-footer bg-dark-subtle border-0 pt-0">
