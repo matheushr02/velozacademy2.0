@@ -1,7 +1,7 @@
-Django==4.2.20
+Django==5.0.6
 Pillow==10.4.0
 python-dotenv==1.0.0
-django-crispy-forms==2.0
-crispy-bootstrap5==0.7
-django-filter==23.2
-pytz==2023.3
+django-crispy-forms==2.1
+crispy-bootstrap5==2023.10
+django-filter==24.1
+pytz==2024.1
