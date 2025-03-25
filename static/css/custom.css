@@ -178,3 +178,62 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
     background-color: #f8f9fa !important;
     border-color: #dee2e6 !important;
 } 
+
+/*combo@* Sidebar Estilo / Sidebar Styling */
+.sidebar {
+    transition: all 0.3s;
+    z-index: 1000;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.content-wrapper {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/*@ Sidebar comportamento no Mobile / Mobile Sidebar behavior */
+@media (max-width: 767px) {
+    .sidebar {
+        width: 80px;
+    }
+
+    .sidebar .d-sm-inline {
+        display: none !important;
+    }
+    .sidebar .fs-4 {
+        font-size: 1rem !important;
+    }
+    
+    .content-wrapper {
+        margin-left: 80px;
+    }
+}
+
+/*@ Para telas muito pequenas, sidebar pode ser encolhida */
+/*todo: fazer isso até para telas médias */
+@media (max-width: 576px) {
+    .sidebar {
+        margin-left: -80px;
+        position: fixed;
+        height: 100%;
+    }
+
+    .sidebar.active {
+        margin-left: 0;
+    }
+
+    .content-wrapper {
+        margin-left: 0;
+    }
+
+    body.sidebar-active .content-wrapper {
+        margin-left: 80px;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1050;
+    }
+}

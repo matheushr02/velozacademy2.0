@@ -69,3 +69,17 @@ window.addEventListener('scroll', function() {
         header.classList.remove('shadow-sm');
     }
 }); 
+
+//+ Sidebar botão clicavel no mobile
+document.addEventListener('DOMContentLoaded', function() {
+    //? checa se o sidebar bptão clivavel exite
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.body.classList.toggle('sidebar-active');
+            
+        });
+        //todo Adicionar animação de transição ao abrir/fechar a sidebar
+    }
+});
