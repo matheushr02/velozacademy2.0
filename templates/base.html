@@ -39,24 +39,24 @@
                         <!--? Sidebar links, items de navegação-->
                         <!--combo*@ remover se redundante-->
                         <li class="nav-item w-100">
-                            <a href="{% url 'home' %}" class="nav-link align-middle px-0 text-white {% if request.path == '/' %}active{% endif %}">
-                                <i class="bi bi-house-door"></i> <span class="ms-1 d-none d-sm-inline">Home</span>
+                            <a href="{% url 'home' %}" class="nav-link px-3 align-middle text-white {% if request.path == '/' %}active{% endif %}">
+                                <i class="bi bi-house-door"></i> <span class="ms-2 d-none d-sm-inline">Home</span>
                             </a>
                         </li>
                         
                         <li class="nav-item w-100">
-                            <a href="{% url 'cursos:lista_trilhas' %}" class="nav-link px-0 align-middle text-white {% if '/cursos/trilhas/' in request.path %}active{% endif %}">
-                                <i class="bi bi-collection-play"></i> <span class="ms-1 d-none d-sm-inline">Trilhas</span>
+                            <a href="{% url 'cursos:lista_trilhas' %}" class="nav-link px-3 align-middle text-white {% if '/cursos/trilhas/' in request.path %}active{% endif %}">
+                                <i class="bi bi-collection-play"></i> <span class="ms-2 d-none d-sm-inline">Trilhas</span>
                             </a>
                         </li>
                         <li class="nav-item w-100">
-                            <a href="{% url 'cursos:lista' %}" class="nav-link px-0 align-middle text-white {% if '/cursos/' in request.path and not '/cursos/trilhas/' in request.path %}active{% endif %}">
-                                <i class="bi bi-collection-play"></i> <span class="ms-1 d-none d-sm-inline">Cursos</span>
+                            <a href="{% url 'cursos:lista' %}" class="nav-link px-3 align-middle text-white {% if '/cursos/' in request.path and not '/cursos/trilhas/' in request.path %}active{% endif %}">
+                                <i class="bi bi-collection-play"></i> <span class="ms-2 d-none d-sm-inline">Cursos</span>
                             </a>
                         </li>
                         <li class="nav-item w-100">
-                            <a href="{% url 'projetos:lista' %}" class="nav-link px-0 align-middle text-white {% if '/projetos/' in request.path %}active{% endif %}">
-                                <i class="bi bi-code-square"></i> <span class="ms-1 d-none d-sm-inline">Projetos</span>
+                            <a href="{% url 'projetos:lista' %}" class="nav-link px-3 align-middle text-white {% if '/projetos/' in request.path %}active{% endif %}">
+                                <i class="bi bi-code-square"></i> <span class="ms-2 d-none d-sm-inline">Projetos</span>
                             </a>
                         </li>
                         <!--* adicionar mais itens de navegação se precisar -->
