@@ -257,7 +257,7 @@ body.sidebar-active .sidebar-overlay {
     top: 10px;
     left: 10px;
     z-index: 1060;
-    transition: left 0.3s ease;
+    transition: left 0.3s cubic-bezier(0.25,0.1, 0.25, 1);
     padding: 6px 10px;
     border-radius: 4px;
 }
@@ -285,10 +285,7 @@ footer {
         background-color: #212529;
         z-index: 1050;
         height: 100vh;
-    }
-
-    .sidebar, .sidebar-toggle {
-        transition: all 0.3s ease; /*+ Transição do butão junto com sidebar */
+        transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
     }
 
     .sidebar.active {
