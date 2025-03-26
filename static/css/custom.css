@@ -251,7 +251,21 @@ footer {
 
     .sidebar.active {
         margin-left: 0;
+        width: 240px;
     }    
+
+    /*? Mostra texto quando a sidebar está ativa */
+    .sidebar .d-none.d-sm-inline { 
+        display: none;
+    }
+
+    .sidebar.active .d-none.d-sm-inline {
+        display: inline !important;
+    }
+
+    .sidebar.active .w-100 {
+        width: 100% !important;
+    }
 
     .content-wrapper {
         margin-left: 0 !important;
