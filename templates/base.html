@@ -19,10 +19,12 @@
     {% block styles %}{% endblock %}
 </head>
 <body>
+    <!--! AVISO o base.html é o menu, ele é o mesmo entre todas as telas-->
     <!--? Botão Mobile Sidebar (visivel apenas em telas bem pequenas) -->
     <button class="btn btn-primary sidebar-toggle d-md-none">
         <i class="bi bi-list"></i>
     </button>
+    <div class="sidebar-overlay"></div>
 
     <!-- Header -->
     <div  class="container-fluid">
@@ -97,6 +99,10 @@
             <div class="col py-3 content-wrapper">
                 <!--? Main Content aqui do base.html-->
                 {% block content %}{% endblock %}
+
+                <!--+ Footer aqui para interação com sidebar se o sticky não funcionar-->
+
+
             </div>
         </div>
     </div>
