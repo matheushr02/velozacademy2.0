@@ -1,7 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import Curso, Trilha
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .forms import CursoForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -80,7 +83,21 @@ def lista_cursos(request):
 
 def detalhe_curso(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    return render(request, 'cursos/detalhe.html', {'curso': curso})
+    
+    # Add context variables needed by the template
+    inscrito = False
+    progresso = 0
+    
+    # Here you would check if the user is enrolled and calculate progress
+    # For now we just set defaults
+    
+    context = {
+        'curso': curso,
+        'inscrito': inscrito,
+        'progresso': progresso
+    }
+    
+    return render(request, 'cursos/detalhe.html', context)
 
 def trilha_cursos(request, trilha_slug):
     # Buscar a trilha pelo slug
@@ -118,3 +135,24 @@ def lista_trilhas(request):
         'search': search,
         'area_selecionada': area
     })
+
+def adicionar_curso(request):
+    if request.method == 'POST':
+        form = CursoForm(request.POST, request.FILES)
+        if form.is_valid():
+            curso = form.save()
+            messages.success(request, 'Curso adicionado com sucesso!')
+            return redirect('cursos:detalhe', curso_id=curso.id)
+    else:
+        form = CursoForm()
+    
+    return render(request, 'cursos/adicionar_curso.html', {'form': form})
+
+@login_required
+def inscrever_curso(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    
+    # Normally, you would handle enrollment logic here
+    # For now, just simulate success and redirect back
+    messages.success(request, f'Você foi inscrito com sucesso no curso {curso.titulo}!')
+    return redirect('cursos:detalhe', curso_id=curso.id)

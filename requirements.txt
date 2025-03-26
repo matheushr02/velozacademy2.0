@@ -5,3 +5,4 @@ django-crispy-forms==2.1
 crispy-bootstrap5==2023.10
 django-filter==24.1
 pytz==2024.1
+django-widget-tweaks==1.4.12
