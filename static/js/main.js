@@ -72,14 +72,35 @@ window.addEventListener('scroll', function() {
 
 //+ Sidebar botão clicavel no mobile
 document.addEventListener('DOMContentLoaded', function() {
-    //? checa se o sidebar bptão clivavel exite
+    //? checa se o sidebar botão clicável existe
     const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('active');
+            sidebar.classList.toggle('active');
+            ////document.querySelector('.sidebar').classList.toggle('active');
             document.body.classList.toggle('sidebar-active');
             
         });
         //todo Adicionar animação de transição ao abrir/fechar a sidebar
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.classList.remove('sidebar-active');
+        });
+    }
+
+    //? fecha a sidebar quando clicado no item menu no mobile
+    const menuLinks = document.querySelectorAll('.sidebar .nav-link');
+    if (window.innerWidth <= 576) {
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-active');
+            });
+        });
     }
 });

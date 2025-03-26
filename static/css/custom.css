@@ -19,6 +19,11 @@ html, body, header, main, footer,
                 border-color 0.4s ease !important;
 }
 
+footer {
+    position: relative;
+    z-index: 1000; /*+ o footer está acima da sidebar */
+}
+
 /* Animação para entrada de cards */
 .card {
     opacity: 0;
@@ -180,42 +185,118 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
 } 
 
 /*combo@* Sidebar Estilo / Sidebar Styling */
+/*todo: colocar uma imagem de fundo no futuro */
 .sidebar {
     transition: all 0.3s;
-    z-index: 1000;
+    z-index: 1050;
+    background-color: #212529;;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
+    /*
+    position: sticky; /+ Faz a sidebar ficar no topo da tela /
+    top: 0; /+ Alinha a sidebar ao topo da tela 
+    */
+    height: 100vh; /*+ Faz a sidebar ocupar toda altura da tela */
+    overflow-y: auto; /*+ permite rolar verticalmente se exceder a altura da tela */
 }
 
 .content-wrapper {
     padding-left: 15px;
     padding-right: 15px;
+    min-height: calc(100vh - 400px); /*+ Ajusta a altura baseado no footer */ 
+    /*todo: fazer com que o sidebar fique por cima do conteudo no mobile */
+}
+/*combo@? Sidebar Overlay para mobile / Sidebar Overlay for mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+}
+
+body.sidebar-active .sidebar-overlay {
+    display: block;
+}
+
+/*combo@? Consistencia z-index hierarquia */
+.sidebar-toggle {
+    z-index: 1060;
+}
+
+footer {
+    position: relative;
+    z-index: 1000; /*+ Mantem o footer acima da sidebar */
 }
 
 /*@ Sidebar comportamento no Mobile / Mobile Sidebar behavior */
-@media (max-width: 767px) {
+/*combo@? Ajusta o tamanho para telas grandes; Desktop */
+@media (min-width: 1200px) {
     .sidebar {
-        width: 80px;
+        position: sticky;
+        top: 0;
+        width: auto;
     }
 
-    .sidebar .d-sm-inline {
+    .content-wrapper {
+        margin-left: 16.67%; 
+    }
+}
+
+/*combo@? Ajusta tamanho para telas de tamanho médio; Tablet */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .sidebar {
+        position: sticky;
+        top: 0;
+        width: auto;
+    }
+
+    .content-wrapper {
+        margin-left: 25%;
+    }
+}
+
+/*combo@? Ajusta tamanho para telas pequenas; Mobile */
+@media (max-width: 767px) and (min-width: 577px) {
+    .sidebar {
+        /*width: 80px;*/
+        position: fixed;
+        /*z-index: 1050; + Adiciona z-index para garantir que a sidebar fique por cima do conteúdo */
+        /*background-color: #212529; + Sidebar com um background solido não trasparente*/
+        /*height: 100vh;*/
+        width: 80px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /*+ adiciona sobra para profundidade */
+    }
+
+    /*.sidebar .d-sm-inline {
         display: none !important;
     }
     .sidebar .fs-4 {
         font-size: 1rem !important;
-    }
+    }*/
     
     .content-wrapper {
         margin-left: 80px;
     }
+
+    /*footer {
+        z-index: 990; /+ Mantem o z-index abaixo da sidebar no mobile/
+    }
+    */
 }
 
-/*@ Para telas muito pequenas, sidebar pode ser encolhida */
-/*todo: fazer isso até para telas médias */
+/*combo@? Para telas muito pequenas; Small Mobile */
 @media (max-width: 576px) {
     .sidebar {
-        margin-left: -80px;
         position: fixed;
-        height: 100%;
+        /*height: 100%;*/
+        /*z-index: 1050; + Mantem o z-index acima do footer */
+        /*background-color: #212529; + Cria um background solido não trasparente */
+        width: 80px;
+        margin-left: -80px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3); 
     }
 
     .sidebar.active {
@@ -223,17 +304,17 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
     }
 
     .content-wrapper {
-        margin-left: 0;
+        margin-left: 0 !important;
     }
-
+    /*
     body.sidebar-active .content-wrapper {
         margin-left: 80px;
-    }
+    }*/
 
     .sidebar-toggle {
         position: fixed;
         top: 10px;
         left: 10px;
-        z-index: 1050;
+        /*z-index: 1060; + Mantem o z-index acima do footer */
     }
 }
