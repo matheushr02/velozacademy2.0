@@ -226,6 +226,7 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
 
 .content-wrapper {
     padding-left: 0;
+    padding-top: 0 !important;
     padding-right: 15px;
     min-height: calc(100vh - 400px); /*+ Ajusta a altura baseado no footer */ 
     /*todo: fazer com que o sidebar fique por cima do conteudo no mobile */
@@ -331,6 +332,12 @@ footer {
 
     .content-wrapper {
         margin-left: 0;
+        margin-top: 0;
+        padding-right: 6px;
+    }
+
+    footer.mt-5 {
+        margin-top: 0 !important;
     }
 }
 
@@ -343,6 +350,10 @@ footer {
     }
 
     .content-wrapper {
-        margin-left: 0; 
+        margin-left: 0;
+    }
+
+    footer.mt-5 {
+        margin-top: 0 !important;
     }
 }
