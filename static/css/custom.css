@@ -195,12 +195,42 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
     overflow-y: auto; /*+ permite rolar verticalmente se exceder a altura da tela */
 }
 
+/* Light mode sidebar styling */
+[data-bs-theme="light"] .sidebar {
+    background-color: #f8f9fa;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+[data-bs-theme="light"] .sidebar .text-white,
+[data-bs-theme="light"] .sidebar .nav-link.text-white {
+    color: #212529 !important;
+}
+
+[data-bs-theme="light"] .sidebar .dropdown-menu-dark {
+    background-color: #fff;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-bs-theme="light"] .sidebar .dropdown-menu-dark .dropdown-item {
+    color: #212529;
+}
+
+[data-bs-theme="light"] .sidebar hr {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-bs-theme="light"] .sidebar .btn-outline-secondary {
+    color: #495057;
+    border-color: #ced4da;
+}
+
 .content-wrapper {
-    padding-left: 15px;
+    padding-left: 0;
     padding-right: 15px;
     min-height: calc(100vh - 400px); /*+ Ajusta a altura baseado no footer */ 
     /*todo: fazer com que o sidebar fique por cima do conteudo no mobile */
 }
+
 /*combo@* Sidebar Overlay para mobile / Sidebar Overlay for mobile */
 .sidebar-overlay {
     display: none;
@@ -300,7 +330,7 @@ footer {
     }
 
     .content-wrapper {
-        margin-left: 25%;
+        margin-left: 0;
     }
 }
 
@@ -313,6 +343,6 @@ footer {
     }
 
     .content-wrapper {
-        margin-left: 16.67%; 
+        margin-left: 0; 
     }
 }
