@@ -226,6 +226,13 @@ body.sidebar-active .sidebar-overlay {
     top: 10px;
     left: 10px;
     z-index: 1060;
+    transition: left 0.3s ease;
+    padding: 6px 10px;
+    border-radius: 4px;
+}
+
+body.sidebar-active .sidebar-toggle {
+    left: 220px; /*+ Ajusta a posição quando a sidebar está ativa */
 }
 
 footer {
@@ -247,6 +254,10 @@ footer {
         background-color: #212529;
         z-index: 1050;
         height: 100vh;
+    }
+
+    .sidebar, .sidebar-toggle {
+        transition: all 0.3s ease; /*+ Transição do butão junto com sidebar */
     }
 
     .sidebar.active {
@@ -273,6 +284,10 @@ footer {
 
     footer {
         z-index: 990;
+    }
+
+    body.sidebar-active .sidebar-toggle .bi-list:before {
+        content: '\f659'; /*+ Muda o ícone para "X" quando a sidebar está ativa */
     }
 }
 
