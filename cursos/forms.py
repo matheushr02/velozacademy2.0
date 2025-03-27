@@ -13,13 +13,8 @@ def validate_video_extension(value):
     if value.size > 500 * 1024 * 1024: # 500MB
         raise ValidationError('O tamanho do arquivo deve ser menor que 500MB.')
 
-def validate_svg(value):
-    ext = os.path.splitext(value.name)[1]
-    if ext.lower() != '.svg':
-        raise ValidationError('O arquivo deve ser no formato SVG.')
-
 class CursoForm(forms.ModelForm):
-    imagem = forms.ImageField(validators=[validate_svg], required=False, help_text="Somente arquivos SVG são aceitos (Ex: nome_da_sua_imagem.svg; Formato recomendado 16:9)")
+    imagem = forms.ImageField(required=False, help_text="Formatos recomendados: JPG, PNG, SVG. Proporção ideal 16:9. Tamanho máximo: 5MB.")
     
     CONTENT_TYPE_CHOICES = (
         ('texto', 'Somente Texto'),

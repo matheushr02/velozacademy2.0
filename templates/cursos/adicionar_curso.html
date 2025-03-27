@@ -115,10 +115,10 @@
                             
                             <!--? Imagem da capa do curso -->
                             <div class="mb-4">
-                                <label for="{{ form.imagem.id_for_label }}" class="form-label fw-semibold">Imagem de Capa (SVG)*</label>   
+                                <label for="{{ form.imagem.id_for_label }}" class="form-label fw-semibold">Imagem de Capa*</label>   
                                 {{ form.imagem|add_class:"form-control bg-dark text-light border-secondary" }}
                                 <script>
-                                    document.getElementById('{{ form.imagem.id_for_label }}').setAttribute('accept', '.svg'); //? Adiciona tipo de arquivo aceito / Adds accepted file types
+                                    document.getElementById('{{ form.imagem.id_for_label }}').setAttribute('accept', 'image/*'); //? Adiciona tipo de arquivo aceito / Adds accepted file types
                                     document.getElementById('{{ form.imagem.id_for_label }}').setAttribute('required', 'required'); //? Faz o campo ser obrigatório / Make the field required
                                 </script>
                                 <div class="form-text">{{ form.imagem.help_text }}</div>

@@ -203,7 +203,7 @@ def adicionar_curso(request):
                 return redirect('cursos:lista')
         else:
             if 'imagem' in form.errors:
-                messages.error(request, 'A imagem de capa deve ser um arquivo SVG.')        
+                messages.error(request, 'Ocorreu um erro com a imagem enviada. Por favor, verifique o formato e tamanho.')        
 
     else:
         form = CursoForm()
