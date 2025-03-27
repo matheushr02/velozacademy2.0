@@ -160,7 +160,8 @@ def adicionar_curso(request):
                             modulo=modulo, 
                             titulo=aula_form.cleaned_data['titulo'],
                             conteudo=aula_form.cleaned_data.get('conteudo', ''), 
-                            duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0), 
+                            duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0),
+                            video_url=aula_form.cleaned_data.get('video_url', ''),
                             ordem=i+1
                         )
                     
