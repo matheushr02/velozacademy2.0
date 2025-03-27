@@ -152,29 +152,46 @@ def adicionar_curso(request):
             #? Cria módulos padrão de aulas
             modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
             
-        else:
-            if 'imagem' in form.errors:
-                messages.error(request, 'A imagem de capa deve ser um arquivo SVG.')
+
             
-            #? O que isso faz? (explicação detalhada)
             #? Salva as aulas
             for i, aula_form in enumerate(aula_formset):
                 if aula_form.cleaned_data and not aula_form.cleaned_data.get('DELETE', False):
                     aula = Aula(modulo=modulo, titulo=aula_form.cleaned_data['titulo'],conteudo=aula_form.cleaned_data.get('conteudo', ''), duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0), ordem=i+1,)
                 
-                #? Verifica se o campo de video(url) foi preenchido     
-                if 'video_url' in aula_form.cleaned_data and aula_form.cleaned_data['video_url']:
-                    aula.video_url = aula_form.cleaned_data['video_url']
+                #? Verifica se o campo de video(file) foi preenchido     
+                if 'video_file' in request.FILES:
+                    video_key = f'aulas-{i}-video_file'
+                    if video_key in request.FILES:
+                        aula.video_file = request.FILES[video_key]
                 
                 aula.save()
-
+                
+                files = []
+                
+                j = 0
+                while True:
+                    file_key = f'aulas-{i}-arquivos-{j}'
+                    if file_key in request.FILES:
+                        files.append(request.FILES[file_key])
+                        j += 1
+                    else:
+                        if j == 0 and f'aulas-{i}-arquivos' in request.FILES:
+                            files.append(request.FILES[f'aulas-{i}-arquivos'])
+                            break
+                for arquivo in files:
+                    ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
+                
                 files = request.FILES.getlist(f'aulas-{i}-arquivos')
                 if files:
                     for arquivo in files:
                         ArquivoAula.objects.create(aula=aula,arquivo=arquivo, nome=arquivo.name)
                         
-        messages.success(request, 'Curso adicionado com sucesso!')
-        return redirect('cursos:detalhe', curso_id=curso.id)
+            messages.success(request, 'Curso adicionado com sucesso!')
+            return redirect('cursos:detalhe', curso_id=curso.id)
+        else:
+            if 'imagem' in form.errors:
+                messages.error(request, 'A imagem de capa deve ser um arquivo SVG.')        
 
     else:
         form = CursoForm()

@@ -5,6 +5,14 @@ import uuid
 import os
 from django.core.exceptions import ValidationError
 
+def validate_video_extension(value):
+    ext = os.path.splitext(value.name)[1]
+    valid_extensions = ['.mp4', '.avi', '.mov', '.wmv', '.mkv', '.webm']
+    if not ext.lower() in valid_extensions:
+        raise ValidationError('Formato de vídeo não suportado pela plataforma; Apenas MP4, AVI, MOV, WMV, MKV e WEBM.')
+    if value.size > 500 * 1024 * 1024: # 500MB
+        raise ValidationError('O tamanho do arquivo deve ser menor que 500MB.')
+
 def validate_svg(value):
     ext = os.path.splitext(value.name)[1]
     if ext.lower() != '.svg':
@@ -52,7 +60,8 @@ class CursoForm(forms.ModelForm):
         return instance 
     
 class AulaForm(forms.ModelForm):
-    video_url = forms.URLField(required=False, help_text="URL do vídeo (Youtube, Vimeo, etc.)")
+    video_file = forms.FileField(required=False, validators=[validate_video_extension], help_text="Faça upload de um vídeo (maximo:500MB; formatos aceitos: MP4, AVI, MOV, WMV, MKV ou WEBM)")
+    
     conteudo = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), required=False)
     arquivos = forms.FileField(required=False)
     
@@ -63,6 +72,6 @@ class AulaForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         #? Verifica se pelo menos um dos campos de conteúdo foi preenchido
-        if not cleaned_data.get('video_url') and not cleaned_data.get('conteudo') and not cleaned_data.get('arquivos'):
+        if not cleaned_data.get('video_file') and not cleaned_data.get('conteudo') and not cleaned_data.get('arquivos'):
             raise forms.ValidationError('Uma aula deve ter pelo menos vídeo, texto ou arquivos.')
         return cleaned_data

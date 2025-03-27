@@ -91,6 +91,7 @@ class Aula(models.Model):
     titulo = models.CharField(max_length=200)
     conteudo = models.TextField(blank=True)
     video_url = models.URLField(blank=True)
+    video_file = models.FileField(upload_to='aulas/videos/', blank=True, null=True)
     ordem = models.PositiveIntegerField(default=0)
     duracao_minutos = models.PositiveIntegerField(default=0)
 
@@ -101,6 +102,10 @@ class Aula(models.Model):
 
     def __str__(self):
         return f'{self.titulo} ({self.modulo.titulo})'
+    
+    def has_video(self):
+        return bool(self.video_file) or bool(self.video_url)
+    
 #? Adiciona um novo modelo para os arquivos de aula
 class ArquivoAula(models.Model):
     aula = models.ForeignKey(Aula, related_name='arquivos', on_delete=models.CASCADE)
