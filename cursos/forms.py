@@ -1,6 +1,6 @@
 from django import forms
 from django.utils.text import slugify
-from .models import Curso
+from .models import Curso, Modulo, Aula
 import uuid
 
 class CursoForm(forms.ModelForm):
@@ -41,3 +41,19 @@ class CursoForm(forms.ModelForm):
             instance.save()
         
         return instance 
+    
+class AulaForm(forms.ModelForm):
+    video_url = forms.URLField(required=False, help_text="URL do vídeo (Youtube, Vimeo, etc.)")
+    conteudo = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), required=False)
+    arquivos = forms.FileField(required=False)
+    
+    class Meta:
+        model = Aula
+        fields = ['titulo', 'duracao_minutos']
+        
+    def clean(self):
+        cleaned_data = super().clean()
+        #? Verifica se pelo menos um dos campos de conteúdo foi preenchido
+        if not cleaned_data.get('video_url') and not cleaned_data.get('conteudo') and not cleaned_data.get('arquivos'):
+            raise forms.ValidationError('Uma aula deve ter pelo menos vídeo, texto ou arquivos.')
+        return cleaned_data

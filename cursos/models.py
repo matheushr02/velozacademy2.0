@@ -89,7 +89,8 @@ class Modulo(models.Model):
 class Aula(models.Model):
     modulo = models.ForeignKey(Modulo, related_name='aulas', on_delete=models.CASCADE)
     titulo = models.CharField(max_length=200)
-    conteudo = models.TextField()
+    conteudo = models.TextField(blank=True)
+    video_url = models.URLField(blank=True)
     ordem = models.PositiveIntegerField(default=0)
     duracao_minutos = models.PositiveIntegerField(default=0)
 
@@ -100,3 +101,16 @@ class Aula(models.Model):
 
     def __str__(self):
         return f'{self.titulo} ({self.modulo.titulo})'
+#? Adiciona um novo modelo para os arquivos de aula
+class ArquivoAula(models.Model):
+    aula = models.ForeignKey(Aula, related_name='arquivos', on_delete=models.CASCADE)
+    arquivo = models.FileField(upload_to='aulas/arquivos/')
+    nome = models.CharField(max_length=255, blank=True)
+    
+    def __str__(self):
+        return f'Arquivo de {self.aula.titulo}'
+    
+    def save(self, *args, **kwargs):
+        if not self.nome and self.arquivo:
+            self.nome = self.arquivo.name
+        super().save(*args, **kwargs)

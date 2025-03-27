@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Curso, Trilha
+from .models import Curso, Trilha, Modulo, Aula, ArquivoAula
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .forms import CursoForm
+from .forms import CursoForm, AulaForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.forms import formset_factory
 
 # Create your views here.
 
@@ -136,17 +137,46 @@ def lista_trilhas(request):
         'area_selecionada': area
     })
 
+#+ adicionar_curso refeito
 def adicionar_curso(request):
+    AulaFormSet = formset_factory(AulaForm, extra=1)
+    
     if request.method == 'POST':
         form = CursoForm(request.POST, request.FILES)
-        if form.is_valid():
+        aula_formset = AulaFormSet(request.POST, request.FILES, prefix='aulas')
+        
+        if form.is_valid() and aula_formset.is_valid():
+            #? Salva o curso
             curso = form.save()
-            messages.success(request, 'Curso adicionado com sucesso!')
-            return redirect('cursos:detalhe', curso_id=curso.id)
+            
+            #? Cria módulos padrão de aulas
+            modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
+            
+            #? O que isso faz? (explicação detalhada)
+            #? Salva as aulas
+            for i, aula_form in enumerate(aula_formset):
+                if aula_form.cleaned_data and not aula_form.cleaned_data.get('DELETE', False):
+                    aula = Aula(modulo=modulo, titulo=aula_form.cleaned_data['titulo'],conteudo=aula_form.cleaned_data.get('conteudo', ''), duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0), ordem=i+1,)
+                
+                #? Verifica se o campo de video(url) foi preenchido     
+                if 'video_url' in aula_form.cleaned_data and aula_form.cleaned_data['video_url']:
+                    aula.video_url = aula_form.cleaned_data['video_url']
+                
+                aula.save()
+
+                files = request.FILES.getlist(f'aulas-{i}-arquivos')
+                if files:
+                    for arquivo in files:
+                        ArquivoAula.objects.create(aula=aula,arquivo=arquivo, nome=arquivo.name)
+                        
+        messages.success(request, 'Curso adicionado com sucesso!')
+        return redirect('cursos:detalhe', curso_id=curso.id)
+
     else:
         form = CursoForm()
-    
-    return render(request, 'cursos/adicionar_curso.html', {'form': form})
+        aula_formset = AulaFormSet(prefix='aulas')
+        
+    return render(request, 'cursos/adicionar_curso.html', {'form': form, 'aula_formset': aula_formset})
 
 @login_required
 def inscrever_curso(request, curso_id):
