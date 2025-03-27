@@ -152,8 +152,6 @@ def adicionar_curso(request):
             #? Cria módulos padrão de aulas
             modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
             
-
-            
             #? Salva as aulas
             for i, aula_form in enumerate(aula_formset):
                 if aula_form.cleaned_data and not aula_form.cleaned_data.get('DELETE', False):
@@ -182,10 +180,7 @@ def adicionar_curso(request):
                 for arquivo in files:
                     ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
                 
-                files = request.FILES.getlist(f'aulas-{i}-arquivos')
-                if files:
-                    for arquivo in files:
-                        ArquivoAula.objects.create(aula=aula,arquivo=arquivo, nome=arquivo.name)
+                # Removed redundant file processing logic to avoid duplicate uploads
                         
             messages.success(request, 'Curso adicionado com sucesso!')
             return redirect('cursos:detalhe', curso_id=curso.id)
