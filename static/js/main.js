@@ -61,7 +61,7 @@ function checkNotifications() {
 }
 
 /*
-- Comentei para futuro uso em outra pagina, agora causa comflito por emquanto
+- Comentei para futuro uso em outra página, agora causa conflito por enquanto
 // Adiciona comportamento de sticky header
 window.addEventListener('scroll', function() {
     let header = document.querySelector('header');

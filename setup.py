@@ -41,7 +41,10 @@ def main():
         print("Virtual environment already exists, skipping creation.")
     
     # Activate virtual environment (by modifying PATH)
-    venv_path = os.path.abspath(os.path.join(os.curdir, "venv", "Scripts"))
+    if os.name == 'nt':  # Windows
+        venv_path = os.path.abspath(os.path.join(os.curdir, "venv", "Scripts"))
+    else:  # Non-Windows (e.g., Linux, macOS)
+        venv_path = os.path.abspath(os.path.join(os.curdir, "venv", "bin"))
     os.environ["PATH"] = venv_path + os.pathsep + os.environ["PATH"]
     
     # Step 3: Install dependencies
