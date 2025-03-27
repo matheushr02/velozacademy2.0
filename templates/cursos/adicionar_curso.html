@@ -1,0 +1,357 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Adicionar Novo Curso | VelozAcademy{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 bg-dark border-bottom">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h1 class="display-5 fw-bold mb-3">Adicionar Novo Curso</h1>
+                <p class="lead mb-0">Preencha o formulário abaixo para adicionar um novo curso à plataforma.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Form Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Mensagens de alerta -->
+                <div id="formMessages"></div>
+                
+                <div class="card bg-dark-subtle border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="adicionarCursoForm">
+                            {% csrf_token %}
+                            
+                            <!-- Título -->
+                            <div class="mb-4">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label fw-semibold">Título do Curso*</label>
+                                {{ form.titulo|add_class:"form-control bg-dark text-light border-secondary" }}
+                                <div class="form-text">O título deve ser descritivo e específico.</div>
+                                {% if form.titulo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.titulo.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Descrição -->
+                            <div class="mb-4">
+                                <label for="{{ form.descricao.id_for_label }}" class="form-label fw-semibold">Descrição*</label>
+                                {{ form.descricao|add_class:"form-control bg-dark text-light border-secondary" }}
+                                <div class="form-text">Descreva o conteúdo e objetivos do curso.</div>
+                                {% if form.descricao.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.descricao.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Categoria e Nível -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="{{ form.categoria.id_for_label }}" class="form-label fw-semibold">Categoria*</label>
+                                    {{ form.categoria|add_class:"form-control bg-dark text-light border-secondary" }}
+                                    <div class="form-text">{{ form.categoria.help_text }}</div>
+                                    {% if form.categoria.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.categoria.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.nivel.id_for_label }}" class="form-label fw-semibold">Nível de Dificuldade*</label>
+                                    {{ form.nivel|add_class:"form-select bg-dark text-light border-secondary" }}
+                                    <div class="form-text">Selecione o nível de conhecimento necessário.</div>
+                                    {% if form.nivel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.nivel.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Tipo de Conteúdo -->
+                            <div class="mb-4">
+                                <label for="{{ form.tipo_conteudo.id_for_label }}" class="form-label fw-semibold">Tipo de Conteúdo*</label>
+                                {{ form.tipo_conteudo|add_class:"form-select bg-dark text-light border-secondary" }}
+                                <div class="form-text">Selecione os tipos de conteúdo que o curso terá.</div>
+                                {% if form.tipo_conteudo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.tipo_conteudo.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Preço e Desconto -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="{{ form.preco.id_for_label }}" class="form-label fw-semibold">Preço (R$)*</label>
+                                    {{ form.preco|add_class:"form-control bg-dark text-light border-secondary" }}
+                                    <div class="form-text">Valor do curso em reais.</div>
+                                    {% if form.preco.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.preco.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.desconto.id_for_label }}" class="form-label fw-semibold">Desconto (R$)</label>
+                                    {{ form.desconto|add_class:"form-control bg-dark text-light border-secondary" }}
+                                    <div class="form-text">Valor do desconto aplicado (se houver).</div>
+                                    {% if form.desconto.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.desconto.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!--? Imagem da capa do curso -->
+                            <div class="mb-4">
+                                <label for="{{ form.imagem.id_for_label }}" class="form-label fw-semibold">Imagem de Capa*</label>   
+                                {{ form.imagem|add_class:"form-control bg-dark text-light border-secondary" }}
+                                <script>
+                                    document.getElementById('{{ form.imagem.id_for_label }}').setAttribute('accept', 'image/*'); //? Adiciona tipo de arquivo aceito / Adds accepted file types
+                                    document.getElementById('{{ form.imagem.id_for_label }}').setAttribute('required', 'required'); //? Faz o campo ser obrigatório / Make the field required
+                                </script>
+                                <div class="form-text">{{ form.imagem.help_text }}</div>
+                                {% if form.imagem.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.imagem.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <!--? Sessão das Aulas-->
+                            <div class="mt-5 mb-4">
+                                <h4 class="fw-bold mb-3">Aulas do Curso</h4>
+                                <p class="text-muted mb-4">Adicione ao menos uma aula ao seu curso. Cada aula pode ter vídeo, texto ou arquivos; No mínimo 1 dos 3.</p>
+
+                                <div id="aulas-container">
+                                    {{ aula_formset.management_form }}
+
+                                    {% for aula_form in aula_formset %}
+                                    <div class="aula-form card bg-dark border-secondary mb-4">
+                                        <div class="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Aula {{ forloop.counter }}</h5>
+                                            {% if forloop.counter > 1 %}
+                                            <button type="button" class="btn btn-outline-danger btn-sm remove-aula">Remover</button>
+                                            {% endif %}
+                                        </div>
+                                        <div class="card-body">
+                                            <!--? Título da Aula -->
+                                            <div class="mb-3">
+                                                <label for="{{ aula_form.titulo.id_for_label }}" class="form-label">Título da Aula*</label>
+                                                {{ aula_form.titulo|add_class:"form-control bg-dark text-light border-secondary" }}
+                                                {% if aula_form.titulo.errors %}
+                                                <div class="invalid-feedback d-block">{{ aula_form.titulo.errors }}</div>
+                                                {% endif %}
+                                            </div>
+
+                                            <!--? Duração da Aula -->
+                                            <!--todo: Futuramente reconhecer apenas a duração dos videos de forma automatica -->
+                                            <div class="mb-3">
+                                                <label for="{{ aula_form.duracao_minutos.id_for_label }}" class="form-label">Duração (minutos)*</label>
+                                                {{ aula_form.duracao_minutos|add_class:"form-control bg-dark text-light border-secondary" }}
+                                                {% if aula_form.duracao_minutos.errors %}
+                                                <div class="invalid-feedback d-block">{{ aula_form.duracao_minutos.erros }}</div>
+                                                {% endif %}
+                                            </div>
+
+                                            <!--? Vídeo (URL) -->
+                                             <div class="mb-3">
+                                                <label for="{{ aula_form.video_url.id_for_label }}" class="form-label">URL do Vídeo</label>
+                                                {{ aula_form.video_url|add_class:"form-control bg-dark text-light border-secondary" }}
+                                                <div class="form-text">{{ aula_form.video_url.help_text }}</div>
+                                                {% if aula_form.video_url.errors %}
+                                                <div class="invalid-feedback d-block">{{ aula_form.video_url.errors }}</div>
+                                                {% endif %}
+                                             </div>
+
+                                             <!--? Conteúdo -->
+                                             <div class="mb-3">
+                                                <label for="{{ aula_form.conteudo.id_for_label }}" class="form-label">Conteúdo da Aula</label>
+                                                {{ aula_form.conteudo|add_class:"form-control bg-dark text-light border-secondary" }}
+                                                {% if aula_form.conteudo.errors %}
+                                                <div class="invalid-feedback d-block">{{ aula_form.conteudo.errors }}</div>
+                                                {% endif %}
+                                             </div>
+
+                                             <!--? Arquivos -->
+                                             <div class="mb-3">
+                                                <label for="{{ aula_form.arquivos.id_for_label }}" class="form-label">Arquivos</label>
+                                                {{ aula_form.arquivos|add_class:"form-control bg-dark text-light border-secondary" }}
+                                                <div class="form-text">Adicione material complementar à aula (pode usar multiplos arquivos)</div>
+                                                {% if aula_form.arquivos.errors %}
+                                                <div class="invalid-feedback d-block">{{ aula_form.arquivos.errors }}</div>
+                                                {% endif %}
+                                             </div>
+
+                                             <!--? Campos ocultos para o formset -->
+                                             {% for hidden in aula_form.hidden_fields %}
+                                             {{ hidden }}
+                                             {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+
+                                <!--? Botão para adicionar mais de uma aula no form do curso-->
+                                <button type="button" id="add-aula" class="btn btn-outline-primary">
+                                    <i class="bi bi-plus-circle">Adicionar Aula</i>
+                                </button>
+
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-flex justify-content-between align-items-center mt-5">
+                                <a href="{% url 'cursos:lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">Adicionar Curso</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        if (fileInputs.length > 0) {
+            fileInputs.forEach(input => {
+                input.setAttribute('multiple', 'multiple');
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('aulas-container');
+        const addButton = document.getElementById('add-aula');
+        const totalForms = document.getElementById("id_aulas-TOTAL_FORMS");
+        const formMessages = document.getElementById('formMessages');
+
+        // Manipulador de envio do formulário para evitar envios duplicados
+        const form = document.getElementById('adicionarCursoForm');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        form.addEventListener('submit', function(e) {
+            // Desabilita o botão e muda o texto para indicar carregamento
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
+            
+            // Adiciona um listener para o evento unload/beforeunload da página
+            const handleUnload = function() {
+                // Se a página está sendo descarregada durante o envio do formulário, 
+                // isso indica que o navegador está redirecionando corretamente
+                window.removeEventListener('unload', handleUnload);
+                window.removeEventListener('beforeunload', handleUnload);
+            };
+            
+            window.addEventListener('unload', handleUnload);
+            window.addEventListener('beforeunload', handleUnload);
+            
+            // Define um timeout para verificar se o formulário foi enviado com sucesso
+            setTimeout(function() {
+                // Se ainda estamos na mesma página após 10 segundos
+                if (document.getElementById('adicionarCursoForm')) {
+                    // Remove os event listeners
+                    window.removeEventListener('unload', handleUnload);
+                    window.removeEventListener('beforeunload', handleUnload);
+                    
+                    // Mostra uma mensagem de alerta
+                    formMessages.innerHTML = '<div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">' +
+                        'O formulário foi enviado e o curso foi adicionado, mas houve um problema no redirecionamento. ' +
+                        '<a href="{% url "cursos:lista" %}" class="alert-link">Clique aqui</a> para ir para a lista de cursos.' +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                        '</div>';
+                    
+                    // Reativa o botão
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Adicionar Curso';
+                }
+            }, 10000);
+        });
+
+        //? Adiciona aula
+        addButton.addEventListener('click', function() {
+            const formCount = parseInt(totalForms.value);
+            const newForm = container.querySelector('.aula-form').cloneNode(true);
+
+            //? Atualiza o index dos campos do formset
+            newForm.innerHTML = newForm.innerHTML.replace(/aulas-0/g, `aulas-${formCount}`);
+            newForm.innerHTML = newForm.innerHTML.replace(/aulas\[0\]/g, `aulas[${formCount}]`);
+
+            //? Limpa o conteudo dos campos do novo form
+            const inputs = newForm.querySelectorAll('input:not([type="hidden"]), textarea');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+
+            //? Atualiza o titulo
+            const title = newForm.querySelector('h5');
+            title.textContent = `Aula ${formCount + 1}`;
+
+            //? Adiciona botão de remover se não estiver presente
+            if (!newForm.querySelector('.remove-aula')) {
+                const header = newForm.querySelector('.card-header');
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'btn btn-outline-danger btn-sm remove-aula';
+                removeButton.textContent = 'Remover';
+                header.appendChild(removeButton);
+            }
+
+            const fileInputs = newForm.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                input.setAttribute('multiple', 'multiple');
+            });
+
+            //? Adiciona container
+            container.appendChild(newForm);
+            //? Contagem de forms
+            totalForms.value = formCount + 1;
+            //? adiciona o evento de remover
+            setupRemoveButtons();
+
+        });
+
+        function setupRemoveButtons() {
+            const removeButtons = document.querySelectorAll('.remove-aula');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const form = this.closest('.aula-form');
+                    form.remove();
+
+                    updateFormIndices();
+
+                    const formCount = container.querySelectorAll('.aula-form').length;
+                    totalForms.value = formCount;
+
+                });
+            });
+        }
+
+        function updateFormIndices() {
+            const forms = container.querySelectorAll('.aula-form');
+            forms.forEach((form,index) => {
+                form.querySelector('h5').textContent = `Aula ${index + 1}`;
+            });
+        }
+
+        setupRemoveButtons();
+
+    });
+</script>
+{% endblock %} 
+</section>
+{% endblock %} 

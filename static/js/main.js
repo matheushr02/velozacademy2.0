@@ -60,12 +60,53 @@ function checkNotifications() {
     console.log('Verificando notificações...');
 }
 
+/*
+- Comentei para futuro uso em outra página, agora causa conflito por enquanto
 // Adiciona comportamento de sticky header
 window.addEventListener('scroll', function() {
     let header = document.querySelector('header');
-    if (window.scrollY > 50) {
-        header.classList.add('shadow-sm');
-    } else {
-        header.classList.remove('shadow-sm');
+    if (header) {
+        // Verifica se o header existe antes de aplicar a classe
+        if (window.scrollY > 50) {
+            header.classList.add('shadow-sm');
+        } else {
+            header.classList.remove('shadow-sm');
+        }
     }
 }); 
+*/
+
+//+ Sidebar botão clicavel no mobile
+document.addEventListener('DOMContentLoaded', function() {
+    //? checa se o sidebar botão clicável existe
+    const sidebarToggle = document.querySelector('.sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            ////document.querySelector('.sidebar').classList.toggle('active');
+            document.body.classList.toggle('sidebar-active');
+            
+        });
+        //todo Adicionar animação de transição ao abrir/fechar a sidebar
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            sidebar.classList.remove('active');
+            document.body.classList.remove('sidebar-active');
+        });
+    }
+
+    //? fecha a sidebar quando clicado no item menu no mobile
+    const menuLinks = document.querySelectorAll('.sidebar .nav-link');
+    if (window.innerWidth <= 576) {
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                sidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-active');
+            });
+        });
+    }
+});

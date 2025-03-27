@@ -1,7 +1,11 @@
-from django.shortcuts import render, get_object_or_404
-from .models import Curso, Trilha
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Curso, Trilha, Modulo, Aula, ArquivoAula
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .forms import CursoForm, AulaForm
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.forms import formset_factory
 
 # Create your views here.
 
@@ -80,7 +84,21 @@ def lista_cursos(request):
 
 def detalhe_curso(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
-    return render(request, 'cursos/detalhe.html', {'curso': curso})
+    
+    # Add context variables needed by the template
+    inscrito = False
+    progresso = 0
+    
+    # Here you would check if the user is enrolled and calculate progress
+    # For now we just set defaults
+    
+    context = {
+        'curso': curso,
+        'inscrito': inscrito,
+        'progresso': progresso
+    }
+    
+    return render(request, 'cursos/detalhe.html', context)
 
 def trilha_cursos(request, trilha_slug):
     # Buscar a trilha pelo slug
@@ -118,3 +136,87 @@ def lista_trilhas(request):
         'search': search,
         'area_selecionada': area
     })
+
+#+ adicionar_curso refeito
+def adicionar_curso(request):
+    AulaFormSet = formset_factory(AulaForm, extra=1)
+    
+    if request.method == 'POST':
+        form = CursoForm(request.POST, request.FILES)
+        aula_formset = AulaFormSet(request.POST, request.FILES, prefix='aulas')
+        
+        if form.is_valid() and aula_formset.is_valid():
+            try:
+                # Salva o curso
+                curso = form.save()
+                
+                # Cria módulos padrão de aulas
+                modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
+                
+                #? Salva as aulas
+                for i, aula_form in enumerate(aula_formset):
+                    if aula_form.cleaned_data and not aula_form.cleaned_data.get('DELETE', False):
+                        aula = Aula(
+                            modulo=modulo, 
+                            titulo=aula_form.cleaned_data['titulo'],
+                            conteudo=aula_form.cleaned_data.get('conteudo', ''), 
+                            duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0),
+                            video_url=aula_form.cleaned_data.get('video_url', ''),
+                            ordem=i+1
+                        )
+                    
+                        #? Verifica se o campo de video(file) foi preenchido     
+                        video_key = f'aulas-{i}-video_file'
+                        if video_key in request.FILES:
+                            aula.video_file = request.FILES[video_key]
+                    
+                        aula.save()
+                        
+                        # Processamento de arquivos
+                        files = []
+                        
+                        j = 0
+                        while True:
+                            file_key = f'aulas-{i}-arquivos-{j}'
+                            if file_key in request.FILES:
+                                files.append(request.FILES[file_key])
+                                j += 1
+                            else:
+                                if j == 0 and f'aulas-{i}-arquivos' in request.FILES:
+                                    files.append(request.FILES[f'aulas-{i}-arquivos'])
+                                break
+                        
+                        # Salva os arquivos da aula
+                        for arquivo in files:
+                            ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
+                
+                messages.success(request, 'Curso adicionado com sucesso!')
+                # Força uma resposta de redirecionamento imediata
+                response = redirect('cursos:detalhe', curso_id=curso.id)
+                response['Location'] = response.url
+                return response
+                
+            except Exception as e:
+                # Se ocorrer qualquer erro, exclui o curso (rollback manual)
+                if 'curso' in locals():
+                    curso.delete()
+                messages.error(request, f'Erro ao adicionar curso: {str(e)}')
+                return redirect('cursos:lista')
+        else:
+            if 'imagem' in form.errors:
+                messages.error(request, 'Ocorreu um erro com a imagem enviada. Por favor, verifique o formato e tamanho.')        
+
+    else:
+        form = CursoForm()
+        aula_formset = AulaFormSet(prefix='aulas')
+        
+    return render(request, 'cursos/adicionar_curso.html', {'form': form, 'aula_formset': aula_formset})
+
+@login_required
+def inscrever_curso(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    
+    # Normally, you would handle enrollment logic here
+    # For now, just simulate success and redirect back
+    messages.success(request, f'Você foi inscrito com sucesso no curso {curso.titulo}!')
+    return redirect('cursos:detalhe', curso_id=curso.id)
