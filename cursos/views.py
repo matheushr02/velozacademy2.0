@@ -146,36 +146,39 @@ def adicionar_curso(request):
         aula_formset = AulaFormSet(request.POST, request.FILES, prefix='aulas')
         
         if form.is_valid() and aula_formset.is_valid():
-            #? Salva o curso
+            # Salva o curso
             curso = form.save()
             
-            #? Cria módulos padrão de aulas
+            # Cria módulos padrão de aulas
             modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
             
+            # Salva as aulas
+            for i, aula_form in enumerate(aula_formset):
+                if aula_form.cleaned_data and not aula_form.cleaned_data.get('DELETE', False):
+                    aula = Aula(
+                        modulo=modulo, 
+                        titulo=aula_form.cleaned_data['titulo'],
+                        conteudo=aula_form.cleaned_data.get('conteudo', ''), 
+                        duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0), 
+                        ordem=i+1,
+                    )
+                    
+                    # Verifica se o campo de video(url) foi preenchido     
+                    if 'video_url' in aula_form.cleaned_data and aula_form.cleaned_data['video_url']:
+                        aula.video_url = aula_form.cleaned_data['video_url']
+                    
+                    aula.save()
+
+                    files = request.FILES.getlist(f'aulas-{i}-arquivos')
+                    if files:
+                        for arquivo in files:
+                            ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
+            
+            messages.success(request, 'Curso adicionado com sucesso!')
+            return redirect('cursos:detalhe', curso_id=curso.id)
         else:
             if 'imagem' in form.errors:
                 messages.error(request, 'A imagem de capa deve ser um arquivo SVG.')
-            
-            #? O que isso faz? (explicação detalhada)
-            #? Salva as aulas
-            for i, aula_form in enumerate(aula_formset):
-                if aula_form.cleaned_data and not aula_form.cleaned_data.get('DELETE', False):
-                    aula = Aula(modulo=modulo, titulo=aula_form.cleaned_data['titulo'],conteudo=aula_form.cleaned_data.get('conteudo', ''), duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0), ordem=i+1,)
-                
-                #? Verifica se o campo de video(url) foi preenchido     
-                if 'video_url' in aula_form.cleaned_data and aula_form.cleaned_data['video_url']:
-                    aula.video_url = aula_form.cleaned_data['video_url']
-                
-                aula.save()
-
-                files = request.FILES.getlist(f'aulas-{i}-arquivos')
-                if files:
-                    for arquivo in files:
-                        ArquivoAula.objects.create(aula=aula,arquivo=arquivo, nome=arquivo.name)
-                        
-        messages.success(request, 'Curso adicionado com sucesso!')
-        return redirect('cursos:detalhe', curso_id=curso.id)
-
     else:
         form = CursoForm()
         aula_formset = AulaFormSet(prefix='aulas')
