@@ -146,10 +146,10 @@ def adicionar_curso(request):
         aula_formset = AulaFormSet(request.POST, request.FILES, prefix='aulas')
         
         if form.is_valid() and aula_formset.is_valid():
-            #? Salva o curso
+            # Salva o curso
             curso = form.save()
             
-            #? Cria módulos padrão de aulas
+            # Cria módulos padrão de aulas
             modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
             
             #? Salva as aulas
