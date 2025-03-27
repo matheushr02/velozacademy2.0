@@ -110,11 +110,15 @@
                                 </div>
                             </div>
                             
-                            <!-- Imagem -->
+                            <!--? Imagem da capa do curso -->
                             <div class="mb-4">
-                                <label for="{{ form.imagem.id_for_label }}" class="form-label fw-semibold">Imagem de Capa</label>
+                                <label for="{{ form.imagem.id_for_label }}" class="form-label fw-semibold">Imagem de Capa (SVG)*</label>   
                                 {{ form.imagem|add_class:"form-control bg-dark text-light border-secondary" }}
-                                <div class="form-text">Imagem de capa do curso (formato recomendado: 16:9).</div>
+                                <script>
+                                    document.getElementById('{{ form.imagem.id_for_label }}').setAttribute('accept', '.svg'); //? Adiciona tipo de arquivo aceito / Adds accepted file types
+                                    document.getElementById('{{ form.imagem.id_for_label }}').setAttribute('required', 'required'); //? Faz o campo ser obrigatório / Make the field required
+                                </script>
+                                <div class="form-text">{{ form.imagem.help_text }}</div>
                                 {% if form.imagem.errors %}
                                 <div class="invalid-feedback d-block">
                                     {{ form.imagem.errors }}
@@ -177,18 +181,13 @@
                                                 {% endif %}
                                              </div>
 
-                                             <!--? Arquivos-->
+                                             <!--? Arquivos -->
+                                             <!--! não funciona corretamente -->
+                                             <!--TODO: implementar botão que expande o bloco onde colocar arquivos deixando o usuario escolher quantos arquivos quiser -->
                                              <div class="mb-3">
                                                 <label for="{{ aula_form.arquivos.id_for_label }}" class="form-label">Arquivos</label>
-                                                <script>
-                                                    document.getElementById('{{ aula_form.arquivos.id_for_label }}').setAttribute('multiple', 'multiple');
-                                                    <!--combo!? Testar e implementar outro momento-->
-                                                    //document.getElementById('{{ aula_form.arquivos.id_for_label }}').classList.add("form-control", "bg-dark", "text-light", "border-secondary");
-                                                    //document.getElementById('{{ aula_form.arquivos.id_for_label }}').setAttribute('accept', '.pdf,.doc,.docx,.ppt,.pptx,.zip'); // Add accepted file types
-                                                </script>
-                                                <!--- conteudo arquivado-->
-                                                //{{ aula_form.arquivos|add_class:"form-control bg-dark text-light border-secondary" }}
-                                                <div class="form-text">Adicione material complementar à aula.</div>
+                                                {{ aula_form.arquivos|add_class:"form-control bg-dark text-light border-secondary" }}
+                                                <div class="form-text">Adicione material complementar à aula (pode usar multiplos arquivos)</div>
                                                 {% if aula_form.arquivos.errors %}
                                                 <div class="invalid-feedback d-block">{{ aula_form.arquivos.errors }}</div>
                                                 {% endif %}
@@ -225,6 +224,15 @@
 
 {% block extra_js %}
 <script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        if (fileInputs.length > 0) {
+            fileInputs.forEach(input => {
+                input.setAttribute('multiple', 'multiple');
+            });
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('aulas-container');
         const addButton = document.getElementById('add-aula');
@@ -258,6 +266,11 @@
                 removeButton.textContent = 'Remover';
                 header.appendChild(removeButton);
             }
+
+            const fileInputs = newForm.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                input.setAttribute('multiple', 'multiple');
+            });
 
             //? Adiciona container
             container.appendChild(newForm);

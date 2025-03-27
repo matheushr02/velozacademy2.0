@@ -152,6 +152,10 @@ def adicionar_curso(request):
             #? Cria módulos padrão de aulas
             modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
             
+        else:
+            if 'imagem' in form.errors:
+                messages.error(request, 'A imagem de capa deve ser um arquivo SVG.')
+            
             #? O que isso faz? (explicação detalhada)
             #? Salva as aulas
             for i, aula_form in enumerate(aula_formset):

@@ -2,8 +2,17 @@ from django import forms
 from django.utils.text import slugify
 from .models import Curso, Modulo, Aula
 import uuid
+import os
+from django.core.exceptions import ValidationError
+
+def validate_svg(value):
+    ext = os.path.splitext(value.name)[1]
+    if ext.lower() != '.svg':
+        raise ValidationError('O arquivo deve ser no formato SVG.')
 
 class CursoForm(forms.ModelForm):
+    imagem = forms.ImageField(validators=[validate_svg], required=False, help_text="Somente arquivos SVG são aceitos (Ex: nome_da_sua_imagem.svg; Formato recomendado 16:9)")
+    
     CONTENT_TYPE_CHOICES = (
         ('texto', 'Somente Texto'),
         ('video', 'Somente Vídeos'),
