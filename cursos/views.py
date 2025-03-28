@@ -229,7 +229,7 @@ def aula_view(request, curso_slug, aula_ordem):
         aula = Aula.objects.filter(modulo=modulo, ordem=aula_ordem).first()
         if not aula:
             raise Http404("Aula não encontrada")
-    except:
+    except Exception:
         raise Http404("Aula não encontrada")
     
     aula_anterior = Aula.objects.filter(modulo__curso=curso, ordem__lt=aula_ordem).order_by('-ordem').first()
