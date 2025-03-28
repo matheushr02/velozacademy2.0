@@ -30,7 +30,7 @@ class CursoForm(forms.ModelForm):
     
     class Meta:
         model = Curso
-        fields = ['titulo', 'descricao', 'nivel', 'preco', 'desconto', 'imagem']
+        fields = ['titulo', 'descricao', 'nivel', 'imagem']
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 4}),
         }

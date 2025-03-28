@@ -89,29 +89,7 @@
                                 {% endif %}
                             </div>
                             
-                            <!-- Preço e Desconto -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label for="{{ form.preco.id_for_label }}" class="form-label fw-semibold">Preço (R$)*</label>
-                                    {{ form.preco|add_class:"form-control bg-dark text-light border-secondary" }}
-                                    <div class="form-text">Valor do curso em reais.</div>
-                                    {% if form.preco.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.preco.errors }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="{{ form.desconto.id_for_label }}" class="form-label fw-semibold">Desconto (R$)</label>
-                                    {{ form.desconto|add_class:"form-control bg-dark text-light border-secondary" }}
-                                    <div class="form-text">Valor do desconto aplicado (se houver).</div>
-                                    {% if form.desconto.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.desconto.errors }}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
+                            <!--- Preço e Desconto (removido/removed) -->
                             
                             <!--? Imagem da capa do curso -->
                             <div class="mb-4">
