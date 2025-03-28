@@ -74,7 +74,7 @@
                         {% if curso.imagem %}
                         <img src="{{ curso.imagem.url }}" alt="{{ curso.titulo }}" class="img-fluid rounded mb-4">
                         {% else %}
-                        <img src="/static/images/course-placeholder.jpg" alt="{{ curso.titulo }}" class="img-fluid rounded mb-4">
+                        <img src="/static/images/cursos/{{ curso.slug }}.jpg" alt="{{ curso.titulo }}" class="img-fluid rounded mb-4" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
                         {% endif %}
                         
                         <div class="d-grid mb-4">
@@ -320,7 +320,7 @@
                     {% if curso_rel.imagem %}
                     <img src="{{ curso_rel.imagem.url }}" class="card-img-top" alt="{{ curso_rel.titulo }}" style="height: 140px; object-fit: cover;">
                     {% else %}
-                    <img src="/static/images/course-placeholder.jpg" class="card-img-top" alt="{{ curso_rel.titulo }}" style="height: 140px; object-fit: cover;">
+                    <img src="/static/images/cursos/{{ curso_rel.slug }}.jpg" class="card-img-top" alt="{{ curso_rel.titulo }}" style="height: 140px; object-fit: cover;" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title fw-bold">{{ curso_rel.titulo }}</h5>
@@ -339,4 +339,22 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .course-description img {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        color: white;
+        background-color: #212529;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: none;
+    }
+</style>
 {% endblock %} 
