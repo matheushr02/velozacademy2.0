@@ -90,6 +90,13 @@
                                     <button type="submit" class="btn btn-primary btn-lg w-100">Inscrever-se Gratuitamente</button>
                                 </form>
                                 {% endif %}
+
+                            <a href="{% if curso.modulos.first and curso.modulos.first.aulas.first %}{% url 'cursos:aula' curso.slug curso.modulos.first.aulas.first.ordem %}{% else %}#{% endif %}" class="btn btn-warning btn-lg w-100 mt-2">
+                                <i class="bi bi-eye-fill me-2">Testar Visualização de Aula</i>
+                            </a>
+                            <div class="alert alert-warning mt-2 small">
+                                <i class="bi bi-info-circle-fill me-2">Este botão é apenas para teste, não implementar no proximo update; todo: concertar botão de inscrição</i>
+                            </div>
                             {% else %}
                             <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-lg">Entrar para se Inscrever</a>
                             {% endif %}

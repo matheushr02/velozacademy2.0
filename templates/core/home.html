@@ -177,7 +177,7 @@
                                 {% endif %}
                                 <small>{{ curso.instrutor.nome }}</small>
                             </div>
-                            <a href="{% url 'cursos:detalhe' curso.id %}" class="btn btn-sm btn-outline-primary">Ver Curso</a>
+                            <a href="{% url 'cursos:detalhe' curso.slug %}" class="btn btn-sm btn-outline-primary">Ver Curso</a>
                         </div>
                     </div>
                 </div>
