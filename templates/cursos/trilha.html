@@ -62,7 +62,7 @@
                 
                 <div class="list-group shadow-sm mb-4">
                     {% for curso in cursos %}
-                    <a href="{% url 'cursos:detalhe' curso.id %}" class="list-group-item list-group-item-action bg-dark-subtle p-4 border-0 mb-3 d-flex align-items-center justify-content-between">
+                    <a href="{% url 'cursos:detalhe' curso.slug %}" class="list-group-item list-group-item-action bg-dark-subtle p-4 border-0 mb-3 d-flex align-items-center justify-content-between">
                         <div class="d-flex align-items-center">
                             <div class="me-3 fs-4 text-primary fw-bold">{{ forloop.counter }}</div>
                             <div>
@@ -104,7 +104,7 @@
                         
                         <div class="d-grid mb-4">
                             {% if cursos.first %}
-                            <a href="{% url 'cursos:detalhe' cursos.first.id %}" class="btn btn-primary py-3">
+                            <a href="{% url 'cursos:detalhe' cursos.first.slug %}" class="btn btn-primary py-3">
                                 Iniciar Trilha
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>

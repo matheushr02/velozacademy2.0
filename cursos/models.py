@@ -27,7 +27,7 @@ class Curso(models.Model):
         return self.titulo
 
     def get_absolute_url(self):
-        return reverse('cursos:detalhe', args=[self.id])
+        return reverse('cursos:detalhe', args=[self.slug])
 
     def preco_com_desconto(self):
         return self.preco - self.desconto

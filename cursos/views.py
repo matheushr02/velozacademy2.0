@@ -6,6 +6,7 @@ from .forms import CursoForm, AulaForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
+from django.http import Http404
 
 # Create your views here.
 
@@ -82,8 +83,10 @@ def lista_cursos(request):
     
     return render(request, 'cursos/lista.html', context)
 
-def detalhe_curso(request, curso_id):
-    curso = get_object_or_404(Curso, id=curso_id)
+def detalhe_curso(request, curso_slug):
+    curso = get_object_or_404(Curso, slug=curso_slug)
+    
+    modulos = curso.modulos.all()
     
     # Add context variables needed by the template
     inscrito = False
@@ -91,6 +94,9 @@ def detalhe_curso(request, curso_id):
     
     # Here you would check if the user is enrolled and calculate progress
     # For now we just set defaults
+    
+    if request.user.is_authenticated:
+        pass
     
     context = {
         'curso': curso,
@@ -192,7 +198,7 @@ def adicionar_curso(request):
                 
                 messages.success(request, 'Curso adicionado com sucesso!')
                 # Força uma resposta de redirecionamento imediata
-                response = redirect('cursos:detalhe', curso_id=curso.id)
+                response = redirect('cursos:detalhe', curso_slug=curso.slug)
                 response['Location'] = response.url
                 return response
                 
@@ -212,6 +218,37 @@ def adicionar_curso(request):
         
     return render(request, 'cursos/adicionar_curso.html', {'form': form, 'aula_formset': aula_formset})
 
+def aula_view(request, curso_slug, aula_ordem):
+    #? pega o curso por slug    
+    curso = get_object_or_404(Curso, slug=curso_slug)
+    try:
+        modulo = Modulo.objects.filter(curso=curso, aulas__ordem=aula_ordem).first()
+        if not modulo:
+            raise Http404("Aula não encontrada")
+        
+        aula = Aula.objects.filter(modulo=modulo, ordem=aula_ordem).first()
+        if not aula:
+            raise Http404("Aula não encontrada")
+    except Exception:
+        raise Http404("Aula não encontrada")
+    
+    aula_anterior = Aula.objects.filter(modulo__curso=curso, ordem__lt=aula_ordem).order_by('-ordem').first()
+    proxima_aula = Aula.objects.filter(modulo__curso=curso, ordem__gt=aula_ordem).order_by('ordem').first()
+    
+    progresso = 0
+    aula_concluida = False
+    
+    context = {
+        'curso': curso,
+        'aula': aula,
+        'aula_anterior': aula_anterior,
+        'proxima_aula': proxima_aula,
+        'progresso': progresso,
+        'aula_concluida': aula_concluida,
+    }
+    
+    return render(request, 'cursos/aula.html', context)
+
 @login_required
 def inscrever_curso(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
@@ -219,4 +256,47 @@ def inscrever_curso(request, curso_id):
     # Normally, you would handle enrollment logic here
     # For now, just simulate success and redirect back
     messages.success(request, f'Você foi inscrito com sucesso no curso {curso.titulo}!')
-    return redirect('cursos:detalhe', curso_id=curso.id)
+    return redirect('cursos:detalhe', curso_slug=curso.slug)
+
+#TODO: Implementar no database estas informações em uma futura implementação
+@login_required 
+def marcar_aula_concluida(request, aula_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    aula = get_object_or_404(Aula, id=aula_id)
+    curso = aula.modulo.curso
+    
+    messages.success(request, 'Aula marcada como concluída!')
+    return redirect('cursos:aula', curso_slug=curso.slug, aula_ordem=aula.ordem)
+
+@login_required
+def comentar_aula(request, aula_id):
+    if not request.user.is_authenticated:
+        return redirect('users:login')
+    
+    aula = get_object_or_404(Aula, id=aula_id)
+    curso = aula.modulo.curso
+    
+    if request.method == 'POST':
+        comentario = request.POST.get('comentario', '')
+        if comentario:
+            #todo: Salvar o comentário no banco de dados
+            messages.success(request, 'Comentário adicionado com sucesso!')
+            
+    return redirect('cursos:aula', curso_slug=curso.slug, aula_ordem=aula.ordem)
+
+@login_required
+def responder_comentario(request, comentario_id):
+    return redirect('cursos:aula', curso_slug='example', aula_ordem=1)
+
+@login_required
+def responder_quiz(request, atividade_id):
+    return redirect('cursos:aula', curso_slug='example', aula_ordem=1)
+
+@login_required
+def entregar_projeto(request, atividade_id):
+    #placeholder para o projeto
+    #TODO: Implementar a lógica para entrega do projeto
+    return redirect('cursos:aula', curso_slug='example', aula_ordem=1)
+    
