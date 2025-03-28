@@ -159,7 +159,7 @@
                     {% if curso.imagem %}
                     <img src="{{ curso.imagem.url }}" class="card-img-top" alt="{{ curso.titulo }}" style="height: 180px; object-fit: cover;">
                     {% else %}
-                    <img src="/static/images/course-placeholder.jpg" class="card-img-top" alt="{{ curso.titulo }}" style="height: 180px; object-fit: cover;">
+                    <img src="/static/images/cursos/{{ curso.slug }}.jpg" class="card-img-top" alt="{{ curso.titulo }}" style="height: 180px; object-fit: cover;" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
                     {% endif %}
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -217,7 +217,7 @@
                     {% if projeto.imagem %}
                     <img src="{{ projeto.imagem.url }}" class="card-img-top" alt="{{ projeto.titulo }}" style="height: 180px; object-fit: cover;">
                     {% else %}
-                    <img src="/static/images/project-placeholder.jpg" class="card-img-top" alt="{{ projeto.titulo }}" style="height: 180px; object-fit: cover;">
+                    <img src="/static/images/projetos/{{ projeto.slug }}.jpg" class="card-img-top" alt="{{ projeto.titulo }}" style="height: 180px; object-fit: cover;" onerror="this.onerror=null; this.src='/static/images/projeto-placeholder.jpg';">
                     {% endif %}
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">

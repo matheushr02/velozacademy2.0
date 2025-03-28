@@ -127,11 +127,7 @@
                         {% if projeto.imagem %}
                         <img src="{{ projeto.imagem.url }}" class="card-img-top" alt="{{ projeto.titulo }}" style="height: 200px; object-fit: cover;">
                         {% else %}
-                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-code-slash" viewBox="0 0 16 16">
-                                <path d="M10.478 1.647a.5.5 0 1 0-.956-.294l-4 13a.5.5 0 0 0 .956.294l4-13zM4.854 4.146a.5.5 0 0 1 0 .708L1.707 8l3.147 3.146a.5.5 0 0 1-.708.708l-3.5-3.5a.5.5 0 0 1 0-.708l3.5-3.5a.5.5 0 0 1 .708 0zm6.292 0a.5.5 0 0 0 0 .708L14.293 8l-3.147 3.146a.5.5 0 0 0 .708.708l3.5-3.5a.5.5 0 0 0 0-.708l-3.5-3.5a.5.5 0 0 0-.708 0z"/>
-                            </svg>
-                        </div>
+                        <img src="/static/images/projetos/{{ projeto.slug }}.jpg" class="card-img-top" alt="{{ projeto.titulo }}" style="height: 200px; object-fit: cover;" onerror="this.onerror=null; this.src='/static/images/projeto-placeholder.jpg';">
                         {% endif %}
                         <span class="position-absolute top-0 end-0 badge bg-{{ projeto.dificuldade|default:'primary' }} m-2 px-3 py-2 rounded-pill">{{ projeto.get_dificuldade_display }}</span>
                     </div>
