@@ -8,6 +8,17 @@ class Curso(models.Model):
         ('avancado', 'Avançado'),
     )
     
+    CONTENT_TYPE_CHOICES = (
+        ('texto', 'Somente Texto'),
+        ('video', 'Somente Vídeo'),
+        ('texto_video', 'Texto e Vídeo'),
+        ('anexos', 'Somente Anexos'),
+        ('completo', 'Texto, Vídeo e Anexos'),
+        ('texto_anexos', 'Texto e Anexos'),
+        ('video_anexos', 'Vídeo e Anexos'),
+        ('nenhum', 'Não especificado'),
+    )
+    
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     descricao = models.TextField()

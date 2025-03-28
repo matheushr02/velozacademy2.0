@@ -195,6 +195,39 @@ def adicionar_curso(request):
                         # Salva os arquivos da aula
                         for arquivo in files:
                             ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
+
+                #? Automaticamente verifica o tipo de conteudo dentro da aula do curso
+                has_video = False
+                has_text = False
+                has_files = False
+                
+                for modulo in curso.modulos.all():
+                    for aula in modulo.aulas.all():
+                        if aula.video_url:
+                            has_video = True
+                        if aula.conteudo and aula.conteudo.strip():
+                            has_text = True
+                        if ArquivoAula.objects.filter(aula=aula).exists():
+                            has_files = True
+                
+                if has_video and has_text and has_files:
+                    curso.tipo_conteudo = 'completo'
+                elif has_video and has_text:
+                    curso.tipo_conteudo = 'texto_video'
+                elif has_video and has_files:
+                    curso.tipo_conteudo = 'video_anexos'
+                elif has_text and has_files:
+                    curso.tipo_conteudo = 'texto_anexos'
+                elif has_video:
+                    curso.tipo_conteudo = 'video'
+                elif has_text:
+                    curso.tipo_conteudo = 'texto'
+                elif has_files:
+                    curso.tipo_conteudo = 'anexos'
+                else:
+                    curso.tipo_conteudo = 'nenhum'
+                #? Salva o curso com o tipo de conteúdo atualizado
+                curso.save()                        
                 
                 messages.success(request, 'Curso adicionado com sucesso!')
                 # Força uma resposta de redirecionamento imediata
