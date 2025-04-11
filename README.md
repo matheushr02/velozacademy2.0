@@ -66,19 +66,7 @@ python populate_db.py
 python populate_trilhas.py
 ```
 
-7. Adicione imagens para as trilhas:
-   - Crie ou obtenha imagens para representar cada trilha
-   - Coloque-as na pasta `static/images/trilhas/` com os seguintes nomes:
-     - ia.jpg
-     - dashboards.jpg
-     - office.jpg
-     - visao.jpg
-     - data-science.jpg
-     - analise-dados.jpg
-     - trading.jpg
-     - web.jpg
-
-8. Inicie o servidor de desenvolvimento:
+7. Inicie o servidor de desenvolvimento:
 ```bash
 python manage.py runserver
 ```
