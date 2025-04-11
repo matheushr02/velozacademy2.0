@@ -173,7 +173,14 @@
                                              </div>
 
                                              <!--todo: Detector automatico de conteudo da Aula (Se é Vídeo, Arquivo ou Texto)-->
-                                             <div class=""></div>
+                                             <div class="mt-3 mb-2 content-type-indicator">
+                                                <label class="form-label text-muted">Conteúdo Detectado:</label>
+                                                <div class="d-flex gap-2 flex-wrap">
+                                                    <span class="badge bg-secondary tipo-texto">Texto</span>
+                                                    <span class="badge bg-secondary tipo-video">Vídeo</span>
+                                                    <span class="badge bg-secondary tipo-arquivo">Arquivo</span>
+                                                </div>
+                                             </div>
 
                                              <!--? Campos ocultos para o formset -->
                                              {% for hidden in aula_form.hidden_fields %}
@@ -206,6 +213,58 @@
 
 {% block extra_js %}
 <script>
+    function updateContentTypes(aulaForm) {
+        const videoUrl = aulaForm.querySelector('input[name$=-video_url]');
+        const videoFile = aulaForm.querySelector('input[name$=-video_file]');
+        const conteudo = aulaForm.querySelector('textarea[name$=-conteudo]');
+        const arquivos = aulaForm.querySelector('input[name$=-arquivos]');
+        
+        const textoSpan = aulaForm.querySelector('.tipo-texto');
+        const videoSpan = aulaForm.querySelector('.tipo-video');
+        const arquivoSpan = aulaForm.querySelector('.tipo-arquivo');
+
+        const hasText = conteudo && conteudo.value.trim().length > 0;
+        const hasVideo = (videoUrl && videoUrl.value.trim().length > 0) || 
+                         (videoFile && videoFile.files.length > 0);
+        const hasFiles = arquivos && arquivos.files.length > 0;
+
+        if (textoSpan) {
+            textoSpan.className = hasText ?
+            'badge bg-primary tipo-texto' : 'badge bg-secondary tipo-texto';
+        }
+
+        if (videoSpan) {
+            videoSpan.className = hasVideo ?
+            'badge bg-primary tipo-video' : 'badge bg-secondary tipo-video';
+        }
+
+        if (arquivoSpan) {
+            arquivoSpan.className = hasFiles ?
+            'badge bg-primary tipo-arquivo' : 'badge bg-secondary tipo-arquivo';
+        }
+    }
+
+function setupContentTypeDetection() {
+    const aulaForms = document.querySelectorAll('.aula-form');
+
+    aulaForms.forEach(form => {
+        const videoUrl = form.querySelector('input[name$="-video_url"]');
+        const videoFile = form.querySelector('input[name$="-video_file"]');
+        const conteudo = form.querySelector('textarea[name$="-conteudo"]');
+        const arquivos = form.querySelector('input[name$="-arquivos"]');
+
+
+        if (videoUrl) videoUrl.addEventListener('input', () => updateContentTypes(form));
+        if (videoFile) videoFile.addEventListener('input', () => updateContentTypes(form));
+        if (conteudo) conteudo.addEventListener('input', () => updateContentTypes(form));
+        if (arquivos) arquivos.addEventListener('input', () => updateContentTypes(form));
+
+        updateContentTypes(form);
+    });
+}
+
+setupContentTypeDetection();
+
     document.addEventListener('DOMContentLoaded', function(){
         const fileInputs = document.querySelectorAll('input[type="file"]');
         if (fileInputs.length > 0) {
@@ -299,11 +358,15 @@
 
             //? Adiciona container
             container.appendChild(newForm);
+
+            //? Atualiza o formset
+            setupContentTypeDetection();
+
             //? Contagem de forms
             totalForms.value = formCount + 1;
+
             //? adiciona o evento de remover
             setupRemoveButtons();
-
         });
 
         function setupRemoveButtons() {
