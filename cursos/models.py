@@ -8,13 +8,22 @@ class Curso(models.Model):
         ('avancado', 'Avançado'),
     )
     
+    CONTENT_TYPE_CHOICES = (
+        ('texto', 'Somente Texto'),
+        ('video', 'Somente Vídeo'),
+        ('texto_video', 'Texto e Vídeo'),
+        ('anexos', 'Somente Anexos'),
+        ('completo', 'Texto, Vídeo e Anexos'),
+        ('texto_anexos', 'Texto e Anexos'),
+        ('video_anexos', 'Vídeo e Anexos'),
+        ('nenhum', 'Não especificado'),
+    )
+    
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     descricao = models.TextField()
     nivel = models.CharField(max_length=15, choices=NIVEL_CHOICES, default='iniciante')
     imagem = models.ImageField(upload_to='cursos/', blank=True, null=True)
-    preco = models.DecimalField(max_digits=6, decimal_places=2)
-    desconto = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -28,9 +37,6 @@ class Curso(models.Model):
 
     def get_absolute_url(self):
         return reverse('cursos:detalhe', args=[self.slug])
-
-    def preco_com_desconto(self):
-        return self.preco - self.desconto
 
 class Trilha(models.Model):
     AREA_CHOICES = (

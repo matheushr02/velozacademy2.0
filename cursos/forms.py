@@ -18,10 +18,13 @@ class CursoForm(forms.ModelForm):
     
     CONTENT_TYPE_CHOICES = (
         ('texto', 'Somente Texto'),
-        ('video', 'Somente Vídeos'),
-        ('texto_video', 'Texto e Vídeos'),
-        ('anexos', 'Anexos'),
-        ('completo', 'Texto, Vídeos e Anexos'),
+        ('video', 'Somente Vídeo'),
+        ('texto_video', 'Texto e Vídeo'),
+        ('anexos', 'Somente Anexos'),
+        ('completo', 'Texto, Vídeo e Anexos'),
+        ('texto_anexos', 'Texto e Anexos'),
+        ('video_anexos', 'Vídeo e Anexos'),
+        ('nenhum', 'Não especificado'),
     )
     
     categoria = forms.CharField(max_length=100, required=True, 
@@ -30,7 +33,7 @@ class CursoForm(forms.ModelForm):
     
     class Meta:
         model = Curso
-        fields = ['titulo', 'descricao', 'nivel', 'preco', 'desconto', 'imagem']
+        fields = ['titulo', 'descricao', 'nivel', 'imagem']
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 4}),
         }

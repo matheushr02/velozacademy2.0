@@ -21,29 +21,21 @@ def criar_cursos():
             'titulo': 'Python para Iniciantes',
             'descricao': 'Aprenda Python do zero, sem conhecimento prévio em programação.',
             'nivel': 'iniciante',
-            'preco': Decimal('99.90'),
-            'desconto': Decimal('20.00'),
         },
         {
             'titulo': 'Django Web Development',
             'descricao': 'Desenvolvimento web completo com Django, do básico ao avançado.',
             'nivel': 'intermediario',
-            'preco': Decimal('159.90'),
-            'desconto': Decimal('30.00'),
         },
         {
             'titulo': 'React: Desenvolvimento Frontend',
             'descricao': 'Crie interfaces modernas e reativas com React e JavaScript.',
             'nivel': 'intermediario',
-            'preco': Decimal('149.90'),
-            'desconto': Decimal('0.00'),
         },
         {
             'titulo': 'JavaScript Avançado',
             'descricao': 'Conceitos avançados de JavaScript, incluindo promises, async/await, e padrões de design.',
             'nivel': 'avancado',
-            'preco': Decimal('179.90'),
-            'desconto': Decimal('30.00'),
         },
     ]
     
@@ -55,8 +47,6 @@ def criar_cursos():
             slug=slugify(curso_data['titulo']),
             descricao=curso_data['descricao'],
             nivel=curso_data['nivel'],
-            preco=curso_data['preco'],
-            desconto=curso_data['desconto'],
         )
         cursos_criados.append(curso)
         
