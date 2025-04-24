@@ -13,7 +13,7 @@
 
 /* Força transição suave ao trocar temas */
 html, body, header, main, footer,
-.card, .navbar, .dropdown-menu, .btn {
+.card, .navbar, .dropdown-menu, .btn, .form-control, .badge, .alert {
     transition: background-color 0.4s ease, 
                 color 0.4s ease, 
                 border-color 0.4s ease !important;

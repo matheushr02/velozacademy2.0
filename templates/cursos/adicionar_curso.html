@@ -255,9 +255,9 @@ function setupContentTypeDetection() {
 
 
         if (videoUrl) videoUrl.addEventListener('input', () => updateContentTypes(form));
-        if (videoFile) videoFile.addEventListener('input', () => updateContentTypes(form));
+        if (videoFile) videoFile.addEventListener('change', () => updateContentTypes(form));
         if (conteudo) conteudo.addEventListener('input', () => updateContentTypes(form));
-        if (arquivos) arquivos.addEventListener('input', () => updateContentTypes(form));
+        if (arquivos) arquivos.addEventListener('change', () => updateContentTypes(form));
 
         updateContentTypes(form);
     });
@@ -265,14 +265,17 @@ function setupContentTypeDetection() {
 
 setupContentTypeDetection();
 
-    document.addEventListener('DOMContentLoaded', function(){
-        const fileInputs = document.querySelectorAll('input[type="file"]');
-        if (fileInputs.length > 0) {
-            fileInputs.forEach(input => {
-                input.setAttribute('multiple', 'multiple');
-            });
+function checkFileInputsMultiple() {
+    const fileInputs = document.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(input => {
+        if (!input.hasAttribute('multiple')) {
+            input.setAttribute('multiple', 'multiple');
         }
     });
+}
+
+document.addEventListener('DOMContentLoaded', checkFileInputsMultiple);
+
 
     document.addEventListener('DOMContentLoaded', function() {
         const container = document.getElementById('aulas-container');
@@ -319,6 +322,16 @@ setupContentTypeDetection();
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = 'Adicionar Curso';
                 }
+
+                form.addEventListener('invalid', function(e) {
+                    //? se valiadação flahar re implementa botão de adicionar curso
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Adicionar Curso';
+
+                    formMessages.innerHTML = '<div class="alert alert-danger">Por favor, corrija os erros presentes no formulário.</div>';
+
+                    e.preventDefault(); 
+                }, true);
             }, 10000);
         });
 
