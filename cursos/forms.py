@@ -29,11 +29,11 @@ class CursoForm(forms.ModelForm):
     
     categoria = forms.CharField(max_length=100, required=True, 
                                help_text="Ex: Python, Java, JavaScript, etc.")
-    tipo_conteudo = forms.ChoiceField(choices=CONTENT_TYPE_CHOICES, required=True)
+    #tipo_conteudo = forms.ChoiceField(choices=CONTENT_TYPE_CHOICES, required=True)
     
     class Meta:
         model = Curso
-        fields = ['titulo', 'descricao', 'nivel', 'imagem']
+        fields = ['titulo', 'descricao', 'nivel', 'imagem', 'categoria']
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 4}),
         }

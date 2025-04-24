@@ -151,13 +151,27 @@ def adicionar_curso(request):
         form = CursoForm(request.POST, request.FILES)
         aula_formset = AulaFormSet(request.POST, request.FILES, prefix='aulas')
         
+        print("POST data:", request.POST)
+        print("FILES data:", request.FILES)
+        
         if form.is_valid() and aula_formset.is_valid():
+            print("Form data is valid, trying to save...")
             try:
+                print("Form cleaned data:", form.cleaned_data)
+                print("FormSet cleaned data:", [f.cleaned_data for f in aula_formset])
                 # Salva o curso
                 curso = form.save()
+                print(f"Couse saved with ID {curso.id} and slug {curso.slug}")
                 
                 # Cria módulos padrão de aulas
                 modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
+                
+                print(f"Module created with ID {modulo.id}")
+                
+                #? Automaticamente verifica o tipo de conteudo dentro da aula do curso
+                has_video = False
+                has_text = False
+                has_files = False
                 
                 #? Salva as aulas
                 for i, aula_form in enumerate(aula_formset):
@@ -175,40 +189,45 @@ def adicionar_curso(request):
                         video_key = f'aulas-{i}-video_file'
                         if video_key in request.FILES:
                             aula.video_file = request.FILES[video_key]
-                    
-                        aula.save()
                         
-                        # Processamento de arquivos
-                        files = []
-                        
-                        j = 0
-                        while True:
-                            file_key = f'aulas-{i}-arquivos-{j}'
-                            if file_key in request.FILES:
-                                files.append(request.FILES[file_key])
-                                j += 1
-                            else:
-                                if j == 0 and f'aulas-{i}-arquivos' in request.FILES:
-                                    files.append(request.FILES[f'aulas-{i}-arquivos'])
-                                break
-                        
-                        # Salva os arquivos da aula
-                        for arquivo in files:
-                            ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
-
-                #? Automaticamente verifica o tipo de conteudo dentro da aula do curso
-                has_video = False
-                has_text = False
-                has_files = False
-                
-                for modulo in curso.modulos.all():
-                    for aula in modulo.aulas.all():
                         if aula.video_url:
                             has_video = True
                         if aula.conteudo and aula.conteudo.strip():
                             has_text = True
-                        if ArquivoAula.objects.filter(aula=aula).exists():
-                            has_files = True
+                        
+                        aula.save()
+                        
+                        # Processamento de arquivos
+                        files = []
+                        for key, value in request.FILES.items():
+                            if key.startswith(f'aulas-{i}-arquivos'):
+                                files.append(value)
+                                has_files = True
+                                
+                        for arquivo in files:
+                            ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
+                        #j = 0
+                        #while True:
+                            #file_key = f'aulas-{i}-arquivos-{j}'
+                            #if file_key in request.FILES:
+                                #files.append(request.FILES[file_key])
+                                #j += 1
+                            #else:
+                                #if j == 0 and f'aulas-{i}-arquivos' in request.FILES:
+                                    #break
+                        
+                        # Salva os arquivos da aula
+                
+
+                
+                #for modulo in curso.modulos.all():
+                    #for aula in modulo.aulas.all():
+                        #if aula.video_url:
+                            has_video = True
+                        #if aula.conteudo and aula.conteudo.strip():
+                            #has_text = True
+                        #if ArquivoAula.objects.filter(aula=aula).exists():
+                            #has_files = True
                 
                 if has_video and has_text and has_files:
                     curso.tipo_conteudo = 'completo'
@@ -226,21 +245,27 @@ def adicionar_curso(request):
                     curso.tipo_conteudo = 'anexos'
                 else:
                     curso.tipo_conteudo = 'nenhum'
+                    
                 #? Salva o curso com o tipo de conteúdo atualizado
                 curso.save()                        
                 
                 messages.success(request, 'Curso adicionado com sucesso!')
                 # Força uma resposta de redirecionamento imediata
-                response = redirect('cursos:detalhe', curso_slug=curso.slug)
-                response['Location'] = response.url
-                return response
+                return redirect('cursos:detalhe', curso_slug=curso.slug)
                 
             except Exception as e:
                 # Se ocorrer qualquer erro, exclui o curso (rollback manual)
                 if 'curso' in locals():
                     curso.delete()
                 messages.error(request, f'Erro ao adicionar curso: {str(e)}')
-                return redirect('cursos:lista')
+                import traceback
+                traceback.print_exc()
+                return render(request, 'cursos/adicionar_curso.html', {'form': form, 'aula_formset': aula_formset})
+                #return redirect('cursos:lista')
+                
+                
+                #messages.success(request, 'Curso adicionado com sucesso!')
+                #return redirect('cursos:detalhe', curso_slug=curso.slug)
         else:
             if 'imagem' in form.errors:
                 messages.error(request, 'Ocorreu um erro com a imagem enviada. Por favor, verifique o formato e tamanho.')        

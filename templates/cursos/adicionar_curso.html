@@ -26,7 +26,7 @@
                 
                 <div class="card bg-dark-subtle border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate id="adicionarCursoForm">
+                        <form method="post" action="{% url 'cursos:adicionar_curso' %}" enctype="multipart/form-data" class="needs-validation" novalidate id="adicionarCursoForm">
                             {% csrf_token %}
                             
                             <!-- Título -->
