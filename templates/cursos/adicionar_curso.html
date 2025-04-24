@@ -286,6 +286,16 @@ document.addEventListener('DOMContentLoaded', checkFileInputsMultiple);
         // Manipulador de envio do formulário para evitar envios duplicados
         const form = document.getElementById('adicionarCursoForm');
         const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('invalid', function(e) {
+            //? se validação falhar re implementa botão de adicionar curso
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Adicionar Curso';
+
+            formMessages.innerHTML = '<div class="alert alert-danger">Por favor, corrija os erros presentes no formulário.</div>';
+
+            e.preventDefault(); 
+        }, true);
         
         form.addEventListener('submit', function(e) {
             // Desabilita o botão e muda o texto para indicar carregamento
@@ -322,17 +332,9 @@ document.addEventListener('DOMContentLoaded', checkFileInputsMultiple);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = 'Adicionar Curso';
                 }
-
-                form.addEventListener('invalid', function(e) {
-                    //? se valiadação flahar re implementa botão de adicionar curso
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Adicionar Curso';
-
-                    formMessages.innerHTML = '<div class="alert alert-danger">Por favor, corrija os erros presentes no formulário.</div>';
-
-                    e.preventDefault(); 
-                }, true);
             }, 10000);
+
+            
         });
 
         //? Adiciona aula
