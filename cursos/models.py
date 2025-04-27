@@ -19,6 +19,7 @@ class Curso(models.Model):
         ('nenhum', 'Não especificado'),
     )
     
+    tipo_conteudo = models.CharField(max_length=20, choices=CONTENT_TYPE_CHOICES, default='nenhum')
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, unique=True)
     descricao = models.TextField()
