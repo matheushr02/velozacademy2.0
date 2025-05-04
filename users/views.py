@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.utils import timezone
 from .models import Perfil
 
 def login_view(request):
@@ -81,6 +82,21 @@ def perfil_view(request):
         return redirect('users:perfil')
     
     return render(request, 'users/perfil.html')
+
+@login_required
+def upgrade_account_view(request):
+    if request.method == 'POST':
+        #Todo colocar pagamento aqui (api de pagamento)
+        #? simula pagamento com sucesso
+
+        perfil = request.user.perfil
+        perfil.tipo_usuario = 'estudante'
+        perfil.data_assinatura = timezone.now().date()
+        perfil.save()
+        
+        messages.success(request, 'Parabéns! Agora você é um VelozEstudante com acesso completo aos cursos, certificados e mais. Aproveite!')
+        return redirect('users:perfil')
+    return render(request, 'users/upgrade_account.html')
 
 def recuperar_senha_view(request):
     if request.method == 'POST':

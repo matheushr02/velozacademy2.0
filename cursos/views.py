@@ -282,6 +282,23 @@ def adicionar_curso(request):
 def aula_view(request, curso_slug, aula_ordem):
     #? pega o curso por slug    
     curso = get_object_or_404(Curso, slug=curso_slug)
+    
+    can_acess = False
+    if request.user.is_authenticated:
+        if hasattr(request.user, 'perfil'):
+            if request.user.perfil.is_estudante() or request.user.perfil.is_admin():
+                can_acess = True
+            elif curso.is_free: #?Cursos gratuitos acesso liberado para todos visitantes 
+                can_acess = True
+            
+    if not can_acess and not request.user.is_authenticated:
+        messages.warning(request, 'Faça login para poder acessar.')
+        return redirect('users:login')
+    elif not can_acess:
+        messages.warning(request, 'Este curso requer uma assinatura para acesso. Faça upgrade para acessar este curso.')
+        return redirect('users:upgrade')
+        
+    
     try:
         modulo = Modulo.objects.filter(curso=curso, aulas__ordem=aula_ordem).first()
         if not modulo:

@@ -4,10 +4,18 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class Perfil(models.Model):
+    USER_TYPE_CHOICES = (
+        ('visitante', 'Visitante'),
+        ('estudante', 'VelozEstudante'),
+        ('admin', 'Administrador'),
+    )
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
     bio = models.TextField(blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     data_nascimento = models.DateField(blank=True, null=True)
+    tipo_usuario = models.CharField(max_length=15, choices=USER_TYPE_CHOICES, default='visitante')
+    data_assinatura = models.DateField(null=True, blank=True)
     
     class Meta:
         verbose_name = 'Perfil'
@@ -15,6 +23,15 @@ class Perfil(models.Model):
     
     def __str__(self):
         return f"Perfil de {self.user.username}"
+    
+    def is_visitante(self):
+        return self.tipo_usuario == 'visitante'
+    
+    def is_estudante(self):
+        return self.tipo_usuario == 'estudante'
+    
+    def is_admin(self):
+        return self.tipo_usuario == 'admin' or self.user.is_superuser
 
 class Inscricao(models.Model):
     STATUS_CHOICES = (

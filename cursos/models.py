@@ -27,6 +27,7 @@ class Curso(models.Model):
     imagem = models.ImageField(upload_to='cursos/', blank=True, null=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
+    is_free = models.BooleanField(default=False, verbose_name="Curso Gratuito")
 
     class Meta:
         ordering = ['-criado_em']
