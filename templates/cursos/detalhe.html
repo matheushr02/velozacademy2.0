@@ -82,7 +82,7 @@
                             {% if inscrito %}
                             <a href="{% url 'cursos:aula' curso.slug curso.modulos.first.aulas.first.ordem %}" class="btn btn-success btn-lg">Continuar Curso</a>
                             <div class="progress mt-3">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ progresso }}%%" aria-valuenow="{{ progresso }}" aria-valuemin="0" aria-valuemax="100">{{ progresso }}%</div>
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ progresso }}%" aria-valuenow="{{ progresso }}" aria-valuemin="0" aria-valuemax="100">{{ progresso }}%</div>
                             </div>
                             {% else %}
                             {% if curso.is_free or user.perfil.is_estudante or user.perfil.is_admin %}
@@ -92,11 +92,11 @@
                             </form>
                             {% else %}
                             <a href="{% url 'users:upgrade' %}" class="btn btn-warning btn-lg w-100">Faça Melhoria para Acessar</a>
-                            <div class="alert alert-info mt-2">Este curso requer um assinatura VelozEstudante</div>
+                            <div class="alert alert-info mt-2">Este curso requer uma assinatura VelozEstudante</div>
                             {% endif %}
                             {% endif %}
                             {% else %}
-                            <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-lg">Entrar para se Inscrever</a>
+                            <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary w-100">Entrar para se Inscrever</a>
                             {% endif %}
 
                             <!--? botão de teste (sempre visivel / para debug) -->
