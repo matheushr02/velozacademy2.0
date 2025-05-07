@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Administrativo{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold">Dashboard Administrativo</h1>
+            <p class="lead">Bem-vindo, {{ request.user.username }}! Aqui você pode visualizar estatísticas da plataforma.</p>
+        </div>
+    </div>
+    
+    <!-- Cards com estatísticas gerais -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        <!-- Usuários -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-people-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Total de Usuários</h6>
+                            <h2 class="fw-bold mb-0">{{ stats.total_usuarios }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cursos -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-book-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Total de Cursos</h6>
+                            <h2 class="fw-bold mb-0">{{ stats.total_cursos }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Trilhas -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-purple text-white rounded-circle p-3 me-3" style="background-color: #6f42c1">
+                            <i class="bi bi-signpost-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Total de Trilhas</h6>
+                            <h2 class="fw-bold mb-0">{{ stats.total_trilhas }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Módulos -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-collection-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Total de Módulos</h6>
+                            <h2 class="fw-bold mb-0">{{ stats.total_modulos }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Aulas -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-play-circle-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Total de Aulas</h6>
+                            <h2 class="fw-bold mb-0">{{ stats.total_aulas }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Inscrições -->
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info text-white rounded-circle p-3 me-3">
+                            <i class="bi bi-person-check-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0">Total de Inscrições</h6>
+                            <h2 class="fw-bold mb-0">{{ stats.total_inscricoes }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Seção Últimos Usuários e Últimos Cursos -->
+    <div class="row g-4 mb-5">
+        <!-- Últimos Usuários -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Últimos Usuários Cadastrados</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for user in ultimos_usuarios %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-bottom py-3">
+                            <div class="d-flex align-items-center">
+                                {% if user.perfil.avatar %}
+                                <img src="{{ user.perfil.avatar.url }}" alt="{{ user.username }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                {% else %}
+                                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <span class="fw-bold">{{ user.username|first|upper }}</span>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0">{{ user.username }}</h6>
+                                    <small class="text-muted">{{ user.email }}</small>
+                                </div>
+                            </div>
+                            <span class="text-muted small">{{ user.date_joined|date:"d/m/Y" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-center py-3">Nenhum usuário encontrado</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Últimos Cursos -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Últimos Cursos Cadastrados</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for curso in ultimos_cursos %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center border-bottom py-3">
+                            <div class="d-flex align-items-center">
+                                {% if curso.imagem %}
+                                <img src="{{ curso.imagem.url }}" alt="{{ curso.titulo }}" class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                {% else %}
+                                <div class="rounded bg-secondary text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-book"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-0">{{ curso.titulo }}</h6>
+                                    <small class="text-muted">Nível: {{ curso.get_nivel_display }}</small>
+                                </div>
+                            </div>
+                            <span class="text-muted small">{{ curso.criado_em|date:"d/m/Y" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item text-center py-3">Nenhum curso encontrado</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Seção de Estatísticas de Cursos e Trilhas -->
+    <div class="row g-4">
+        <!-- Distribuição por Níveis de Cursos -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">Distribuição por Nível de Cursos</h5>
+                </div>
+                <div class="card-body">
+                    {% for nivel in niveis_cursos %}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">
+                                {% if nivel.nivel == 'iniciante' %}Iniciante
+                                {% elif nivel.nivel == 'intermediario' %}Intermediário
+                                {% elif nivel.nivel == 'avancado' %}Avançado
+                                {% else %}{{ nivel.nivel }}
+                                {% endif %}
+                            </span>
+                            <span class="text-muted">{{ nivel.count }}</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar {% if nivel.nivel == 'iniciante' %}bg-success{% elif nivel.nivel == 'intermediario' %}bg-warning{% elif nivel.nivel == 'avancado' %}bg-danger{% else %}bg-primary{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ nivel.porcentagem }}%" 
+                                 aria-valuenow="{{ nivel.porcentagem }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted">Nenhum dado disponível</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Distribuição por Áreas de Trilhas -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header" style="background-color: #6f42c1; color: white;">
+                    <h5 class="card-title mb-0">Distribuição por Área de Trilhas</h5>
+                </div>
+                <div class="card-body">
+                    {% for area in areas_trilhas %}
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="text-muted">
+                                {% if area.area == 'dados' %}Ciência de Dados
+                                {% elif area.area == 'dev' %}Desenvolvimento de Software
+                                {% elif area.area == 'automacao' %}Automação
+                                {% elif area.area == 'ia' %}Inteligência Artificial
+                                {% else %}{{ area.area }}
+                                {% endif %}
+                            </span>
+                            <span class="text-muted">{{ area.count }}</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar {% if area.area == 'dados' %}bg-primary{% elif area.area == 'dev' %}bg-success{% elif area.area == 'automacao' %}bg-warning{% elif area.area == 'ia' %}bg-info{% else %}bg-secondary{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {{ area.porcentagem }}%" 
+                                 aria-valuenow="{{ area.porcentagem }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4 text-muted">Nenhum dado disponível</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
