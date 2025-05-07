@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %} Upgrade para VelozEstudante | VelozAcademy {% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card bg-dark border-secondary shadow-sm">
+                    <div class="card-body p-5">
+                        <h1 class="card-title fw-bold mb-4 text-center">Seja um VelozEstudante</h1>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-dark-subtle mb-3 h-100">
+                                    <div class="card-body">
+                                        <h5 class="fw-bold">Visitante (Status de conta atuais)</h5>
+                                        <ul class="list-unstyled">
+                                            <li><i class="bi bi-check-circle text-success me-2"></i> Acesso a cursos gratuitos</li>
+                                            <li><i class="bi bi-check-circle text-success me-2"></i> Perfil básico</li>
+                                            <li><i class="bi bi-x-circle text-danger me-2"></i> Cursos para alunos pagos bloqueados</li>
+                                            <li><i class="bi bi-x-circle text-danger me-2"></i> Sem acesso a projetos práticos</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-primary bg-opacity-25 border-primary mb-3 h-100">
+                                    <div class="card-body">
+                                        <h5 class="fw-bold text-primary">VelozEstudante</h5>
+                                        <ul class="list-unstyled">
+                                            <li><i class="bi bi-check-circle text-success me-2"></i> Acesso a <strong>TODOS</strong> os cursos</li>
+                                            <li><i class="bi bi-check-circle text-success me-2"></i> Livre acesso a <strong>projetos práticos</strong></li>
+                                            <li><i class="bi bi-check-circle text-success me-2"></i> Suporte dos instrutores</li>
+                                            <li><i class="bi bi-check-circle text-success me-2"></i> Certificação disponível</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <h3 class="mb-4">R$ 29,90</h3>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <!--Todo: API de pagamento feita aqui-->
+                                <button type="submit" class="btn btn-primary btn-lg">Fazer Melhoria Agora</button>
+                            </form>
+
+                            <p class="mt-3 text-muted small">Cancele a qualquer momento. Sem taxas adicionais (pode ser revisado futuramente)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

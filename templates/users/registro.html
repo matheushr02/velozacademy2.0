@@ -12,7 +12,7 @@
                         <h1 class="fw-bold">Criar Conta</h1>
                         <p>Junte-se à comunidade VelozAcademy</p>
                     </div>
-                    
+
                     <!-- Messages -->
                     {% if messages %}
                     <div class="mb-4">
@@ -23,7 +23,7 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    
+
                     <form method="post">
                         {% csrf_token %}
                         <div class="mb-3">
@@ -50,9 +50,9 @@
                             <button type="submit" class="btn btn-primary">Criar Conta</button>
                         </div>
                     </form>
-                    
+
                     <hr>
-                    
+
                     <div class="text-center">
                         <p class="mb-3">Já tem uma conta?</p>
                         <a href="{% url 'users:login' %}" class="btn btn-outline-primary">Entrar na conta</a>
@@ -62,4 +62,4 @@
         </div>
     </div>
 </section>
-{% endblock %} 
+{% endblock %}
