@@ -24,11 +24,20 @@
                     </div>
                     {% endif %}
 
-                    <form method="post">
+                    <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <div class="mb-3">
+                            <label for="first_name" class="form-label">Nome</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="first-name" name="first_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Sobrenome</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="last_name" name="last_name">
+                        </div>
+
+                        <div class="mb-3">
                             <label for="username" class="form-label">Nome de usuário</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="username" name="username" required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>

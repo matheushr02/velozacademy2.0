@@ -32,6 +32,8 @@ def registro_view(request):
         return redirect('home')
         
     if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -50,6 +52,8 @@ def registro_view(request):
             return render(request, 'users/registro.html')
             
         user = User.objects.create_user(username=username, email=email, password=password)
+        user.first_name = first_name
+        user.last_name = last_name
         user.save()
         
         # Perfil is created automatically via signal
