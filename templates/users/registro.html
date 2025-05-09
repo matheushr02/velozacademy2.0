@@ -7,68 +7,98 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
-                <div class="card p-4">
-                    <div class="text-center mb-4">
-                        <h1 class="fw-bold">Criar Conta</h1>
+                <div class="card bg-dark border-secondary shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="card-title fw-bold mb-4 text-center">Criar Conta</h2>
                         <p>Junte-se à comunidade VelozAcademy</p>
-                    </div>
 
-                    <!-- Messages -->
-                    {% if messages %}
-                    <div class="mb-4">
+                        <!-- Messages -->
+                        {% if messages %}
                         {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}" role="alert">
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                             {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         {% endfor %}
-                    </div>
-                    {% endif %}
+                        {% endif %}
 
-                    <form method="post" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="first_name" class="form-label">Nome</label>
-                            <input type="text" class="form-control bg-dark text-light border-secondary" id="first-name" name="first_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="last_name" class="form-label">Sobrenome</label>
-                            <input type="text" class="form-control bg-dark text-light border-secondary" id="last_name" name="last_name">
-                        </div>
+                        <form method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary {% if form.first_name.errors %}is-invalid{% endif %}" id="first_name" name="first_name" value="{{ request.POST.first_name|default:'' }}" required>
+                                <div class="invalid-feedback">Insira seu nome.</div>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Nome de usuário</label>
-                            <input type="text" class="form-control bg-dark text-light border-secondary" id="username" name="username" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password2" class="form-label">Confirmar Senha</label>
-                            <input type="password" class="form-control" id="password2" name="password2" required>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="termos" required>
-                            <label class="form-check-label" for="termos">Concordo com os <a href="#" class="text-primary">termos e condições</a></label>
-                        </div>
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary">Criar Conta</button>
-                        </div>
-                    </form>
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Sobrenome</label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary" id="last_name" name="last_name" value="{{request.POST.last_name|default:'' }}">
+                            </div>
 
-                    <hr>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Nome de usuário <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark text-light border-secondary {% if form.username.errors %}is-invalid{% endif %}" id="username" name="username" value="{{ request.POST.username|default:'' }}" required>
+                                <div class="form-text">Seu nome de usuário único e não contem espaços entre caracteres</div>
+                                <div class="invalid-feedback">
+                                    Insira um nome de usuário válido.
+                                </div>
+                            </div>
 
-                    <div class="text-center">
-                        <p class="mb-3">Já tem uma conta?</p>
-                        <a href="{% url 'users:login' %}" class="btn btn-outline-primary">Entrar na conta</a>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control bg-dark text-light border-secondary {% if form.email.errors %}is-invalid{% endif %}" id="email" name="email" required>
+                                <div class="invalid-feedback">Insira um endereço de email válido.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control bg-dark text-light border-secondary {% if form.password.errors %}is-invalid{% endif %}" id="password" name="password" required>
+                                <div class="invalid-feedback">
+                                    Insira uma senha válida.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password2" class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control bg-dark text-light border-secondary {% if form.password2.errors %}is-invalid{% endif %}" id="password2" name="password2" required>
+                                <div class="invalid-feedback">
+                                    As senhas não são iguais.
+                                </div>
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="termos" required>
+                                <label class="form-check-label" for="termos">Concordo com os <a href="#" class="text-primary">termos e condições</a></label>
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">Criar Conta</button>
+                            </div>
+
+                            <p class="text-center text-muted small">Já tem uma conta? <a href="{% url 'users:login' %}" class="text-decoration-none">Faça login</a>
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+
+            })
+    })()
+</script>
 {% endblock %}

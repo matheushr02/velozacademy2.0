@@ -29,38 +29,53 @@ def logout_view(request):
 
 def registro_view(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('core:home')
         
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        password2 = request.POST.get('password2')
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        username = request.POST.get('username', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '')
+        password2 = request.POST.get('password2', '')
+        
+        if not all([first_name, username, email, password, password2]):
+            messages.error(request, 'Preencha os campos faltantes com *')
+            return render(request, 'users/registro.html')
+        
+        if ' ' in username:
+            messages.error(request, 'Nome de usuário não pode conter espaços')
+            return render(request, 'users/registro.html')
         
         if password != password2:
-            messages.error(request, 'As senhas não conferem')
+            messages.error(request, 'As senhas não são iguais')
+            return render(request, 'users/registro.html')
+        
+        if len(password) < 8:
+            messages.error(request, 'A senha tem que conter 8 caracteres no minimo')
             return render(request, 'users/registro.html')
             
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Nome de usuário já existe')
+            messages.error(request, f"Nome de usuário '{username}' já está cadastrado. Troque o nome por outro")
             return render(request, 'users/registro.html')
             
         if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email já cadastrado')
+            messages.error(request, f"'{email}' Email já cadastrado, troque o email por outro")
             return render(request, 'users/registro.html')
             
-        user = User.objects.create_user(username=username, email=email, password=password)
-        user.first_name = first_name
-        user.last_name = last_name
-        user.save()
-        
-        # Perfil is created automatically via signal
-        
-        messages.success(request, 'Conta criada com sucesso! Faça login para continuar.')
-        return redirect('users:login')
-    
+        try:
+            user = User.objects.create_user(username=username, email=email, password=password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            
+            #? Cria perfil (automaticamente perfil visitante)
+            Perfil.objects.create(user=user)
+            
+            login(request, user)
+            messages.success(request, f'Conta criada! Faça login para acessar o VelozAcademy e seja Bem-Vindo(a) {user.first_name}!')            
+        except Exception as e:
+            messages.error(request, f'Ocorreu um erro ao criar sua conta: {e}')
     return render(request, 'users/registro.html')
 
 @login_required
