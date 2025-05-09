@@ -46,7 +46,7 @@
 
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control bg-dark text-light border-secondary {% if form.email.errors %}is-invalid{% endif %}" id="email" name="email" required>
+                                <input type="email" class="form-control bg-dark text-light border-secondary {% if form.email.errors %}is-invalid{% endif %}" id="email" name="email" value="{{ request.POST.email|default:'' }}" required>
                                 <div class="invalid-feedback">Insira um endereço de email válido.</div>
                             </div>
 
