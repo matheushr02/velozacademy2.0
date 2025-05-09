@@ -38,6 +38,11 @@ def registro_view(request):
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
         password2 = request.POST.get('password2', '')
+        termos = request.POST.get('termos')
+        
+        if not termos:
+            messages.error(request, 'Você precisa aceitar os termos de uso')
+            return render(request, 'users/registro.html')
         
         if not all([first_name, username, email, password, password2]):
             messages.error(request, 'Preencha os campos faltantes com *')
@@ -73,7 +78,7 @@ def registro_view(request):
             Perfil.objects.create(user=user)
             
             login(request, user)
-            messages.success(request, f'Conta criada! Faça login para acessar o VelozAcademy e seja Bem-Vindo(a) {user.first_name}!')            
+            messages.success(request, f'Conta criada! Bem-Vindo(a) {user.first_name}!')            
         except Exception as e:
             messages.error(request, f'Ocorreu um erro ao criar sua conta: {e}')
     return render(request, 'users/registro.html')
