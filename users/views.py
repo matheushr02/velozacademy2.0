@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.utils import timezone
 from .models import Perfil
+from .forms import RegistrationForm
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -32,56 +33,31 @@ def registro_view(request):
         return redirect('core:home')
         
     if request.method == 'POST':
-        first_name = request.POST.get('first_name', '').strip()
-        last_name = request.POST.get('last_name', '').strip()
-        username = request.POST.get('username', '').strip()
-        email = request.POST.get('email', '').strip()
-        password = request.POST.get('password', '')
-        password2 = request.POST.get('password2', '')
-        termos = request.POST.get('termos')
-        
-        if not termos:
-            messages.error(request, 'Você precisa aceitar os termos de uso')
-            return render(request, 'users/registro.html')
-        
-        if not all([first_name, username, email, password, password2]):
-            messages.error(request, 'Preencha os campos faltantes com *')
-            return render(request, 'users/registro.html')
-        
-        if ' ' in username:
-            messages.error(request, 'Nome de usuário não pode conter espaços')
-            return render(request, 'users/registro.html')
-        
-        if password != password2:
-            messages.error(request, 'As senhas não são iguais')
-            return render(request, 'users/registro.html')
-        
-        if len(password) < 8:
-            messages.error(request, 'A senha tem que conter 8 caracteres no minimo')
-            return render(request, 'users/registro.html')
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            first_name = form.cleaned_data.get('first_name')
+            last_name = form.cleaned_data.get('last_name')
+            username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
             
-        if User.objects.filter(username=username).exists():
-            messages.error(request, f"Nome de usuário '{username}' já está cadastrado. Troque o nome por outro")
-            return render(request, 'users/registro.html')
+            try:
+                user = User.objects.create_user(username=username, email=email, password=password)
+                user.first_name = first_name
+                user.last_name = last_name
+                user.save()
+                
+                messages.success(request, 'Sua conta foi criada com sucesso! Faça login.')
+                
+                return redirect('users:login')
+            except Exception as e:
+                messages.error(request, f'Ocorreu um erro ao criar sua conta: {e}')
+        else:
+            messages.error(request, 'Por favor, corrija os erros.')
             
-        if User.objects.filter(email=email).exists():
-            messages.error(request, f"'{email}' Email já cadastrado, troque o email por outro")
-            return render(request, 'users/registro.html')
-            
-        try:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user.first_name = first_name
-            user.last_name = last_name
-            user.save()
-            
-            #? Cria perfil (automaticamente perfil visitante)
-            Perfil.objects.create(user=user)
-            
-            login(request, user)
-            messages.success(request, f'Conta criada! Bem-Vindo(a) {user.first_name}!')            
-        except Exception as e:
-            messages.error(request, f'Ocorreu um erro ao criar sua conta: {e}')
-    return render(request, 'users/registro.html')
+    else:
+        form = RegistrationForm()
+    return render(request, 'users/registro.html', {'form': form})
 
 @login_required
 def perfil_view(request):

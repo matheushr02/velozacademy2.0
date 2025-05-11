@@ -22,52 +22,79 @@
                         {% endfor %}
                         {% endif %}
 
-                        <form method="post" class="needs-validation" novalidate>
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <form method="post" novalidate>
                             {% csrf_token %}
+
                             <div class="mb-3">
-                                <label for="first_name" class="form-label">Nome <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary {% if form.first_name.errors %}is-invalid{% endif %}" id="first_name" name="first_name" value="{{ request.POST.first_name|default:'' }}" required>
-                                <div class="invalid-feedback">Insira seu nome.</div>
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }} <span class="text-danger">*</span></label>
+                                {{ form.first_name }}
+                                {% if form.first_name.help_text %}
+                                <div class="form-text">{{ form.first_name.help_text|safe }}</div>
+                                {% endif %}
+                                {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="mb-3">
-                                <label for="last_name" class="form-label">Sobrenome</label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary" id="last_name" name="last_name" value="{{request.POST.last_name|default:'' }}">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.help_text %}
+                                <div class="form-text">{{ form.last_name.help_text|safe }}</div>
+                                {% endif %}
+                                {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="mb-3">
-                                <label for="username" class="form-label">Nome de usuário <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control bg-dark text-light border-secondary {% if form.username.errors %}is-invalid{% endif %}" id="username" name="username" value="{{ request.POST.username|default:'' }}" required>
-                                <div class="form-text">Seu nome de usuário único e não contem espaços entre caracteres</div>
-                                <div class="invalid-feedback">
-                                    Insira um nome de usuário válido.
-                                </div>
+                                <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}<span class="text-danger">*</span></label>
+                                {{ form.username }}
+                                <div class="form-text">Seu usuário deve ser único e não conter espaços.</div>
+                                {% for error in form.username.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                <input type="email" class="form-control bg-dark text-light border-secondary {% if form.email.errors %}is-invalid{% endif %}" id="email" name="email" value="{{ request.POST.email|default:'' }}" required>
-                                <div class="invalid-feedback">Insira um endereço de email válido.</div>
+                                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}<span class="text-danger">*</span></label>
+                                {{ form.email }}
+                                <div class="form-text">Forneça um e-mail válido.</div>
+                                {% for error in form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="mb-3">
-                                <label for="password" class="form-label">Senha <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control bg-dark text-light border-secondary {% if form.password.errors %}is-invalid{% endif %}" id="password" name="password" required>
-                                <div class="invalid-feedback">
-                                    Insira uma senha válida.
-                                </div>
+                                <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}<span class="text-danger">*</span></label>
+                                {{ form.password }}
+                                {% for error in form.password.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
                             </div>
+
                             <div class="mb-3">
-                                <label for="password2" class="form-label">Confirmar Senha <span class="text-danger">*</span></label>
-                                <input type="password" class="form-control bg-dark text-light border-secondary {% if form.password2.errors %}is-invalid{% endif %}" id="password2" name="password2" required>
-                                <div class="invalid-feedback">
-                                    As senhas não são iguais.
-                                </div>
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}<span class="text-danger">*</span></label>
+                                {{ form.password2 }}
+                                {% for error in form.password2.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="termos" required>
-                                <label class="form-check-label" for="termos">Concordo com os <a href="#" class="text-primary">termos e condições</a></label>
+                                {{ form.termos }}
+                                <label for="{{ form.termos.id_for_label }}" class="form-check-label">{{ form.termos.label|safe }}</label>
+                                {% for error in form.termos.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
                             </div>
 
                             <div class="d-grid mb-3">
@@ -84,21 +111,4 @@
     </div>
 </section>
 
-<script>
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-
-            })
-    })()
-</script>
 {% endblock %}
