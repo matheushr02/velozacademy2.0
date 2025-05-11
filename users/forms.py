@@ -6,31 +6,27 @@ class RegistrationForm(forms.Form):
         label='Nome',
         max_length=100,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control bg-dark text-light border-secondary',
-                                      'placeholder': 'Seu nome'})
+        widget=forms.TextInput(attrs={'class': 'form-control bg-dark text-light border-secondary', 'placeholder': 'Seu nome'})
     )
 
     last_name = forms.CharField(
         label='Sobrenome',
         max_length=100,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control bg-dark text-light border-secondary',
-                                      'placeholder': 'Seu sobrenome'})
+        widget=forms.TextInput(attrs={'class': 'form-control bg-dark text-light border-secondary', 'placeholder': 'Seu sobrenome'})
         )
     
     username = forms.CharField(
         label='Nome de usuário',
         max_length=150,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control bg-dark text-light border-secondary',
-                                      'placeholder': 'Escolha um nome de usuário'})
+        widget=forms.TextInput(attrs={'class': 'form-control bg-dark text-light border-secondary', 'placeholder': 'Escolha um nome de usuário'})
     )
 
     email = forms.EmailField(
         label='Email',
         required=True,
-        widget=forms.EmailInput(attrs={'class': 'form-control bg-dark text-light border-secondary',
-                                       'placeholder': 'Seu email: seuemail@exemplo.com'})
+        widget=forms.EmailInput(attrs={'class': 'form-control bg-dark text-light border-secondary', 'placeholder': 'Seu email: seuemail@exemplo.com'})
     )
     
     password = forms.CharField(
@@ -49,11 +45,11 @@ class RegistrationForm(forms.Form):
     termos = forms.BooleanField(
         label ='Concordo com os <a href="#" class="text-primary">termos e condições</a>',
         required=True,
-        widget=forms.CheckboxInput(attrs={'class': 'forms-check-input'})
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
     
     def clean_username(self):
-        username =self.cleaned_data.get('username')
+        username = self.cleaned_data.get('username')
         if ' ' in username:
             raise forms.ValidationError('O nome de usuário não pode conter espaços.')
         if User.objects.filter(username=username).exists():
@@ -69,7 +65,7 @@ class RegistrationForm(forms.Form):
     def clean_password2(self):
         password = self.cleaned_data.get('password')
         password2 = self.cleaned_data.get('password2')
-        if password != password2:
+        if password and password2 and password != password2:
             raise forms.ValidationError('As duas senhas não são iguais, tente novamente')
         return password2
     
