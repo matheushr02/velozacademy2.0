@@ -61,4 +61,7 @@ def criar_perfil(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def salvar_perfil(sender, instance, **kwargs):
-    instance.perfil.save()
+    try:
+        instance.perfil.save()
+    except Perfil.DoesNotExist:
+        Perfil.objects.create(user=instance)
