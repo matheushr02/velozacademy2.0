@@ -51,7 +51,7 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-5. Crie um superusuário (admin) (**PULE ESTA ETAPA**):
+5. Crie um superusuário (admin) (**ESTE USUARIO E SENHA SERÃO USADOS PARA LOGAR COMO ADMIN, ENTÃO DECORE**):
 ```bash
 python manage.py createsuperuser
 ```

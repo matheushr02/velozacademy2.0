@@ -10,6 +10,7 @@
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <h1 class="display-5 fw-bold mb-3">Cursos de Programação</h1>
                 <p class="lead mb-4">Aprenda programação com cursos práticos e focados em projetos reais.</p>
+                {% if user.is_staff or user.is_superuser %}
                 <a href="{% url 'cursos:adicionar_curso' %}" class="btn btn-primary btn-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
@@ -17,6 +18,7 @@
                     </svg>
                     Adicionar Curso
                 </a>
+                {% endif %}
             </div>
             <div class="col-lg-6 text-center">
                 <img src="/static/images/cursos-hero.svg" alt="Cursos VelozAcademy" class="img-fluid">

@@ -7,6 +7,8 @@ from .models import Perfil
 
 def login_view(request):
     if request.user.is_authenticated:
+        if request.user.is_staff or request.user.is_superuser:
+            return redirect('dashboard:home')
         return redirect('home')
         
     if request.method == 'POST':
@@ -16,6 +18,8 @@ def login_view(request):
         
         if user is not None:
             login(request, user)
+            if user.is_staff or user.is_superuser:
+                return redirect('dashboard:home')
             return redirect('home')
         else:
             messages.error(request, 'Usuário ou senha inválidos')

@@ -4,9 +4,10 @@ from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import CursoForm, AulaForm
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.forms import formset_factory
 from django.http import Http404
+import logging
 
 # Create your views here.
 
@@ -143,7 +144,13 @@ def lista_trilhas(request):
         'area_selecionada': area
     })
 
+def is_admin(user):
+    """Verifica se o usuário é um administrador."""
+    return user.is_staff or user.is_superuser
+
 #+ adicionar_curso refeito
+@login_required
+@user_passes_test(is_admin)
 def adicionar_curso(request):
     AulaFormSet = formset_factory(AulaForm, extra=1)
     
