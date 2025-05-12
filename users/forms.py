@@ -1,5 +1,40 @@
 from django import forms
 from django.contrib.auth.models import User
+from .models import Perfil
+
+class UserUpdateForm(forms.ModelForm):
+    first_name = forms.CharField(
+        label='Nome',
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    last_name = forms.CharField(
+        label='Sobrenome',
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
+
+class PerfilUpdateForm(forms.ModelForm):
+    bio = forms.CharField(
+        label='Biografia',
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 4})
+    )
+    avatar = forms.ImageField(
+        label='Alterar foto',
+        required=False,
+        widget=forms.FileInput(attrs={'class': 'form-control d-none', 'id': 'id_avatar'})
+    )
+    
+    class Meta:
+        model = Perfil
+        fields = ['bio', 'avatar']
 
 class RegistrationForm(forms.Form):
     first_name = forms.CharField(

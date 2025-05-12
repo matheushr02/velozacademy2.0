@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db import transaction, IntegrityError
 from .models import Perfil
-from .forms import RegistrationForm
+from .forms import RegistrationForm, UserUpdateForm, PerfilUpdateForm
 import logging
 
 logger = logging.getLogger(__name__)
@@ -79,27 +79,31 @@ def registro_view(request):
 
 @login_required
 def perfil_view(request):
-    user = request.user
+    user_instance = request.user
+    perfil_instance = user_instance.perfil
     
     if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=user_instance)
+        perfil_form = PerfilUpdateForm(request.POST, request.FILES, instance=perfil_instance)
+        
+        if user_form.is_valid() and perfil_form.is_valid():
         # Update profile info
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.save()
-        
-        # Update profile
-        perfil = user.perfil
-        perfil.bio = request.POST.get('bio')
-        
-        if 'avatar' in request.FILES:
-            perfil.avatar = request.FILES['avatar']
-            
-        perfil.save()
-        
-        messages.success(request, 'Perfil atualizado com sucesso')
-        return redirect('users:perfil')
+            user_form.save()
+            perfil_form.save()
+            messages.success(request, 'Perfil atualizado')
+            return redirect('users:perfil')
+        else:
+            messages.error(request, 'Por favor, corrija os erros abaixo.')
+    else:
+       user_form = UserUpdateForm(instance=user_instance)
+       perfil_form = PerfilUpdateForm(instance=perfil_instance)
     
-    return render(request, 'users/perfil.html')
+    context = {
+        'user_form': user_form,
+        'perfil_form': perfil_form,
+        'user': user_instance
+    }
+    return render(request, 'users/perfil.html', context)
 
 @login_required
 def upgrade_account_view(request):
