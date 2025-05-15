@@ -10,13 +10,15 @@
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <h1 class="display-5 fw-bold mb-3">Cursos de Programação</h1>
                 <p class="lead mb-4">Aprenda programação com cursos práticos e focados em projetos reais.</p>
+                {% if user.is_authenticated and user.perfil.is_admin %}
                 <a href="{% url 'cursos:adicionar_curso' %}" class="btn btn-primary btn-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                     </svg>
                     Adicionar Curso
                 </a>
+                {% endif %}
             </div>
             <div class="col-lg-6 text-center">
                 <img src="/static/images/cursos-hero.svg" alt="Cursos VelozAcademy" class="img-fluid">
@@ -61,7 +63,7 @@
 <section id="filtros" class="py-5 bg-dark">
     <div class="container">
         <h2 class="fw-bold mb-4">Encontre o curso ideal</h2>
-        
+
         <div class="card bg-dark-subtle border-0 shadow-sm mb-5">
             <div class="card-body p-4">
                 <form method="get" action="#cursos" class="row g-3">
@@ -70,13 +72,13 @@
                         <div class="input-group">
                             <span class="input-group-text bg-dark border-secondary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                                 </svg>
                             </span>
                             <input type="text" class="form-control bg-dark text-light border-secondary" id="search" name="search" value="{{ search }}" placeholder="Ex: Python, Dashboard, Data Science...">
                         </div>
                     </div>
-                    
+
                     <div class="col-lg-3 col-md-6">
                         <label for="nivel" class="form-label">Nível</label>
                         <select class="form-select bg-dark text-light border-secondary" id="nivel" name="nivel">
@@ -86,7 +88,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    
+
                     <div class="col-lg-3 col-md-6">
                         <label for="categoria" class="form-label">Categoria</label>
                         <select class="form-select bg-dark text-light border-secondary" id="categoria" name="categoria">
@@ -96,7 +98,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    
+
                     <div class="col-lg-2 col-md-6">
                         <label for="ordenar" class="form-label">Ordenar por</label>
                         <select class="form-select bg-dark text-light border-secondary" id="ordenar" name="ordenar">
@@ -106,7 +108,7 @@
                             <option value="horas_desc" {% if ordenar == 'horas_desc' %}selected{% endif %}>Maior duração</option>
                         </select>
                     </div>
-                    
+
                     <div class="col-12 mt-4 d-flex justify-content-between align-items-center">
                         <a href="{% url 'cursos:lista' %}" class="text-decoration-none">Limpar filtros</a>
                         <button type="submit" class="btn btn-primary px-4">Filtrar Resultados</button>
@@ -135,9 +137,9 @@
             </div>
         </div>
         {% endif %}
-        
+
         <h2 class="fw-bold mb-4">{% if cursos %}Cursos disponíveis{% else %}Nenhum curso encontrado{% endif %}</h2>
-        
+
         <div class="row g-4">
             {% for curso in cursos %}
             <div class="col-lg-4 col-md-6">
@@ -153,12 +155,12 @@
                     <div class="card-body p-4">
                         <h5 class="card-title fw-bold mb-3">{{ curso.titulo }}</h5>
                         <p class="card-text text-muted mb-4" style="height: 4.5rem; overflow: hidden;">{{ curso.descricao|truncatechars:120 }}</p>
-                        
+
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clock me-2" viewBox="0 0 16 16">
-                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                                    <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z" />
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z" />
                                 </svg>
                                 <span class="text-muted">
                                     {% with total_minutos=curso.modulos.all|length %}
@@ -168,7 +170,7 @@
                             </div>
                             <div class="d-flex align-items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-book me-2" viewBox="0 0 16 16">
-                                    <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z"/>
+                                    <path d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752v9.746c-.935-.53-2.12-.603-3.213-.493-1.18.12-2.37.461-3.287.811V2.828zm7.5-.141c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492V2.687zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783z" />
                                 </svg>
                                 <span class="text-muted">
                                     {% with total_modulos=curso.modulos.all|length %}
@@ -177,7 +179,7 @@
                                 </span>
                             </div>
                         </div>
-                        
+
                         <div class="d-grid">
                             <a href="{% url 'cursos:detalhe' curso.slug %}" class="btn btn-primary">Ver Detalhes</a>
                         </div>
@@ -188,7 +190,7 @@
             <div class="col-12">
                 <div class="alert bg-dark-subtle text-center p-5 border-0 shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-search mb-3" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                     </svg>
                     <h4 class="fw-bold mb-3">Nenhum curso encontrado com esses filtros</h4>
                     <p class="mb-4">Tente outros termos de busca ou remova os filtros aplicados.</p>
@@ -197,7 +199,7 @@
             </div>
             {% endfor %}
         </div>
-        
+
         <!-- Pagination -->
         {% if cursos.has_other_pages %}
         <nav aria-label="Page navigation" class="mt-5">
@@ -214,31 +216,30 @@
                     </a>
                 </li>
                 {% endif %}
-                
+
                 {% for num in cursos.paginator.page_range %}
                 {% if cursos.number == num %}
                 <li class="page-item active">
                     <span class="page-link bg-primary border-primary">{{ num }}</span>
                 </li>
-                {% elif num > cursos.number|add:'-3' and num < cursos.number|add:'3' %}
-                <li class="page-item">
+                {% elif num > cursos.number|add:'-3' and num < cursos.number|add:'3' %} <li class="page-item">
                     <a class="page-link bg-dark-subtle text-light border-secondary" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if nivel_selecionado %}&nivel={{ nivel_selecionado }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}#cursos">{{ num }}</a>
-                </li>
-                {% endif %}
-                {% endfor %}
-                
-                {% if cursos.has_next %}
-                <li class="page-item">
-                    <a class="page-link bg-dark-subtle text-light border-secondary" href="?page={{ cursos.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if nivel_selecionado %}&nivel={{ nivel_selecionado }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}#cursos" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link bg-dark-subtle text-light border-secondary" href="?page={{ cursos.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if nivel_selecionado %}&nivel={{ nivel_selecionado }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}#cursos" aria-label="Last">
-                        <span aria-hidden="true">&raquo;&raquo;</span>
-                    </a>
-                </li>
-                {% endif %}
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if cursos.has_next %}
+                    <li class="page-item">
+                        <a class="page-link bg-dark-subtle text-light border-secondary" href="?page={{ cursos.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if nivel_selecionado %}&nivel={{ nivel_selecionado }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}#cursos" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link bg-dark-subtle text-light border-secondary" href="?page={{ cursos.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if nivel_selecionado %}&nivel={{ nivel_selecionado }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenar %}&ordenar={{ ordenar }}{% endif %}#cursos" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
             </ul>
         </nav>
         {% endif %}
@@ -267,17 +268,17 @@
     .bg-dark-subtle {
         background-color: #1e1e1e !important;
     }
-    
+
     .hover-zoom {
         transition: transform 0.3s ease;
     }
-    
+
     .hover-zoom:hover {
         transform: translateY(-5px);
     }
-    
+
     .hover-shadow:hover {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     }
 </style>
-{% endblock %} 
+{% endblock %}

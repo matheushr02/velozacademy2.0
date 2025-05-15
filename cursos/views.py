@@ -145,6 +145,10 @@ def lista_trilhas(request):
 
 #+ adicionar_curso refeito
 def adicionar_curso(request):
+    if not request.user.is_authenticated or not request.user.perfil.is_admin():
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect('cursos:lista')
+
     AulaFormSet = formset_factory(AulaForm, extra=1)
     
     if request.method == 'POST':

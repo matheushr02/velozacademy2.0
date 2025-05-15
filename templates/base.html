@@ -106,7 +106,7 @@
                             <li><a href="{% url 'users:upgrade' %}" class="dropdown-item text-primary">Upgrade para VelozEstuadante</a></li>
                             {% endif %}
 
-                            {% if user.is_staff or user.perfil.is_admin %}
+                            {% if user.perfil.is_admin %}
                             <li><a href="{% url 'admin:index' %}" class="dropdown-item text-warning">Administração</a></li>
                             {% endif %}
                             <li>
