@@ -49,7 +49,7 @@
                                                         {% if user.perfil.avatar %}
                                                         <img src="{{ user.perfil.avatar.url }}" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
                                                         {% else %}
-                                                        <img src="/static/images/default-avatar.jpg" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                                        <img src="/static/images/default-avatar.jpg" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover; object-position: 50% 70%;">
                                                         {% endif %}
                                                     </div>
                                                     <div>
