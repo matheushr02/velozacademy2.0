@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
+from users.models import Inscricao
 from .models import Curso, Trilha, Modulo, Aula, ArquivoAula
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -7,8 +9,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.forms import formset_factory
 from django.http import Http404
+import logging
 
 # Create your views here.
+
+logger = logging.getLogger(__name__)
 
 def lista_cursos(request):
     # Obter parâmetros de filtro
@@ -85,23 +90,36 @@ def lista_cursos(request):
 
 def detalhe_curso(request, curso_slug):
     curso = get_object_or_404(Curso, slug=curso_slug)
+    modulos = curso.modulos.all().order_by('ordem')
     
-    modulos = curso.modulos.all()
-    
-    # Add context variables needed by the template
+    # Valores padrão
     inscrito = False
     progresso = 0
+    first_aula_ordem = None
     
+    for modulo in modulos:
+        primeira_aula_do_modulo = modulo.aulas.all().order_by('ordem').first()
+        if primeira_aula_do_modulo:
+            first_aula_ordem = primeira_aula_do_modulo.ordem
+            break
+
     # Here you would check if the user is enrolled and calculate progress
     # For now we just set defaults
     
     if request.user.is_authenticated:
-        pass
+        try:
+            inscricao = Inscricao.objects.get(user=request.user, curso=curso)
+            inscrito = True
+            progresso = inscricao.progresso
+        except Inscricao.DoesNotExist:
+            pass
     
     context = {
         'curso': curso,
+        'modulos': modulos,
         'inscrito': inscrito,
-        'progresso': progresso
+        'progresso': progresso,
+        'first_aula_ordem': first_aula_ordem
     }
     
     return render(request, 'cursos/detalhe.html', context)
@@ -111,13 +129,14 @@ def trilha_cursos(request, trilha_slug):
     trilha = get_object_or_404(Trilha, slug=trilha_slug)
     
     # Obter os cursos associados à trilha
-    cursos = trilha.cursos.all()
+    cursos_da_trilha = trilha.cursos.all()
     
-    return render(request, 'cursos/trilha.html', {
-        'trilha_nome': trilha.nome,
-        'trilha_slug': trilha_slug,
-        'cursos': cursos
-    })
+    context = {
+        'trilha': trilha,
+        'cursos': cursos_da_trilha,
+    }
+    
+    return render(request, 'cursos/trilha.html', context)
 
 def lista_trilhas(request):
     # Obter parâmetros de filtro
@@ -287,46 +306,72 @@ def aula_view(request, curso_slug, aula_ordem):
     #? pega o curso por slug    
     curso = get_object_or_404(Curso, slug=curso_slug)
     
-    can_acess = False
+    logger.debug(f"Aula_view: Access attempt by user '{request.user.username if request.user.is_authenticated else 'Anonymous'}', for course: '{curso.slug}', aula_ordem: '{aula_ordem}'")
+    
+    can_access = False
+    is_admin_user = False
+    
     if request.user.is_authenticated:
-        if hasattr(request.user, 'perfil'):
-            if request.user.perfil.is_estudante() or request.user.perfil.is_admin():
-                can_acess = True
-            elif curso.is_free: #?Cursos gratuitos acesso liberado para todos visitantes 
-                can_acess = True
+        logger.debug(f"Aula_view: User '{request.user.username}' is authenticated.")
+        if hasattr(request.user, 'perfil') and request.user.perfil.is_admin():
+            can_access = True
+            is_admin_user = True
+            logger.debug(f"Aula_view: User '{request.user.username}' is admin. Access granted.")
+
+        if not can_access:
+            is_enrolled = Inscricao.objects.filter(user=request.user, curso=curso).exists()
+            logger.debug(f"Aula_view: User '{request.user.username}' is enrolled in course '{curso.slug}'? {is_enrolled}")
+            if is_enrolled:
+                can_access = True
+                logger.debug(f"Aula_view: User '{request.user.username}' is enrolled. Access granted.")
+            else:
+                course_is_free = hasattr(curso, 'is_free') and curso.is_free
+                logger.debug(f"Aula_view: Course '{curso.slug}' is free? {course_is_free}")
+                if course_is_free:
+                    can_access = True
+                    logger.debug(f"Aula_view: Course '{curso.slug}' is free. Access granted for user '{request.user.username}'.")
+    else:
+        logger.debug(f"Aula_view: User is not authenticated for this request.")
+
+    logger.info(f"Aula_view: Final access decision for user '{request.user.username if request.user.is_authenticated else 'Anonymous'}' to course '{curso.slug}', aula_ordem '{aula_ordem}': {'Granted' if can_access else 'Denied'}")
             
-    if not can_acess and not request.user.is_authenticated:
-        messages.warning(request, 'Faça login para poder acessar.')
-        return redirect('users:login')
-    elif not can_acess:
-        messages.warning(request, 'Este curso requer uma assinatura para acesso. Faça upgrade para acessar este curso.')
-        return redirect('users:upgrade')
-        
-    
+    if not can_access:
+        if not request.user.is_authenticated:
+            messages.warning(request, 'Faça login para poder acessar.')
+            return redirect(f"{reverse('users:login')}?next={request.path}")
+        else:
+            messages.warning(request, 'Você precisa se inscrever neste curso para assistir às aulas. ')
+            return redirect('cursos:detalhe', curso_slug=curso.slug)
+
     try:
-        modulo = Modulo.objects.filter(curso=curso, aulas__ordem=aula_ordem).first()
-        if not modulo:
-            raise Http404("Aula não encontrada")
-        
-        aula = Aula.objects.filter(modulo=modulo, ordem=aula_ordem).first()
+        aula = None
+        for m in curso.modulos.all().order_by("ordem"):
+            aula_candidata = m.aulas.filter(ordem=aula_ordem).first()
+            if aula_candidata:
+                aula = aula_candidata
+                break
+
         if not aula:
-            raise Http404("Aula não encontrada")
-    except Exception:
-        raise Http404("Aula não encontrada")
-    
+            raise Http404("Aula não encontrada neste curso com a ordem especificada.")
+
+    except Exception as e:
+        logger.error(f"Error fetching aula: {e}")
+        raise Http404("Aula não encontrada ou erro ao carregar.")
+
     aula_anterior = Aula.objects.filter(modulo__curso=curso, ordem__lt=aula_ordem).order_by('-ordem').first()
     proxima_aula = Aula.objects.filter(modulo__curso=curso, ordem__gt=aula_ordem).order_by('ordem').first()
     
-    progresso = 0
-    aula_concluida = False
+    progresso_aula = 0
+    aula_esta_concluida = False
     
     context = {
         'curso': curso,
         'aula': aula,
         'aula_anterior': aula_anterior,
         'proxima_aula': proxima_aula,
-        'progresso': progresso,
-        'aula_concluida': aula_concluida,
+        'progresso_aula': progresso_aula,
+        'aula_concluida': aula_esta_concluida,
+        'is_admin_user': is_admin_user
     }
     
     return render(request, 'cursos/aula.html', context)
@@ -335,9 +380,18 @@ def aula_view(request, curso_slug, aula_ordem):
 def inscrever_curso(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     
-    # Normally, you would handle enrollment logic here
-    # For now, just simulate success and redirect back
-    messages.success(request, f'Você foi inscrito com sucesso no curso {curso.titulo}!')
+    if Inscricao.objects.filter(user=request.user, curso=curso).exists():
+        messages.info(request, f'Você já está inscrito no curso {curso.titulo}!')
+    else:
+        Inscricao.objects.create(
+            user=request.user,
+            curso=curso,
+            status='ativo',
+            progresso=0
+        )
+        # Normally, you would handle enrollment logic here
+        # For now, just simulate success and redirect back
+        messages.success(request, f'Você foi inscrito com sucesso no curso {curso.titulo}!')
     return redirect('cursos:detalhe', curso_slug=curso.slug)
 
 #TODO: Implementar no database estas informações em uma futura implementação

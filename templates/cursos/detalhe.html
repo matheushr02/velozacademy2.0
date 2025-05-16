@@ -80,7 +80,7 @@
                         <div class="d-grid mb-4">
                             {% if user.is_authenticated %}
                             {% if inscrito %}
-                            <a href="{% url 'cursos:aula' curso.slug curso.modulos.first.aulas.first.ordem %}" class="btn btn-success btn-lg">Continuar Curso</a>
+                            <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-success btn-lg {% if first_aula_ordem is None %}disabled{% endif %}">Continuar Curso</a>
                             <div class="progress mt-3">
                                 <div class="progress-bar bg-success" role="progressbar" style="width: {{ progresso }}%" aria-valuenow="{{ progresso }}" aria-valuemin="0" aria-valuemax="100">{{ progresso }}%</div>
                             </div>
@@ -100,12 +100,21 @@
                             {% endif %}
 
                             <!--? botão de teste (sempre visivel / para debug) -->
-                            <a href="{% if curso.modulos.first and curso.modulos.first.aulas.first %}{% url 'cursos:aula' curso.slug curso.modulos.first.aulas.first.ordem %}{% else %}#{% endif %}" class="btn btn-warning btn-lg w-100 mt-2">
-                                <i class="bi bi-eye-fill me-2"></i>Testar Visualização de Aula
-                            </a>
-                            <div class="alert alert-warning mt-2 small">
-                                <i class="bi bi-info-circle-fill me-2"></i>Este botão é apenas para teste, não implementar no proximo update; todo: concertar botão de inscrição
-                            </div>
+                            {% if inscrito %}
+                                {% if user.perfil.is_admin %}
+                                <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-outline-secondary w-100 mt-3 {% if first_aula_ordem is None %}disabled{% endif %}">
+                                    <i class="bi bi-eye-fill me-2"></i>Testar Visualização de Aula
+                                </a>
+                                {% else %}
+                                <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-primary w-100 mt-3 {% if first_aula_ordem is None %}disabled{% endif %}">
+                                    <i class="bi bi-check-circle-fill me-2"></i>Assistir Curso
+                                </a>
+                                {% endif %}
+                            {% elif user.is_authenticated and user.perfil.is_admin %}
+                                <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-success w-100 mt-3 {% if first_aula_ordem is None %}disabled{% endif %}">
+                                    <i class="bi bi-tools me-2"></i>Admin: Testar Aula
+                                </a>
+                            {% endif %}
                         </div>
 
                         <h5 class="fw-bold mb-3">Este curso inclui:</h5>
