@@ -25,7 +25,37 @@
     <!--combo@* Custom CSS -->
     <link href="/static/css/custom.css" rel="stylesheet">
 
-    {% block styles %}{% endblock %}
+    {% block styles %}
+    <style>
+        .course-description img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .accordion_button:not(.collapsed) {
+            color: #ffffff;
+            background-color: #212529;
+        }
+        .accordion_button:focus {
+            box-shadow: none;
+        }
+        .dropdown-menu .dropdown-item {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        /** Estilo do upgrade para VelozEstudante **/
+        .dropdown-menu-dark .dropdown-item.dropdown-item-upgrade-link {
+            color: #FC6438 !important;
+        }
+
+        .dropdown-menu-dark .dropdown-item.dropdown-item-upgrade-link:hover,
+        .dropdown-menu-dark .dropdown-item.dropdown-item-upgrade-link:focus {
+            color: #FE7044 !important;
+            background-color: #202428 !important;
+        }
+    </style>   
+    {% endblock %}
 </head>
 
 <body>
@@ -102,8 +132,8 @@
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
                             <li><a href="{% url 'users:perfil' %}" class="dropdown-item">Perfil</a></li>
 
-                            {% if user.perfil.is_visitante %}
-                            <li><a href="{% url 'users:upgrade' %}" class="dropdown-item text-primary">Upgrade para VelozEstuadante</a></li>
+                            {% if user.perfil.is_visitante and not user.perfil.is_admin %}
+                            <li><a href="{% url 'users:upgrade' %}" class="dropdown-item fw-bold dropdown-item-upgrade-link"><i class="bi bi-check-circle-fill me-2"></i>Upgrade para VelozEstudante</a></li>
                             {% endif %}
 
                             {% if user.perfil.is_admin %}
@@ -213,10 +243,6 @@
             </div>
         </nav>
     </header>
-    <!--- Main Content (old arquived)
-    <main>
-        { block content %}{ endblock %}
-    </main>
     -->
 
     <!-- Footer -->

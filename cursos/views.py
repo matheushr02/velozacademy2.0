@@ -11,7 +11,7 @@ from django.forms import formset_factory
 from django.http import Http404
 import logging
 
-# Create your views here.
+#// remover/comentar logger quando em produção
 
 logger = logging.getLogger(__name__)
 

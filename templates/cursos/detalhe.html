@@ -100,19 +100,9 @@
                             {% endif %}
 
                             <!--? botão de teste (sempre visivel / para debug) -->
-                            {% if inscrito %}
-                                {% if user.perfil.is_admin %}
+                            {% if user.is_authenticated and user.perfil.is_admin %}
                                 <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-outline-secondary w-100 mt-3 {% if first_aula_ordem is None %}disabled{% endif %}">
-                                    <i class="bi bi-eye-fill me-2"></i>Testar Visualização de Aula
-                                </a>
-                                {% else %}
-                                <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-primary w-100 mt-3 {% if first_aula_ordem is None %}disabled{% endif %}">
-                                    <i class="bi bi-check-circle-fill me-2"></i>Assistir Curso
-                                </a>
-                                {% endif %}
-                            {% elif user.is_authenticated and user.perfil.is_admin %}
-                                <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-success w-100 mt-3 {% if first_aula_ordem is None %}disabled{% endif %}">
-                                    <i class="bi bi-tools me-2"></i>Admin: Testar Aula
+                                    <i class="bi bi-eye-fill me-2"></i>Admin: Teste Visualização de Aula
                                 </a>
                             {% endif %}
                         </div>
@@ -216,11 +206,11 @@
                                         </div>
                                     </button>
                                 </h2>
-                                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#accordionCurriculum">
-                                    <div class="accordion-body">
-                                        <ul class="list-group list-group-flush">
+                                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#accordionCurriculum">
+                                    <div class="accordion-body p-0">
+                                        <div class="list-group list-group-flush">
                                             {% for aula in modulo.aulas.all %}
-                                            <li class="list-group-item bg-dark border-secondary d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'cursos:aula' curso.slug aula.ordem %}" class="list-group-item list-group-item-action bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
                                                 <div class="d-flex align-items-center">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-circle me-3 text-primary" viewBox="0 0 16 16">
                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
@@ -229,9 +219,9 @@
                                                     <span>{{ aula.titulo }}</span>
                                                 </div>
                                                 <span class="badge bg-dark text-secondary border border-secondary">{{ aula.duracao }} min</span>
-                                            </li>
+                                            </a>
                                             {% endfor %}
-                                        </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
