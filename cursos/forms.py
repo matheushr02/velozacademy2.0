@@ -60,17 +60,17 @@ class CursoForm(forms.ModelForm):
 class AulaForm(forms.ModelForm):
     video_file = forms.FileField(required=False, validators=[validate_video_extension], help_text="Faça upload de um vídeo (maximo:500MB; formatos aceitos: MP4, AVI, MOV, WMV, MKV ou WEBM)")
     video_url = forms.URLField(required=False, help_text="Cole a URL do vídeo (YouTube, Vimeo, etc.)")
-    
     conteudo = forms.CharField(widget=forms.Textarea(attrs={'rows': 4}), required=False)
-    arquivos = forms.FileField(required=False)
-    
+    arquivos = forms.FileField(required=False, widget=forms.widgets.Input(attrs={'type':'file','multiple': True}))
+
     class Meta:
         model = Aula
-        fields = ['titulo', 'duracao_minutos', 'video_url']
+        fields = ['titulo', 'duracao_minutos', 'video_url', 'video_file', 'conteudo', 'arquivos']
         
     def clean(self):
         cleaned_data = super().clean()
         #? Verifica se pelo menos um dos campos de conteúdo foi preenchido
-        if not cleaned_data.get('video_file') and not cleaned_data.get('conteudo') and not cleaned_data.get('arquivos') and not cleaned_data.get('video_url'):
-            raise forms.ValidationError('Uma aula deve ter pelo menos vídeo, texto ou arquivos.')
+        has_video_content = cleaned_data.get('video_file') or cleaned_data.get('video_url')
+        if not has_video_content and not cleaned_data.get('conteudo') and not cleaned_data.get('arquivos'):
+            raise forms.ValidationError('Uma aula deve ter pelo menos vídeo (arquivo ou URL), texto ou arquivos.')
         return cleaned_data
