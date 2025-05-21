@@ -12,16 +12,27 @@
 }
 
 /* Força transição suave ao trocar temas */
-html, body, header, main, footer,
-.card, .navbar, .dropdown-menu, .btn, .form-control, .badge, .alert {
-    transition: background-color 0.4s ease, 
-                color 0.4s ease, 
-                border-color 0.4s ease !important;
+html,
+body,
+header,
+main,
+footer,
+.card,
+.navbar,
+.dropdown-menu,
+.btn,
+.form-control,
+.badge,
+.alert {
+    transition: background-color 0.4s ease,
+        color 0.4s ease,
+        border-color 0.4s ease !important;
 }
 
 footer {
     position: relative;
-    z-index: 1000; /*+ o footer está acima da sidebar */
+    z-index: 1000;
+    /*+ o footer está acima da sidebar */
 }
 
 /* Animação para entrada de cards */
@@ -64,7 +75,7 @@ footer {
 /* Fix for dropdown menus */
 [data-bs-theme="light"] .dropdown-menu {
     background-color: #fff !important;
-    border-color: rgba(0,0,0,0.15) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
 }
 
 [data-bs-theme="light"] .dropdown-menu .dropdown-item {
@@ -78,7 +89,7 @@ footer {
 
 [data-bs-theme="dark"] .dropdown-menu {
     background-color: #343a40 !important;
-    border-color: rgba(255,255,255,0.15) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 [data-bs-theme="dark"] .dropdown-menu .dropdown-item {
@@ -95,7 +106,12 @@ footer {
 }
 
 /* Theme transition */
-body, .card, .navbar, .dropdown-menu, .btn, .form-control {
+body,
+.card,
+.navbar,
+.dropdown-menu,
+.btn,
+.form-control {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -182,7 +198,7 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
 [data-bs-theme="light"] .navbar {
     background-color: #f8f9fa !important;
     border-color: #dee2e6 !important;
-} 
+}
 
 /*combo@* Sidebar Estilo / Sidebar Styling */
 /*todo: colocar uma imagem de fundo no futuro */
@@ -191,8 +207,10 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
     z-index: 1050;
     background-color: #212529;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    height: 100vh; /*+ Faz a sidebar ocupar toda altura da tela */
-    overflow-y: auto; /*+ permite rolar verticalmente se exceder a altura da tela */
+    height: 100vh;
+    /*+ Faz a sidebar ocupar toda altura da tela */
+    overflow-y: auto;
+    /*+ permite rolar verticalmente se exceder a altura da tela */
 }
 
 /* Light mode sidebar styling */
@@ -225,10 +243,12 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
 }
 
 .content-wrapper {
-    padding-left: 0;
+    padding-left: 3px;
     padding-top: 0 !important;
-    padding-right: 15px;
-    min-height: calc(100vh - 400px); /*+ Ajusta a altura baseado no footer */ 
+    padding-right: 3px;
+    padding-bottom: 14.5px;
+    min-height: calc(100vh - 400px);
+    /*+ Ajusta a altura baseado no footer */
     /*todo: fazer com que o sidebar fique por cima do conteudo no mobile */
 }
 
@@ -257,18 +277,20 @@ body.sidebar-active .sidebar-overlay {
     top: 10px;
     left: 10px;
     z-index: 1060;
-    transition: left 0.3s cubic-bezier(0.25,0.1, 0.25, 1) !important;
+    transition: left 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
     padding: 6px 10px;
     border-radius: 4px;
 }
 
 body.sidebar-active .sidebar-toggle {
-    left: 220px; /*+ Ajusta a posição quando a sidebar está ativa */
+    left: 220px;
+    /*+ Ajusta a posição quando a sidebar está ativa */
 }
 
 footer {
     position: relative;
-    z-index: 1000; /*+ Mantem o footer acima da sidebar */
+    z-index: 1000;
+    /*+ Mantem o footer acima da sidebar */
 }
 
 /*? Z-index hierarquia para clarificação:*/
@@ -281,7 +303,8 @@ footer {
         position: fixed;
         width: 80px;
         margin-left: -80px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /*+ adiciona sobra para profundidade */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        /*+ adiciona sobra para profundidade */
         background-color: #212529;
         z-index: 1050;
         height: 100vh;
@@ -291,10 +314,10 @@ footer {
     .sidebar.active {
         margin-left: 0;
         width: 240px;
-    }    
+    }
 
     /*? Mostra texto quando a sidebar está ativa */
-    .sidebar .d-none.d-sm-inline { 
+    .sidebar .d-none.d-sm-inline {
         display: none;
     }
 
@@ -307,16 +330,23 @@ footer {
     }
 
     .content-wrapper {
-        margin-left: 0 !important;
-        padding-right: 0 !important;
+        margin-left: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px !important;
+        padding-left: 0px;
     }
 
     footer {
         z-index: 990;
     }
 
+    footer.mt-5 {
+        margin-top: 0 !important;
+    }
+
     body.sidebar-active .sidebar-toggle .bi-list:before {
-        content: '\f659'; /*+ Muda o ícone para "X" quando a sidebar está ativa */
+        content: '\f659';
+        /*+ Muda o ícone para "X" quando a sidebar está ativa */
     }
 }
 
@@ -331,7 +361,9 @@ footer {
     .content-wrapper {
         margin-left: 0;
         margin-top: 0;
-        padding-right: 6px;
+        padding-bottom: 0px !important;
+        padding-right: 0px;
+        padding-left: 0px;
     }
 
     footer.mt-5 {
