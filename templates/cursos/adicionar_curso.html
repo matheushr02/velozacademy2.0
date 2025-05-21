@@ -380,27 +380,18 @@
     const form = document.getElementById("adicionarCursoForm");
     const submitBtn = document.getElementById("submitBtn");
 
-    form.addEventListener(
-      "invalid",
-      function (e) {
+    form.addEventListener("invalid", function (e) {
         //? se validação falhar re implementa botão de adicionar curso
         submitBtn.disabled = false;
         submitBtn.innerHTML = "Adicionar Curso";
-
-        formMessages.innerHTML =
-          '<div class="alert alert-danger">Por favor, corrija os erros presentes no formulário.</div>';
-
+        formMessages.innerHTML = '<div class="alert alert-danger">Por favor, corrija os erros presentes no formulário.</div>';
         e.preventDefault();
-      },
-      true
-    );
+      },true);
 
     form.addEventListener("submit", function (e) {
       // Desabilita o botão e muda o texto para indicar carregamento
       submitBtn.disabled = true;
-      submitBtn.innerHTML =
-        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
-
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processando...';
       // Adiciona um listener para o evento unload/beforeunload da página
       const handleUnload = function () {
         // Se a página está sendo descarregada durante o envio do formulário,
@@ -408,10 +399,8 @@
         window.removeEventListener("unload", handleUnload);
         window.removeEventListener("beforeunload", handleUnload);
       };
-
       window.addEventListener("unload", handleUnload);
       window.addEventListener("beforeunload", handleUnload);
-
       // Define um timeout para verificar se o formulário foi enviado com sucesso
       setTimeout(function () {
         // Se ainda estamos na mesma página após 10 segundos
@@ -419,7 +408,6 @@
           // Remove os event listeners
           window.removeEventListener("unload", handleUnload);
           window.removeEventListener("beforeunload", handleUnload);
-
           // Mostra uma mensagem de alerta
           formMessages.innerHTML =
             '<div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">' +
@@ -427,7 +415,6 @@
             '<a href="{% url "cursos:lista" %}" class="alert-link">Clique aqui</a> para ir para a lista de cursos.' +
             '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
             "</div>";
-
           // Reativa o botão
           submitBtn.disabled = false;
           submitBtn.innerHTML = "Adicionar Curso";
@@ -435,84 +422,9 @@
       }, 10000);
     });
 
-    //? Adiciona aula
-    addButton.addEventListener("click", function () {
-      const formCount = parseInt(totalForms.value);
-      const newForm = container.querySelector(".aula-form").cloneNode(true);
-
-      //? Atualiza o index dos campos do formset
-      newForm.innerHTML = newForm.innerHTML.replace(
-        /aulas-0/g,
-        `aulas-${formCount}`
-      );
-      newForm.innerHTML = newForm.innerHTML.replace(
-        /aulas\[0\]/g,
-        `aulas[${formCount}]`
-      );
-
-      //? Limpa o conteudo dos campos do novo form
-      const inputs = newForm.querySelectorAll(
-        'input:not([type="hidden"]), textarea'
-      );
-      inputs.forEach((input) => {
-        input.value = "";
-      });
-
-      //? Atualiza o titulo
-      const title = newForm.querySelector("h5");
-      title.textContent = `Aula ${formCount + 1}`;
-
-      //? Adiciona botão de remover se não estiver presente
-      if (!newForm.querySelector(".remove-aula")) {
-        const header = newForm.querySelector(".card-header");
-        const removeButton = document.createElement("button");
-        removeButton.type = "button";
-        removeButton.className = "btn btn-outline-danger btn-sm remove-aula";
-        removeButton.textContent = "Remover";
-        header.appendChild(removeButton);
-      }
-
-      const fileInputs = newForm.querySelectorAll('input[type="file"]');
-      fileInputs.forEach((input) => {
-        input.setAttribute("multiple", "multiple");
-      });
-
-      //? Adiciona container
-      container.appendChild(newForm);
-
-      //? Atualiza o formset
-      setupContentTypeDetection();
-
-      //? Contagem de forms
-      totalForms.value = formCount + 1;
-
-      //? adiciona o evento de remover
-      setupRemoveButtons();
-    });
-
-    function setupRemoveButtons() {
-      const removeButtons = document.querySelectorAll(".remove-aula");
-      removeButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-          const form = this.closest(".aula-form");
-          form.remove();
-
-          updateFormIndices();
-
-          const formCount = container.querySelectorAll(".aula-form").length;
-          totalForms.value = formCount;
-        });
-      });
+    //? imagem de capa
+      const imageInput = document.getElementById("{{ form.}}");
     }
-
-    function updateFormIndices() {
-      const forms = container.querySelectorAll(".aula-form");
-      forms.forEach((form, index) => {
-        form.querySelector("h5").textContent = `Aula ${index + 1}`;
-      });
-    }
-
-    setupRemoveButtons();
   });
 </script>
 {% endblock extra_js %}
