@@ -174,15 +174,15 @@ def adicionar_curso(request):
         form = CursoForm(request.POST, request.FILES)
         aula_formset = AulaFormSet(request.POST, request.FILES, prefix='aulas')
         
-        logger = logging.getLogger(__name__)
-        logger.debug("POST data: %s", request.POST)
-        logger.debug("FILES data: %s", request.FILES)
-        
+        current_logger = logging.getLogger(__name__)
+        current_logger.debug("POST data: %s", request.POST)
+        current_logger.debug("FILES data: %s", request.FILES)
+
         if form.is_valid() and aula_formset.is_valid():
-            logger.debug("Form data is valid, trying to save...")
+            current_logger.debug("Form data is valid, trying to save...")
             try:
-                logger.debug("Form cleaned data: %s", form.cleaned_data)
-                logger.debug("FormSet cleaned data: %s", [f.cleaned_data for f in aula_formset])
+                current_logger.debug("Form cleaned data: %s", form.cleaned_data)
+                current_logger.debug("FormSet cleaned data: %s", [f.cleaned_data for f in aula_formset])
                 # Salva o curso
                 curso = form.save()
                 print(f"Couse saved with ID {curso.id} and slug {curso.slug}")
@@ -190,10 +190,8 @@ def adicionar_curso(request):
                 # Cria módulos padrão de aulas
                 modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
                 
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.debug(f"Module created with ID {modulo.id}")
-                
+                current_logger.debug(f"Module created with ID {modulo.id}")
+
                 #? Automaticamente verifica o tipo de conteudo dentro da aula do curso
                 has_video = False
                 has_text = False
