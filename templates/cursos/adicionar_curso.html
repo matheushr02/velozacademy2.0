@@ -300,21 +300,21 @@
 </section>
 {% endblock content %} {% block extra_js %}
 <script>
-  function updateContentTypes(aulaForm) {
-    const videoUrl = aulaForm.querySelector("input[name$=-video_url]");
-    const videoFile = aulaForm.querySelector("input[name$=-video_file]");
-    const conteudo = aulaForm.querySelector("textarea[name$=-conteudo]");
-    const arquivos = aulaForm.querySelector("input[name$=-arquivos]");
+  function updateContentTypes(aulaFormElement) {
+    const videoUrlInput = aulaFormElement.querySelector("input[name$=-video_url]");
+    const videoFileInput = aulaFormElement.querySelector("input[name$=-video_file]");
+    const conteudoTextarea = aulaFormElement.querySelector("textarea[name$=-conteudo]");
+    const arquivosInput = aulaFormElement.querySelector("input[name$=-arquivos]");
 
-    const textoSpan = aulaForm.querySelector(".tipo-texto");
-    const videoSpan = aulaForm.querySelector(".tipo-video");
-    const arquivoSpan = aulaForm.querySelector(".tipo-arquivo");
+    const textoSpan = aulaFormElement.querySelector(".tipo-texto");
+    const videoSpan = aulaFormElement.querySelector(".tipo-video");
+    const arquivoSpan = aulaFormElement.querySelector(".tipo-arquivo");
 
-    const hasText = conteudo && conteudo.value.trim().length > 0;
+    const hasText = conteudoTextarea && conteudoTextarea.value.trim().length > 0;
     const hasVideo =
-      (videoUrl && videoUrl.value.trim().length > 0) ||
-      (videoFile && videoFile.files.length > 0);
-    const hasFiles = arquivos && arquivos.files.length > 0;
+      (videoUrlInput && videoUrlInput.value.trim().length > 0) ||
+      (videoFileInput && videoFileInput.files && videoFileInput.files.length > 0);
+    const hasFiles = arquivosInput && arquivosInput.files && arquivosInput.files.length > 0;
 
     if (textoSpan) {
       textoSpan.className = hasText
@@ -335,50 +335,70 @@
     }
   }
 
-  function setupContentTypeDetection() {
-    const aulaForms = document.querySelectorAll(".aula-form");
+  function setupContentTypeDetectionForForm(aulaFormElement) {
+    const videoUrlInput = aulaFormElement.querySelector('input[name$="-video_url"]');
+    const videoFileInput = aulaFormElement.querySelector('input[name$="-video_file"]');
+    const conteudoTextarea = aulaFormElement.querySelector('textarea[name$="-conteudo"]');
+    const arquivosInput = aulaFormElement.querySelector('input[name$="-arquivos"]');
 
-    aulaForms.forEach((form) => {
-      const videoUrl = form.querySelector('input[name$="-video_url"]');
-      const videoFile = form.querySelector('input[name$="-video_file"]');
-      const conteudo = form.querySelector('textarea[name$="-conteudo"]');
-      const arquivos = form.querySelector('input[name$="-arquivos"]');
+    if (videoUrlInput) videoUrlInput.addEventListener("input", () => updateContentTypes(aulaFormElement));
+    if (videoFileInput) videoFileInput.addEventListener("change", () => updateContentTypes(aulaFormElement));
+    if (conteudoTextarea) conteudoTextarea.addEventListener("input", () => updateContentTypes(aulaFormElement));
+    if (arquivosInput) arquivosInput.addEventListener("change", () => updateContentTypes(aulaFormElement));
 
-      if (videoUrl)
-        videoUrl.addEventListener("input", () => updateContentTypes(form));
-      if (videoFile)
-        videoFile.addEventListener("change", () => updateContentTypes(form));
-      if (conteudo)
-        conteudo.addEventListener("input", () => updateContentTypes(form));
-      if (arquivos)
-        arquivos.addEventListener("change", () => updateContentTypes(form));
-
-      updateContentTypes(form);
-    });
-  }
-
-  setupContentTypeDetection();
-
-  function checkFileInputsMultiple() {
-    const fileInputs = document.querySelectorAll('input[type="file"]');
-    fileInputs.forEach((input) => {
-      if (!input.hasAttribute("multiple")) {
-        input.setAttribute("multiple", "multiple");
-      }
-    });
+    updateContentTypes(aulaFormElement);
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    checkFileInputsMultiple();
-
-    const container = document.getElementById("aulas-container");
-    const addButton = document.getElementById("add-aula");
-    const totalForms = document.getElementById("id_aulas-TOTAL_FORMS");
-    const formMessages = document.getElementById("formMessages");
+    const aulasContainer = document.getElementById("aulas-container");
+    const addAulaButton = document.getElementById("add-aula");
+    const totalFormsInput = document.querySelector('input[name="aulas-TOTAL_FORMS"]');
+    const emptyFormTemplateHtml = document.getElementById("empty-aula-form-template").innerHTML;
 
     // Manipulador de envio do formulário para evitar envios duplicados
     const form = document.getElementById("adicionarCursoForm");
     const submitBtn = document.getElementById("submitBtn");
+    const formMessages = document.getElementById("formMessages");
+
+    document.querySelectorAll("#aulas-container .aula-form").forEach(formDiv => {
+      setupContentTypeDetectionForForm(formDiv);
+    })
+
+    addAulaButton.addEventListener("click", function () {
+      let formIdx = parseInt(totalFormsInput.value);
+      const newFormHtml = emptyFormTemplateHtml
+                            .replace(/__prefix__/g, formIdx)
+                            .replace(/__FORM_NUMBER__/g, formIdx + 1);
+      
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = newFormHtml;
+      const newFormElement = tempDiv.querySelector('.aula-form-template-item');
+      if (newFormElement) {
+        newFormElement.classList.remove(' aula-form-template-item');
+        newFormElement.classList.add('aula-form');
+        aulasContainer.appendChild(newFormElement);
+        totalFormsInput.value = formIdx + 1;
+
+        setupContentTypeDetectionForForm(newFormElement);
+      } else {
+        console.error("Could not find .aula-form-template in new form HTML");
+      }
+    });
+
+    aulasContainer.addEventListener('click', function (event) {
+      if (event.target.classList.contains('remove-aula')) {
+        const formToRemove = event.target.closest('.aula-form');
+        if (formToRemove) {
+          const deleteInput = formToRemove.querySelector('input[name$="-DELETE"]');
+          if (deleteInput) {
+            deleteInput.checked = true;
+            formToRemove.style.display = 'none';
+          } else {
+            formToRemove.remove();
+          }
+        }
+      }
+    });
 
     form.addEventListener("invalid", function (e) {
         //? se validação falhar re implementa botão de adicionar curso
@@ -423,7 +443,11 @@
     });
 
     //? imagem de capa
-      const imageInput = document.getElementById("{{ form.}}");
+    const imagemInput = document.getElementById("{{ form.imagem.id_for_label }}");
+    if (imagemInput) {
+      if(!imagemInput.getAttribute("accept")) {
+        imagemInput.setAttribute("accept", "image/*");
+      }
     }
   });
 </script>
