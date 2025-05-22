@@ -374,14 +374,14 @@
       tempDiv.innerHTML = newFormHtml;
       const newFormElement = tempDiv.querySelector('.aula-form-template-item');
       if (newFormElement) {
-        newFormElement.classList.remove(' aula-form-template-item');
+        newFormElement.classList.remove('aula-form-template-item');
         newFormElement.classList.add('aula-form');
         aulasContainer.appendChild(newFormElement);
         totalFormsInput.value = formIdx + 1;
 
         setupContentTypeDetectionForForm(newFormElement);
       } else {
-        console.error("Could not find .aula-form-template in new form HTML");
+        console.error("Could not find .aula-form-template-item in new form HTML");
       }
     });
 
