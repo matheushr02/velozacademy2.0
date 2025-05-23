@@ -241,8 +241,8 @@ def adicionar_curso(request):
                                 #j += 1
                             #else:
                                 #if j == 0 and f'aulas-{i}-arquivos' in request.FILES:
-                                    #break
-                        
+                                #   break
+
                         # Salva os arquivos da aula
                 
 
@@ -250,7 +250,7 @@ def adicionar_curso(request):
                 #for modulo in curso.modulos.all():
                     #for aula in modulo.aulas.all():
                         #if aula.video_url:
-                            has_video = True
+                            #has_video = True
                         #if aula.conteudo and aula.conteudo.strip():
                             #has_text = True
                         #if ArquivoAula.objects.filter(aula=aula).exists():
