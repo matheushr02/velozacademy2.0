@@ -102,14 +102,6 @@
               <div class="mb-4">
                 <label for="{{ form.imagem.id_for_label }}" class="form-label fw-semibold">Imagem de Capa*</label>
                 {{ form.imagem|add_class:"form-control bg-dark text-light border-secondary" }}
-                <script>
-                  document
-                    .getElementById("{{ form.imagem.id_for_label }}")
-                    .setAttribute("accept", "image/*"); //? Adiciona tipo de arquivo aceito / Adds accepted file types
-                  document
-                    .getElementById("{{ form.imagem.id_for_label }}")
-                    .setAttribute("required", "required"); //? Faz o campo ser obrigatório / Make the field required
-                </script>
                 <div class="form-text">{{ form.imagem.help_text }}</div>
                 {% if form.imagem.errors %}
                 <div class="invalid-feedback d-block">
@@ -300,21 +292,59 @@
 </section>
 {% endblock content %} {% block extra_js %}
 <script>
+  let aulasContainer;
   function updateContentTypes(aulaFormElement) {
+    console.log("--- updateContentTypes chamado para o formulário:", aulaFormElement, "---");
     const videoUrlInput = aulaFormElement.querySelector("input[name$=-video_url]");
     const videoFileInput = aulaFormElement.querySelector("input[name$=-video_file]");
     const conteudoTextarea = aulaFormElement.querySelector("textarea[name$=-conteudo]");
     const arquivosInput = aulaFormElement.querySelector("input[name$=-arquivos]");
 
-    const textoSpan = aulaFormElement.querySelector(".tipo-texto");
-    const videoSpan = aulaFormElement.querySelector(".tipo-video");
-    const arquivoSpan = aulaFormElement.querySelector(".tipo-arquivo");
+    if (conteudoTextarea) {
+      console.log("Conteúdo Texto:", conteudoTextarea.value.trim(), "length:", conteudoTextarea.value.trim().length);
+    } else {
+      console.log("conteudoTextarea não encontrado");
+    }
+
+    if (videoUrlInput) {
+      console.log("URL Vídeo:", videoUrlInput.value.trim(), "Length:", videoUrlInput.value.trim().length);
+    } else {
+      console.log("videoUrlInput não encontrado");
+    }
+
+    if (videoFileInput) {
+      console.log("videoFileInput DOM Element:", videoFileInput);
+      console.log("videoFileInput.files:", videoFileInput.files);
+      if (videoFileInput.files) {
+        console.log("videoFileInput.files.length:", videoFileInput.files.length);
+        if (videoFileInput.files.length > 0) {
+          console.log("Primeiro arquivo em videoFileInput:", videoFileInput.files[0]);
+        }
+      } else {
+        console.log("videoFileInput.files é null ou undefined");
+      }
+    } else {
+      console.log("videoFileInput não encontrado");
+    }
+
+    if (arquivosInput) {
+      console.log("arquivosInput DOM Element:", arquivosInput);
+      console.log("arquivosInput.files:", arquivosInput.files);
+    } else {
+      console.log("arquivosInput não encontrado");
+    }
 
     const hasText = conteudoTextarea && conteudoTextarea.value.trim().length > 0;
     const hasVideo =
       (videoUrlInput && videoUrlInput.value.trim().length > 0) ||
       (videoFileInput && videoFileInput.files && videoFileInput.files.length > 0);
     const hasFiles = arquivosInput && arquivosInput.files && arquivosInput.files.length > 0;
+
+    console.log("Resultados da detecção - hasText:", hasText, "hasVideo:", hasVideo, "hasFiles:", hasFiles);
+
+    const textoSpan = aulaFormElement.querySelector(".tipo-texto");
+    const videoSpan = aulaFormElement.querySelector(".tipo-video");
+    const arquivoSpan = aulaFormElement.querySelector(".tipo-arquivo");
 
     if (textoSpan) {
       textoSpan.className = hasText
@@ -333,6 +363,7 @@
         ? "badge bg-primary tipo-arquivo"
         : "badge bg-secondary tipo-arquivo";
     }
+    console.log("--- Fim de updateContentTypes ---");
   }
 
   function setupContentTypeDetectionForForm(aulaFormElement) {
@@ -349,8 +380,19 @@
     updateContentTypes(aulaFormElement);
   }
 
+  function updateAulaDisplayNumbers() {
+    if (!aulasContainer) return;
+    const visibleAulaForms = aulasContainer.querySelectorAll('.aula-form:not([style*="display: none"])');
+    visibleAulaForms.forEach((form, index) => {
+      const headerTitle = form.querySelector('.card-header h5');
+      if (headerTitle) {
+        headerTitle.textContent = `Aula ${index + 1}`;
+      }
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    const aulasContainer = document.getElementById("aulas-container");
+    aulasContainer = document.getElementById("aulas-container");
     const addAulaButton = document.getElementById("add-aula");
     const totalFormsInput = document.querySelector('input[name="aulas-TOTAL_FORMS"]');
     const emptyFormTemplateHtml = document.getElementById("empty-aula-form-template").innerHTML;
@@ -360,28 +402,74 @@
     const submitBtn = document.getElementById("submitBtn");
     const formMessages = document.getElementById("formMessages");
 
+    const mainFormCard = document.getElementById('adicionarCursoForm').closest('.card');
+    if (mainFormCard) {
+      mainFormCard.style.opacity = '1';
+      mainFormCard.style.transform = 'translateY(0)';
+    }
+
     document.querySelectorAll("#aulas-container .aula-form").forEach(formDiv => {
+      formDiv.style.opacity = '1';
+      formDiv.style.transform = 'translateY(0)';
       setupContentTypeDetectionForForm(formDiv);
-    })
+    });
+    updateAulaDisplayNumbers();
 
     addAulaButton.addEventListener("click", function () {
-      let formIdx = parseInt(totalFormsInput.value);
+      console.log("Botão Adicionar aula clicado");
+
+      const totalFormsInputValue = totalFormsInput ? totalFormsInput.value : 'TOTAL_FORMS_INPUT-NOT_FOUND';
+      console.log("Valor de totalFormsInput:", totalFormsInputValue);
+
+      let formIdx;
+      if (totalFormsInput && !isNaN(parseInt(totalFormsInput.value))) {
+        formIdx = parseInt(totalFormsInput.value);
+      } else {
+        console.error("totalFormsInput não encontrado ou valor  invalido:", totalFormsInputValue)
+        formIdx = 0;
+        if (totalFormsInput) totalFormsInput.value = document.querySelectorAll("#aulas-container .aula-form").length;
+        formIdx = parseInt(totalFormsInput.value);
+      }
+      
+
+      console.log("Conteúdo de emptyFormTemplateHtml (primeiros 100 chars);", emptyFormTemplateHtml ? emptyFormTemplateHtml.substring(0, 100) + "..." : "VAZIO ou NÃO ENCONTRADO");
+
+
+      const currentVisibleFormsCount = aulasContainer.querySelectorAll('.aula-form:not([style*="display: none"])').length;
+      const displayNumber = currentVisibleFormsCount + 1;
+      console.log("displayNumber para __FORM_NUMBER__:", displayNumber);
+
       const newFormHtml = emptyFormTemplateHtml
                             .replace(/__prefix__/g, formIdx)
-                            .replace(/__FORM_NUMBER__/g, formIdx + 1);
-      
+                            .replace(/__FORM_NUMBER__/g, displayNumber);
+
+      console.log("HTML do novo formulario (primeiros 100 chars):", newFormHtml ? newFormHtml.substring(0, 100) + "..." : "VAZIO");
+
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = newFormHtml;
       const newFormElement = tempDiv.querySelector('.aula-form-template-item');
+
+      console.log("newFormElement encontrado:", newFormElement);
+
       if (newFormElement) {
         newFormElement.classList.remove('aula-form-template-item');
         newFormElement.classList.add('aula-form');
         aulasContainer.appendChild(newFormElement);
-        totalFormsInput.value = formIdx + 1;
+
+        if (totalFormsInput) {
+          totalFormsInput.value = formIdx + 1;
+        }
+        console.log("Novo formulario adicionado. Novo totalFormsInput.value:", totalFormsInput.value);
+
+        setTimeout(() => {
+          newFormElement.style.opacity = '1';
+          newFormElement.style.transform = 'translateY(0)';
+        }, 10);
 
         setupContentTypeDetectionForForm(newFormElement);
+        updateAulaDisplayNumbers();
       } else {
-        console.error("Could not find .aula-form-template-item in new form HTML");
+        console.error("Não foi possivel encontrar .aula-form-template-item no HTML do novo formulario. HTML gerado:", newFormHtml);
       }
     });
 
@@ -396,6 +484,7 @@
           } else {
             formToRemove.remove();
           }
+          updateAulaDisplayNumbers();
         }
       }
     });

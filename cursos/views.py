@@ -168,7 +168,9 @@ def adicionar_curso(request):
         messages.error(request, "Você não tem permissão para acessar esta página.")
         return redirect('cursos:lista')
 
-    AulaFormSet = formset_factory(AulaForm, extra=1)
+    AulaFormSet = formset_factory(AulaForm, extra=1, can_delete=True)
+    
+    current_logger = logging.getLogger(__name__)
     
     if request.method == 'POST':
         form = CursoForm(request.POST, request.FILES)
@@ -180,6 +182,7 @@ def adicionar_curso(request):
 
         if form.is_valid() and aula_formset.is_valid():
             current_logger.debug("Form data is valid, trying to save...")
+            #! continuar aqui debugando
             try:
                 current_logger.debug("Form cleaned data: %s", form.cleaned_data)
                 current_logger.debug("FormSet cleaned data: %s", [f.cleaned_data for f in aula_formset])
