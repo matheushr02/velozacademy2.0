@@ -138,22 +138,22 @@
                             </div>
                         </div>
                         
-                        <!-- Material Complementar -->
+                        <!--? Material Complementar -->
                         {% if aula.arquivos.all %}
                         <div class="mb-5">
                             <h3 class="fw-bold mb-3">Material Complementar</h3>
                             <div class="list-group">
-                                {% for arquivo in aula.arquivos.all %}
-                                <a href="{{ arquivo.arquivo.url }}" class="list-group-item list-group-item-action bg-dark border-secondary d-flex justify-content-between align-items-center" download>
+                                {% for arquivo_item in aula.arquivos.all %}
+                                <a href="{{ arquivo_item.arquivo.url }}" class="list-group-item list-group-item-action bg-dark border-secondary d-flex justify-content-between align-items-center" download>
                                     <div class="d-flex align-items-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text me-3 text-primary" viewBox="0 0 16 16">
                                             <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
                                             <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
                                         </svg>
-                                        {{ arquivo.titulo }}
+                                        {{ arquivo_item.nome }}
                                     </div>
                                     <div class="d-flex align-items-center">
-                                        <small class="text-secondary me-3">{{ arquivo.get_extensao_display }}</small>
+                                        <small class="text-secondary me-3">{{ arquivo_item.extensao }}</small>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download text-primary" viewBox="0 0 16 16">
                                             <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                             <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>

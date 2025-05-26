@@ -188,8 +188,8 @@ def adicionar_curso(request):
                 current_logger.debug("FormSet cleaned data: %s", [f.cleaned_data for f in aula_formset])
                 # Salva o curso
                 curso = form.save()
-                print(f"Couse saved with ID {curso.id} and slug {curso.slug}")
-                
+                print(f"Curso saved with ID {curso.id} and slug {curso.slug}")
+
                 # Cria módulos padrão de aulas
                 modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
                 
@@ -217,7 +217,7 @@ def adicionar_curso(request):
                         if video_key in request.FILES:
                             aula.video_file = request.FILES[video_key]
                         
-                        if aula.video_url:
+                        if aula.video_file or aula.video_url:
                             has_video = True
                         if aula.conteudo and aula.conteudo.strip():
                             has_text = True
@@ -225,37 +225,14 @@ def adicionar_curso(request):
                         aula.save()
                         
                         # Processamento de arquivos
-                        files = []
-                        for key, value in request.FILES.items():
-                            if key.startswith(f'aulas-{i}-arquivos'):
-                                files.append(value)
+                        arquivos_field_name = f'aulas-{i}-arquivos'
+                        if arquivos_field_name in request.FILES:
+                            uploaded_files_for_aula = request.FILES.getlist(arquivos_field_name)
+                            if uploaded_files_for_aula:
                                 has_files = True
-                                
-                        for arquivo in files:
-                            ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
-                        #j = 0
-                        #while True:
-                            #file_key = f'aulas-{i}-arquivos-{j}'
-                            #if file_key in request.FILES:
-                                #files.append(request.FILES[file_key])
-                                #j += 1
-                            #else:
-                                #if j == 0 and f'aulas-{i}-arquivos' in request.FILES:
-                                #   break
+                                for uploaded_file in uploaded_files_for_aula:
+                                    ArquivoAula.objects.create(aula=aula,arquivo=uploaded_file, nome=uploaded_file.name)
 
-                        # Salva os arquivos da aula
-                
-
-                
-                #for modulo in curso.modulos.all():
-                    #for aula in modulo.aulas.all():
-                        #if aula.video_url:
-                            #has_video = True
-                        #if aula.conteudo and aula.conteudo.strip():
-                            #has_text = True
-                        #if ArquivoAula.objects.filter(aula=aula).exists():
-                            #has_files = True
-                
                 if has_video and has_text and has_files:
                     curso.tipo_conteudo = 'completo'
                 elif has_video and has_text:
@@ -294,6 +271,19 @@ def adicionar_curso(request):
                 #messages.success(request, 'Curso adicionado com sucesso!')
                 #return redirect('cursos:detalhe', curso_slug=curso.slug)
         else:
+            current_logger.debug("Form or Formset is invalid.")
+            current_logger.debug("CursoForm errors: %s", form.errors)
+            current_logger.debug("AulaFormSet errors: %s", aula_formset.errors)
+            current_logger.debug("AulaFormSet non_form_errors: %s", aula_formset.non_form_errors())
+            
+            if aula_formset.non_form_errors():
+                for error in aula_formset.non_form_errors():
+                    messages.error(request, f"Erro no conjunto de aulas: {error}")
+            
+            has_aula_errors = any(f.errors for f in aula_formset.forms if not f.cleaned_data.get('DELETE'))
+            if form.errors or has_aula_errors:
+                messages.error(request, "Por favor, corrija os erros no formulário.")
+            
             if 'imagem' in form.errors:
                 messages.error(request, 'Ocorreu um erro com a imagem enviada. Por favor, verifique o formato e tamanho.')        
 

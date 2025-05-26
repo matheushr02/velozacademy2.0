@@ -70,7 +70,8 @@ class AulaForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         #? Verifica se pelo menos um dos campos de conteúdo foi preenchido
-        has_video_content = cleaned_data.get('video_file') or cleaned_data.get('video_url')
-        if not has_video_content and not cleaned_data.get('conteudo') and not cleaned_data.get('arquivos'):
-            raise forms.ValidationError('Uma aula deve ter pelo menos vídeo (arquivo ou URL), texto ou arquivos.')
+        if not cleaned_data.get('DELETE'):
+            has_video_content = cleaned_data.get('video_file') or cleaned_data.get('video_url')
+            if not has_video_content and not cleaned_data.get('conteudo') and not cleaned_data.get('arquivos'):
+                raise forms.ValidationError('Uma aula deve ter pelo menos vídeo (arquivo ou URL), texto ou arquivos.')
         return cleaned_data

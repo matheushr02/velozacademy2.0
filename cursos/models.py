@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+import os
 
 class Curso(models.Model):
     NIVEL_CHOICES = (
@@ -127,3 +128,10 @@ class ArquivoAula(models.Model):
         if not self.nome and self.arquivo:
             self.nome = self.arquivo.name
         super().save(*args, **kwargs)
+
+    @property
+    def extensao(self):
+        if self.arquivo and self.arquivo.name:
+            name, extension = os.path.splitext(self.arquivo.name)
+            return extension.lstrip('.').upper()
+        return ''
