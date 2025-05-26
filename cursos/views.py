@@ -272,13 +272,24 @@ def adicionar_curso(request):
                 #return redirect('cursos:detalhe', curso_slug=curso.slug)
         else:
             current_logger.debug("Form or Formset is invalid.")
-            current_logger.debug("CursoForm errors: %s", form.errors)
-            current_logger.debug("AulaFormSet errors: %s", aula_formset.errors)
-            current_logger.debug("AulaFormSet non_form_errors: %s", aula_formset.non_form_errors())
+            current_logger.debug("CursoForm errors: %s", form.errors.as_json() if form.errors else "No CursoForm errors")
+            current_logger.debug("AulaFormSet errors: %s", aula_formset.errors if aula_formset.errors else "No AulaFormSet errors")
+            current_logger.debug("AulaFormSet non_form_errors: %s", aula_formset.non_form_errors().as_json() if aula_formset.non_form_errors() else "No AulaFormSet non_form_errors")
             
+            for field_name, error_list in form.errors.items():
+                label = form.fields[field_name].label if field_name != '__all__' and field_name in form.fields else 'Geral do Curso'
+                for error in error_list:
+                    error_text = error.message if hasattr(error, 'message') else str(error)
+                    messages.error(request, f"Erro em '{label}': {error_text}")
+                
             if aula_formset.non_form_errors():
                 for error in aula_formset.non_form_errors():
-                    messages.error(request, f"Erro no conjunto de aulas: {error}")
+                    error_text = error.message if hasattr(error, 'message') else str(error)
+                    messages.error(request, f"Erro no conjunto de aulas: {error_text}")
+
+            for i, form_errors_dict in enumerate(aula_formset.errors):
+                if form_errors_dict:
+                    aula-form_instance = a
             
             has_aula_errors = any(f.errors for f in aula_formset.forms if not f.cleaned_data.get('DELETE'))
             if form.errors or has_aula_errors:
