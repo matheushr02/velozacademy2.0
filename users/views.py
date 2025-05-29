@@ -18,22 +18,46 @@ def login_view(request):
         
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():    
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(request, username=username, password=password)
-            
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'Bem-vindo de volta, {username}!')
-                next_url = request.POST.get('next')
-                if next_url:
-                    return redirect(next_url)
-                return redirect('home')
-            else:
-                messages.error(request, 'Nome de usuário ou senha inválidos.')
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f'Bem-vindo de volta, {user.username}!')
+            next_url = request.POST.get('next')
+            if next_url:
+                return redirect(next_url)
+            return redirect('home')
         else:
-            messages.error(request, 'Por favor, corrija os erros.')
+            current_non_field_errors = list(form.non_field_errors())
+            logger.info(f"DEBUG: Login form non-field errors: {current_non_field_errors}")
+            for i, err_item in enumerate(current_non_field_errors):
+                logger.info(f"DEBUG: Non-field error {i} type: {type(err_item)}, content: {err_item}")
+                if hasattr(err_item, 'code'):
+                    logger.info(f"DEBUG: Non-field error {i} code: {err_item.code}")
+
+            is_invalid_login_error = any(
+                hasattr(e, 'code') and e.code == 'invalid_login'
+                for e in current_non_field_errors
+            )
+            is_inactive_error = any(
+                hasattr(e, 'code') and e.code == 'inactive'
+                for e in current_non_field_errors
+            )
+            
+            logger.info(f"DEBUG: is_invalid_login_error = {is_invalid_login_error}")
+            logger.info(f"DEBUG: is_inactive_error = {is_inactive_error}")
+            
+            if is_invalid_login_error:
+                username_submitted = request.POST.get('username')
+                if username_submitted and User.objects.filter(username__iexact=username_submitted).exists():
+                    messages.error(request, 'Senha incorreta.')
+                else:
+                    messages.error(request, 'Nome de usuário ou senha inválidos.')
+            elif is_inactive_error:
+                messages.error(request, 'Esta conta está inativa.')
+            else:
+                logger.warning(f"Login form errors (unhandled by specific checks): {form.errors.as_json()}")
+                
+                #todo fazer o resto do log aqui
     else:
         form = AuthenticationForm()
     return render(request, 'users/login.html', {'form': form, 'next': request.GET.get('next', '')})
