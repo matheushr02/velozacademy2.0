@@ -289,8 +289,19 @@ def adicionar_curso(request):
 
             for i, form_errors_dict in enumerate(aula_formset.errors):
                 if form_errors_dict:
-                    aula-form_instance = a
-            
+                    aula_form_instance = aula_formset.forms[i]
+
+                    delete_field_name = aula_form_instance.add_prefix('DELETE')
+                    if request.POST.get(delete_field_name):
+                        #? Log que diz que marca aulas para deletar
+                        current_logger.debug(f"Skipping errors for aula form {i} as it was marked for deletion.")
+                        continue
+                    
+                    for field_name, error_list in form_errors_dict.items():
+                        label = aula_form_instance.fields[field_name].label if field_name != '__all__' and field_name in aula_form_instance.fields else 'Geral da Aula'
+                        
+                    
+
             has_aula_errors = any(f.errors for f in aula_formset.forms if not f.cleaned_data.get('DELETE'))
             if form.errors or has_aula_errors:
                 messages.error(request, "Por favor, corrija os erros no formulário.")
