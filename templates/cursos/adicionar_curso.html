@@ -157,10 +157,10 @@
 
                             <!--? Vídeo (URL) -->
                             <div class="mb-3">
-                              <label for="{{ aula_form.video_url.id_for_label }}" class="form-label">URL do Vídeo</label>
-                              {{ aula_form.video_url|add_class:"form-control bg-dark text-light border-secondary" }}
-                              <div class="form-text">{{ aula_form.video_url.help_text }}</div>
-                              {% if aula_form.video_url.errors %}<div class="invalid-feedback d-block">{{ aula_form.video_url.errors|join:", " }}</div>{% endif %}
+                              <label for="{{ aula_form.video_embed_code.id_for_label }}" class="form-label">Código de Incorporação do Vídeo (iframe)</label>
+                              {{ aula_form.video_embed_code|add_class:"form-control bg-dark text-light border-secondary" }}
+                              <div class="form-text">{{ aula_form.video_embed_code.help_text }}</div>
+                              {% if aula_form.video_embed_code.errors %}<div class="invalid-feedback d-block">{{ aula_form.video_embed_code.errors|join:", " }}</div>{% endif %}
                             </div>
 
                             <!--? Vídeo (File) -->
@@ -207,11 +207,11 @@
                   {% with delete_is_checked=aula_form.DELETE.value %}
                   <div class="aula-form card bg-dark border-secondary mb-4" {% if delete_is_checked %}style="display: none;"{% endif %}>
                     <div class="card-header bg-dark border-secondary d-flex justify-content-between align-items-center">
-                      <h5 class="mb-0">Aula {{ forloop.counter }}</h5>
+                      <h5 class="mb-0">Aula <span class="aula-number">{{ forloop.counter }}</span></h5>
                       {% if aula_formset.can_delete %}
-                        <!--{% if aula_formset.forms|length > 1 or not forloop.first or aula_formset.initial_forms|length == 0 and aula_formset.forms|length > aula_formset.min_num %}-->
+                        {% if aula_formset.forms|length > 1 or not forloop.first or aula_formset.initial_forms|length == 0 and aula_formset.forms|length > aula_formset.min_num %}
                         <button type="button" class="btn btn-outline-danger btn-sm remove-aula">Remover</button>
-                        <!--{% endif %}-->
+                        {% endif %}
                       {% endif %}
                     </div>
                     <div class="card-body">
@@ -236,11 +236,11 @@
 
                       <!--? Vídeo (URL) -->
                       <div class="mb-3">
-                        <label for="{{ aula_form.video_url.id_for_label }}" class="form-label">URL do Vídeo</label>
-                        {{ aula_form.video_url|add_class:"form-control bg-dark text-light border-secondary" }}
-                        <div class="form-text">{{ aula_form.video_url.help_text }}</div>
-                        {% if aula_form.video_url.errors and not delete_is_checked %}
-                        <div class="invalid-feedback d-block">{{ aula_form.video_url.errors|join:", " }}</div>
+                        <label for="{{ aula_form.video_embed_code.id_for_label }}" class="form-label">Código de Incorporação do Vídeo (iframe)</label>
+                        {{ aula_form.video_embed_code|add_class:"form-control bg-dark text-light border-secondary" }}
+                        <div class="form-text">{{ aula_form.video_embed_code.help_text }}</div>
+                        {% if aula_form.video_embed_code.errors and not delete_is_checked %}
+                        <div class="invalid-feedback d-block">{{ aula_form.video_embed_code.errors|join:", " }}</div>
                         {% endif %}
                       </div>
 
@@ -319,7 +319,7 @@
   let aulasContainer;
   function updateContentTypes(aulaFormElement) {
     console.log("--- updateContentTypes chamado para o formulário:", aulaFormElement, "---");
-    const videoUrlInput = aulaFormElement.querySelector("input[name$=-video_url]");
+    const videoEmbedCodeTextarea = aulaFormElement.querySelector("textarea[name$=-video_embed_code]");
     const videoFileInput = aulaFormElement.querySelector("input[name$=-video_file]");
     const conteudoTextarea = aulaFormElement.querySelector("textarea[name$=-conteudo]");
     const arquivosInput = aulaFormElement.querySelector("input[name$=-arquivos]");
@@ -330,10 +330,10 @@
       console.log("conteudoTextarea não encontrado");
     }
 
-    if (videoUrlInput) {
-      console.log("URL Vídeo:", videoUrlInput.value.trim(), "Length:", videoUrlInput.value.trim().length);
+    if (videoEmbedCodeTextarea) {
+      console.log("Embed Code Vídeo:", videoEmbedCodeTextarea.value.trim(), "Length:", videoEmbedCodeTextarea.value.trim().length);
     } else {
-      console.log("videoUrlInput não encontrado");
+      console.log("videoEmbedCodeTextarea não encontrado");
     }
 
     if (videoFileInput) {
@@ -360,7 +360,7 @@
 
     const hasText = conteudoTextarea && conteudoTextarea.value.trim().length > 0;
     const hasVideo =
-      (videoUrlInput && videoUrlInput.value.trim().length > 0) ||
+      (videoEmbedCodeTextarea && videoEmbedCodeTextarea.value.trim().length > 0) ||
       (videoFileInput && videoFileInput.files && videoFileInput.files.length > 0);
     const hasFiles = arquivosInput && arquivosInput.files && arquivosInput.files.length > 0;
 
@@ -391,12 +391,12 @@
   }
 
   function setupContentTypeDetectionForForm(aulaFormElement) {
-    const videoUrlInput = aulaFormElement.querySelector('input[name$="-video_url"]');
+    const videoEmbedCodeTextarea = aulaFormElement.querySelector('textarea[name$="-video_embed_code"]');
     const videoFileInput = aulaFormElement.querySelector('input[name$="-video_file"]');
     const conteudoTextarea = aulaFormElement.querySelector('textarea[name$="-conteudo"]');
     const arquivosInput = aulaFormElement.querySelector('input[name$="-arquivos"]');
 
-    if (videoUrlInput) videoUrlInput.addEventListener("input", () => updateContentTypes(aulaFormElement));
+    if (videoEmbedCodeTextarea) videoEmbedCodeTextarea.addEventListener("input", () => updateContentTypes(aulaFormElement));
     if (videoFileInput) videoFileInput.addEventListener("change", () => updateContentTypes(aulaFormElement));
     if (conteudoTextarea) conteudoTextarea.addEventListener("input", () => updateContentTypes(aulaFormElement));
     if (arquivosInput) arquivosInput.addEventListener("change", () => updateContentTypes(aulaFormElement));

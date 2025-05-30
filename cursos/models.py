@@ -20,18 +20,20 @@ class Curso(models.Model):
         ('nenhum', 'Não especificado'),
     )
     
-    tipo_conteudo = models.CharField(max_length=20, choices=CONTENT_TYPE_CHOICES, default='nenhum')
     titulo = models.CharField(max_length=200)
+    nivel = models.CharField(max_length=15, choices=NIVEL_CHOICES, default='iniciante')
     slug = models.SlugField(max_length=200, unique=True)
     descricao = models.TextField()
-    nivel = models.CharField(max_length=15, choices=NIVEL_CHOICES, default='iniciante')
-    imagem = models.ImageField(upload_to='cursos/', blank=True, null=True)
-    criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
+    imagem = models.ImageField(upload_to='cursos/', blank=True, null=True, help_text="Imagem de capa para o curso.")
+    categoria = models.CharField(max_length=100, default='Indefinido')
+    #tipo_conteudo = models.CharField(max_length=20, choices=CONTENT_TYPE_CHOICES, default='nenhum')
+    publicado = models.BooleanField(default=False)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
     is_free = models.BooleanField(default=False, verbose_name="Curso Gratuito")
 
     class Meta:
-        ordering = ['-criado_em']
+        ordering = ['-data_criacao']
         verbose_name = 'Curso'
         verbose_name_plural = 'Cursos'
 
@@ -39,7 +41,7 @@ class Curso(models.Model):
         return self.titulo
 
     def get_absolute_url(self):
-        return reverse('cursos:detalhe', args=[self.slug])
+        return reverse('cursos:detalhe', kwargs={'curso_slug': self.slug})
 
 class Trilha(models.Model):
     AREA_CHOICES = (
@@ -49,37 +51,39 @@ class Trilha(models.Model):
         ('ia', 'Inteligência Artificial'),
     )
     
-    nome = models.CharField(max_length=200)
-    slug = models.SlugField(max_length=200, unique=True)
-    descricao = models.TextField()
-    imagem = models.ImageField(upload_to='trilhas/', blank=True, null=True)
-    area = models.CharField(max_length=15, choices=AREA_CHOICES)
-    total_cursos = models.PositiveIntegerField(default=0)
-    total_horas = models.PositiveIntegerField(default=0)
-    cursos = models.ManyToManyField(Curso, related_name='trilhas', blank=True)
-    criado_em = models.DateTimeField(auto_now_add=True)
-    atualizado_em = models.DateTimeField(auto_now=True)
+    titulo = models.CharField(max_length=200, verbose_name="Titulo da Trilha", default="Nova Trilha")
+    slug = models.SlugField(max_length=200, unique=True, help_text="Será preenchido automaticamente a partir do título.")
+    descricao = models.TextField(blank=True, verbose_name="Descrição")
+    cursos = models.ManyToManyField(Curso, related_name='trilhas', verbose_name="Cursos na Trilha", blank=True)
+    imagem_capa = models.ImageField(upload_to='trilhas_capas/', blank=True, null=True, verbose_name="Imagem de Capa")
+    publicada = models.BooleanField(default=False, verbose_name="Publicada")
+    area = models.CharField(max_length=15, choices=AREA_CHOICES, blank=True, null=True, verbose_name="Área de Conhecimento")
+    #total_cursos = models.PositiveIntegerField(default=0)
+    #total_horas = models.PositiveIntegerField(default=0)
+    #cursos = models.ManyToManyField(Curso, related_name='trilhas', blank=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
     
     class Meta:
-        ordering = ['nome']
-        verbose_name = 'Trilha'
-        verbose_name_plural = 'Trilhas'
+        ordering = ['titulo']
+        verbose_name = 'Trilha de Aprendizagem'
+        verbose_name_plural = 'Trilhas de Aprendizagem'
         
     def __str__(self):
-        return self.nome
+        return self.titulo
         
     def get_absolute_url(self):
-        return reverse('cursos:trilha', args=[self.slug])
-        
-    def atualizar_totais(self):
-        """Atualiza os totais de cursos e horas com base nos cursos relacionados."""
-        self.total_cursos = self.cursos.count()
-        total_horas = 0
-        for curso in self.cursos.all():
-            for modulo in curso.modulos.all():
-                total_horas += modulo.aulas.aggregate(models.Sum('duracao_minutos'))['duracao_minutos__sum'] or 0
-        self.total_horas = total_horas // 60  # Converter minutos para horas
-        self.save()
+        return reverse('cursos:detalhe_trilha', kwargs={'trilha_slug': self.slug})
+
+    #def atualizar_totais(self):
+        #"""Atualiza os totais de cursos e horas com base nos cursos relacionados."""
+        #self.total_cursos = self.cursos.count()
+        #total_horas = 0
+        #for curso in self.cursos.all():
+            #for modulo in curso.modulos.all():
+                #total_horas += modulo.aulas.aggregate(models.Sum('duracao_minutos'))['duracao_minutos__sum'] or 0
+        #self.total_horas = total_horas // 60  # Converter minutos para horas
+        #self.save()
 
 class Modulo(models.Model):
     curso = models.ForeignKey(Curso, related_name='modulos', on_delete=models.CASCADE)
@@ -99,7 +103,7 @@ class Aula(models.Model):
     modulo = models.ForeignKey(Modulo, related_name='aulas', on_delete=models.CASCADE)
     titulo = models.CharField(max_length=200)
     conteudo = models.TextField(blank=True)
-    video_url = models.URLField(blank=True)
+    video_embed_code = models.TextField(blank=True, null=True, verbose_name="Código de Incorporação do Vídeo (iframe)")
     video_file = models.FileField(upload_to='aulas/videos/', blank=True, null=True)
     ordem = models.PositiveIntegerField(default=0)
     duracao_minutos = models.PositiveIntegerField(default=0)
@@ -113,7 +117,7 @@ class Aula(models.Model):
         return f'{self.titulo} ({self.modulo.titulo})'
     
     def has_video(self):
-        return bool(self.video_file) or bool(self.video_url)
+        return bool(self.video_file) or bool(self.video_embed_code and self.video_embed_code.strip())
     
 #? Adiciona um novo modelo para os arquivos de aula
 class ArquivoAula(models.Model):

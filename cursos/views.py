@@ -38,7 +38,7 @@ def lista_cursos(request):
     
     # Ordenação
     if ordenar == 'recentes':
-        cursos = cursos.order_by('-criado_em')
+        cursos = cursos.order_by('-data_criacao')
     elif ordenar == 'populares':
         # Aqui seria ideal ter um campo de popularidade, mas por simplicidade usamos id
         cursos = cursos.order_by('-id')
@@ -141,26 +141,28 @@ def trilha_cursos(request, trilha_slug):
 def lista_trilhas(request):
     # Obter parâmetros de filtro
     search = request.GET.get('search', '')
-    area = request.GET.get('area', '')
+    area_selecionada = request.GET.get('area', '')
     
     # Iniciar queryset
-    trilhas = Trilha.objects.all()
+    trilhas = Trilha.objects.filter(publicada=True)
     
     # Aplicar filtros
     if search:
         trilhas = trilhas.filter(
-            Q(nome__icontains=search) | 
+            Q(titulo__icontains=search) | 
             Q(descricao__icontains=search)
         )
     
-    if area:
-        trilhas = trilhas.filter(area=area)
+    if area_selecionada:
+        trilhas = trilhas.filter(area=area_selecionada)
     
-    return render(request, 'cursos/lista_trilhas.html', {
+    context = {
         'trilhas': trilhas,
         'search': search,
-        'area_selecionada': area
-    })
+        'area_selecionada': area_selecionada,
+        #todo: tornar dinamico as opções da trilhas futuramente
+    }
+    return render(request, 'cursos/lista_trilhas.html', context)
 
 #+ adicionar_curso refeito
 def adicionar_curso(request):
@@ -208,7 +210,7 @@ def adicionar_curso(request):
                             titulo=aula_form.cleaned_data['titulo'],
                             conteudo=aula_form.cleaned_data.get('conteudo', ''), 
                             duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0),
-                            video_url=aula_form.cleaned_data.get('video_url', ''),
+                            video_embed_code=aula_form.cleaned_data.get('video_embed_code', ''),
                             ordem=i+1
                         )
                     
@@ -217,7 +219,7 @@ def adicionar_curso(request):
                         if video_key in request.FILES:
                             aula.video_file = request.FILES[video_key]
                         
-                        if aula.video_file or aula.video_url:
+                        if aula.video_file or (aula.video_embed_code and aula.video_embed_code.strip()):
                             has_video = True
                         if aula.conteudo and aula.conteudo.strip():
                             has_text = True
@@ -299,7 +301,7 @@ def adicionar_curso(request):
                     
                     for field_name, error_list in form_errors_dict.items():
                         label = aula_form_instance.fields[field_name].label if field_name != '__all__' and field_name in aula_form_instance.fields else 'Geral da Aula'
-                        
+                                                
                     
 
             has_aula_errors = any(f.errors for f in aula_formset.forms if not f.cleaned_data.get('DELETE'))
