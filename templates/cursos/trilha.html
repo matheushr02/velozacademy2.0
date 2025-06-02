@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 
-{% block title %}{{ trilha_nome }} | VelozAcademy{% endblock %}
+{% block title %}{{ trilha.titulo }} | VelozAcademy{% endblock %}
 
 {% block content %}
 <section class="py-5 bg-dark border-bottom">
@@ -12,28 +12,38 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none">Home</a></li>
                         <li class="breadcrumb-item"><a href="{% url 'cursos:lista_trilhas' %}" class="text-decoration-none">Trilhas</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ trilha_nome }}</li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ trilha.titulo }}</li>
                     </ol>
                 </nav>
-                <h1 class="display-5 fw-bold mb-3">{{ trilha_nome }}</h1>
-                <p class="lead mb-4">Desenvolva suas habilidades em {{ trilha_nome }} de forma estruturada e eficiente.</p>
+                <h1 class="display-5 fw-bold mb-3">{{ trilha.titulo }}</h1>
+                {% if trilha.descricao %}
+                <p class="lead mb-4">{{ trilha.descricao|truncatewords:30 }}</p>
+                {% else %}
+                <p class="lead mb-4">Explore e Desenvolva suas habilidades em {{ trilha.titulo }} de forma Estruturada e Eficiente.</p>
+                {% endif %}
                 <div class="d-inline-flex align-items-center">
                     <div class="me-4">
                         <span class="d-block fw-bold text-primary">{{ cursos.count }}</span>
                         <small>Cursos</small>
                     </div>
                     <div class="me-4">
-                        <span class="d-block fw-bold text-primary">{{ cursos|length|default:"0" }}</span>
+                        <!--todo: pegar tempo de todos os cursos juntos-->
+                        <span class="d-block fw-bold text-primary">--</span>
                         <small>Horas</small>
                     </div>
                     <div>
-                        <span class="d-block fw-bold text-primary">47</span>
+                        <!--todo: pegar quantidade de alunos fazendo a trilha-->
+                        <span class="d-block fw-bold text-primary">--</span>
                         <small>Alunos</small>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6 text-center">
-                <img src="/static/images/trilhas/{{ trilha_slug }}.jpg" alt="{{ trilha_nome }}" class="img-fluid" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
+                {% if trilha.imagem_capa %}
+                <img src="{{ trilha.imagem_capa.url }}" alt="{{ trilha.titulo }}" class="img-fluid rounded shadow-sm" style="max-height: 300px; object-fit:cover;">
+                {% else %}
+                <img src="/static/images/trilhas/{{ trilha.slug }}.jpg" alt="{{ trilha.titulo }}" class="img-fluid" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
+                {% endif %}
             </div>
         </div>
     </div>
@@ -93,7 +103,7 @@
                 <div class="card bg-dark-subtle border-0 shadow-sm sticky-top" style="top: 20px; z-index: 100;">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-3">Certificação da Trilha</h5>
-                        <p class="mb-4">Conclua todos os cursos para receber seu certificado da trilha {{ trilha_nome }}.</p>
+                        <p class="mb-4">Conclua todos os cursos para receber seu certificado da trilha {{ trilha.titulo }}.</p>
                         
                         <div class="text-center py-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-award text-primary" viewBox="0 0 16 16">
@@ -120,15 +130,15 @@
                         <div class="mb-4">
                             <h6 class="fw-bold mb-3">O que você aprenderá</h6>
                             <ul class="list-group list-group-flush">
-                                {% if trilha_slug == 'aplicacoes-ia' %}
+                                {% if trilha.slug == 'aplicacoes-ia' %}
                                 <li class="list-group-item bg-transparent ps-0 py-2">Conceitos de IA e Machine Learning</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Processamento de linguagem natural</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Desenvolvimento de apps de IA com Python</li>
-                                {% elif trilha_slug == 'python-office' %}
+                                {% elif trilha.slug == 'python-office' %}
                                 <li class="list-group-item bg-transparent ps-0 py-2">Automação de planilhas Excel</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Manipulação de documentos Word e PDF</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Integração com e-mail e calendários</li>
-                                {% elif trilha_slug == 'data-science' %}
+                                {% elif trilha.slug == 'data-science' %}
                                 <li class="list-group-item bg-transparent ps-0 py-2">Análise exploratória de dados</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Machine Learning com scikit-learn</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Visualização de dados avançada</li>
