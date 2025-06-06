@@ -1,10 +1,9 @@
 from django.contrib import admin
-from .models import Curso, Modulo, Aula, ArquivoAula, Trilha
+from .models import Curso, Modulo, Aula, ArquivoAula, Trilha, TrilhaCurso
 
 # Register your models here.
 #admin.site.register(Trilha)
 
-#!terminar de criar o admin outro momento
 @admin.register(Curso)
 class CursoAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'nivel', 'publicado', 'data_criacao')
@@ -20,21 +19,30 @@ class CursoAdmin(admin.ModelAdmin):
         }),
     )
     pass
+
+class TrilhaCursoInline(admin.TabularInline):
+    model = TrilhaCurso
+    fields = ('curso', 'section_name', 'order')
+    extra = 1
+    autocomplete_fields = ['curso']
+    ordering = ['order']
+    
 @admin.register(Trilha)
 class TrilhaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'publicada', 'data_criacao', 'data_atualizacao')
     list_filter = ('publicada',)
     search_fields = ('titulo', 'descricao')
     prepopulated_fields = {'slug': ('titulo',)}
-    filter_horizontal = ('cursos',)
+    # -removido filter_horizontal = ('cursos',)
     fieldsets = (
         (None, {
-            'fields': ('titulo', 'slug', 'descricao', 'imagem_capa', 'publicada')
+            'fields': ('titulo', 'slug', 'descricao', 'imagem_capa', 'publicada', 'area')
         }),
-        ('Cursos da Trilha', {
-            'fields': ('cursos',)
-        }),
+        # -removed ('Cursos da Trilha', {
+        # -     'fields': ('cursos',)
+        # - }),
     )
+    inlines = [TrilhaCursoInline]
     pass
 class ArquivoAulaInline(admin.TabularInline):
     model = ArquivoAula

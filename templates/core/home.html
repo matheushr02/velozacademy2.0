@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}VelozAcademy - Aprenda programação com projetos práticos{% endblock %}
 
@@ -28,7 +29,7 @@
                 </div>
             </div>
             <div class="col-lg-6 d-none d-lg-block">
-                <img src="/static/images/velozacademia.png" alt="VelozAcademy" class="img-fluid">
+                <img src="{% static 'images/velozacademia-logo-icon.png' %}" style="height:372px" alt="VelozAcademy" class="img-fluid">
             </div>
         </div>
         

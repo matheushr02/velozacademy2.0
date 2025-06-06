@@ -129,11 +129,11 @@ def trilha_cursos(request, trilha_slug):
     trilha = get_object_or_404(Trilha, slug=trilha_slug)
     
     # Obter os cursos associados à trilha
-    cursos_da_trilha = trilha.cursos.all()
+    trilha_curso_items = trilha.trilhacurso_set.all().select_related('curso')
     
     context = {
         'trilha': trilha,
-        'cursos': cursos_da_trilha,
+        'trilha_curso_items': trilha_curso_items,
     }
     
     return render(request, 'cursos/trilha.html', context)

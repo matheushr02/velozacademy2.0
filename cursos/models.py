@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 import os
+from django.db.models import F
 
 class Curso(models.Model):
     NIVEL_CHOICES = (
@@ -42,6 +43,31 @@ class Curso(models.Model):
 
     def get_absolute_url(self):
         return reverse('cursos:detalhe', kwargs={'curso_slug': self.slug})
+    
+class TrilhaCurso(models.Model):
+    trilha = models.ForeignKey('Trilha', on_delete=models.CASCADE)
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0, verbose_name="Ordem")
+    section_name = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name="Nome da Seção (Opcional)",
+        help_text="Ex: Módulo 1, Fundamentos, Avançado"
+    )
+    
+    class Meta:
+        ordering = [F('section_name').asc(nulls_last=True), 'order']
+        #!Alerta: O uso de unique_together foi depreciado em Django 2.2 e removido em Django 4.0.
+        #!Use UniqueConstraint em Meta.constraints para garantir unicidade.
+        #? um curso pode estar apenas em uma trilha por vez
+        #todo: permitir que o curso esteja em várias trilhas sem restrições
+        unique_together = ('trilha', 'curso')
+        verbose_name = "Curso na Trilha"
+        verbose_name_plural = "Cursos da Trilha"
+    
+    def __str__(self):
+        return f"{self.curso.titulo} na trilha {self.trilha.titulo} (Ordem: {self.order})"
 
 class Trilha(models.Model):
     AREA_CHOICES = (
@@ -54,13 +80,13 @@ class Trilha(models.Model):
     titulo = models.CharField(max_length=200, verbose_name="Titulo da Trilha", default="Nova Trilha")
     slug = models.SlugField(max_length=200, unique=True, help_text="Será preenchido automaticamente a partir do título.")
     descricao = models.TextField(blank=True, verbose_name="Descrição")
-    cursos = models.ManyToManyField(Curso, related_name='trilhas', verbose_name="Cursos na Trilha", blank=True)
+    cursos = models.ManyToManyField(Curso, through='TrilhaCurso', related_name='trilhas_associadas', verbose_name="Cursos na Trilha", blank=True)
+    # -removed cursos_old = models.ManyToManyField(Curso, related_name='trilhas_old', blank=True)
     imagem_capa = models.ImageField(upload_to='trilhas_capas/', blank=True, null=True, verbose_name="Imagem de Capa")
     publicada = models.BooleanField(default=False, verbose_name="Publicada")
     area = models.CharField(max_length=15, choices=AREA_CHOICES, blank=True, null=True, verbose_name="Área de Conhecimento")
     #total_cursos = models.PositiveIntegerField(default=0)
     #total_horas = models.PositiveIntegerField(default=0)
-    #cursos = models.ManyToManyField(Curso, related_name='trilhas', blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
     
