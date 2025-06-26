@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 import os
 from django.db.models import F
+from django.contrib.auth.models import User
+from django.conf import settings
 
 class Curso(models.Model):
     NIVEL_CHOICES = (
@@ -43,6 +45,17 @@ class Curso(models.Model):
 
     def get_absolute_url(self):
         return reverse('cursos:detalhe', kwargs={'curso_slug': self.slug})
+    
+    def get_total_aulas(self):
+        count = 0
+        for modulo in self.modulos.all():
+            count += modulo.aulas.count()
+        return count
+    
+    def get_aulas_concluidas_count(self, user):
+        if not user.is_authenticated:
+            return 0
+        return AulaConcluida.objects.filter(user=user, aula__modulo__curso=self).count()
     
 class TrilhaCurso(models.Model):
     trilha = models.ForeignKey('Trilha', on_delete=models.CASCADE)
@@ -165,3 +178,17 @@ class ArquivoAula(models.Model):
             name, extension = os.path.splitext(self.arquivo.name)
             return extension.lstrip('.').upper()
         return ''
+    
+class AulaConcluida(models.Model):
+    #todo para suporte de usuários customizados usar settings.AUTH...
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='aulas_concluidas')
+    aula = models.ForeignKey(Aula, on_delete=models.CASCADE, related_name='conclusoes')
+    data_conclusao = models.DateTimeField(auto_now_add=True)
+        
+    class Meta:
+        unique_together = ('user', 'aula')
+        verbose_name = 'Aula Concluída'
+        verbose_name_plural = 'Aulas Concluídas'
+        
+    def __str__(self):
+        return f"{self.user.username} concluiu {self.aula.titulo}"

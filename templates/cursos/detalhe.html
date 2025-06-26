@@ -80,24 +80,26 @@
 
                         <div class="d-grid mb-4">
                             {% if user.is_authenticated %}
-                            {% if inscrito %}
-                            <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-success btn-lg {% if first_aula_ordem is None %}disabled{% endif %}">Continuar Curso</a>
-                            <div class="progress mt-3">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ progresso }}%" aria-valuenow="{{ progresso }}" aria-valuemin="0" aria-valuemax="100">{{ progresso }}%</div>
-                            </div>
+                                {% if inscrito %}
+                                    <a href="{% if first_aula_ordem is not None %}{% url 'cursos:aula' curso.slug first_aula_ordem %}{% else %}#{% endif %}" class="btn btn-success btn-lg {% if first_aula_ordem is None %}disabled{% endif %}">Continuar Curso</a>
+                                    <div class="progress mt-3">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ progresso }}%" aria-valuenow="{{ progresso }}" aria-valuemin="0" aria-valuemax="100">
+                                            {{ progresso }}%
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    {% if curso.is_free or user.perfil.is_estudante or user.perfil.is_admin %}
+                                    <form method="post" action="{% url 'cursos:inscrever' curso.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">Inscrever-se {% if curso.is_free %}Gratuitamente{% endif %}</button>
+                                    </form>
+                                    {% else %}
+                                    <a href="{% url 'users:upgrade' %}" class="btn btn-warning btn-lg w-100">Faça Melhoria para Acessar</a>
+                                    <div class="alert alert-info mt-2">Este curso requer uma assinatura VelozEstudante</div>
+                                    {% endif %}
+                                {% endif %}
                             {% else %}
-                            {% if curso.is_free or user.perfil.is_estudante or user.perfil.is_admin %}
-                            <form method="post" action="{% url 'cursos:inscrever' curso.id %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-primary btn-lg w-100">Inscrever-se {% if curso.is_free %}Gratuitamente{% endif %}</button>
-                            </form>
-                            {% else %}
-                            <a href="{% url 'users:upgrade' %}" class="btn btn-warning btn-lg w-100">Faça Melhoria para Acessar</a>
-                            <div class="alert alert-info mt-2">Este curso requer uma assinatura VelozEstudante</div>
-                            {% endif %}
-                            {% endif %}
-                            {% else %}
-                            <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary w-100">Entrar para se Inscrever</a>
+                                <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary w-100">Entrar para se Inscrever</a>
                             {% endif %}
 
                             <!--? botão de teste (sempre visivel / para debug) -->

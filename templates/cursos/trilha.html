@@ -60,11 +60,11 @@
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <div>
-                                <h5 class="mb-1">Progresso Total</h5>
+                                <h5 class="mb-1">Progresso Total da Trilha</h5>
                                 <p class="text-muted mb-0">Conclua todos os cursos para receber seu certificado</p>
                             </div>
                             <div class="progress mt-2 mt-md-0" style="height: 10px; width: 200px;">
-                                <div class="progress-bar" role="progressbar" style="width: 15%;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar" role="progressbar" style="width: {{ overall_trilha_progresso}}%;" aria-valuenow="{{ overall_trilha_progresso }}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
                     </div>
@@ -81,21 +81,36 @@
 
                     <div class="list-group shadow-sm mb-{% if section.grouper %}3{% else %}4{% endif %}">
                         {% for item in section.list %}
-                        <a href="{% url 'cursos:detalhe' item.curso.slug %}" class="list-group-item list-group-item-action bg-dark-subtle p-4 border-0 mb-3 d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center">
+                        <a href="{% url 'cursos:detalhe' item.curso.slug %}" class="list-group-item list-group-item-action bg-dark-subtle p-4 border-0 mb-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                            <div class="d-flex align-items-center mb-3 mb-md-0">
                                 <div class="me-3 fs-4 text-primary fw-bold">{{ item.order }}</div>
                                 <div>
                                     <h5 class="mb-1">{{ item.curso.titulo }}</h5>
-                                    <p class="text-muted mb-0">{{ item.curso.descricao|truncatechars:120 }}</p>
+                                    <p class="text-muted mb-0 d-none d-sm-block">{{ item.curso.descricao|truncatechars:120 }}</p>
                                     <div class="mt-2">
-                                        <span class="badge bg-primary me-2">{{ item.curso.nivel|title }}</span>
+                                        <span class="badge bg-primary me-2">{{ item.curso.get_nivel_display }}</span>
                                         {# todo: fazer duração da trilha ser a soma de duração cursos #}
-                                        <span class="badge bg-secondary">10 horas</span>
+                                        <span class="badge bg-secondary">
+                                            {% with total_modulos=item.curso.modulos.all|length %}
+                                                {{ total_modulos }} Módulo{{ total_modulos|pluralize }}
+                                            {% endwith %}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="progress ms-3 d-none d-md-block" style="height: 10px; width: 100px;">
-                                <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="ms-md-3 mt-3 ,mt-md-0 text-center text-md-end" style="min-width: 100px;">
+                                {% if user.is_authenticated and item.user_curso_progresso is not None %}
+                                    <div class="mb-1">
+                                        <small class="text-muted {% if item.user_curso_progresso == 100 %}text-success fw-bold{% endif %}">
+                                            {% if item.user_curso_progresso == 100 %}Concluído{% else %}{{ item.user_curso_progresso }}%{% endif %}
+                                        </small>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar {% if item.user_curso_progresso == 100 %}bg-success{% endif %}" role="progressbar" style="width: {{ item.user_curso_progresso }}%;" aria-valuenow="{{ item.user_curso_progresso }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                {% else %}
+                                    <small class="text-muted">Progresso não disponivel</small>
+                                {% endif %}
                             </div>
                         </a>
                         {% endfor %}
@@ -125,8 +140,14 @@
                         
                         <div class="d-grid mb-4">
                             {% if trilha_curso_items.first %}
-                            <a href="{% url 'cursos:detalhe' trilha_curso_items.first.curso.slug %}" class="btn btn-primary py-3">
+                            <a href="{% url 'cursos:aula' trilha_curso_items.first.curso.slug trilha_curso_items.first.curso.get_primeira_aula_ordem %}" class="btn btn-primary py-3">
+                                {% if overall_trilha_progresso > 0 and overall_trilha_progresso < 100 %}
+                                Continuar Trilha
+                                {% elif overall_trilha_progresso == 100 %}
+                                Revisar Trilha
+                                {% else %}
                                 Iniciar Trilha
+                                {% endif %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
                                 </svg>

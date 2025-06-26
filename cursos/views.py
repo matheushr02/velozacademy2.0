@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from users.models import Inscricao
-from .models import Curso, Trilha, Modulo, Aula, ArquivoAula
-from django.db.models import Q
+from .models import Curso, Trilha, Modulo, Aula, ArquivoAula, AulaConcluida
+from django.db.models import Q, Count, Sum
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import CursoForm, AulaForm
 from django.contrib import messages
@@ -66,7 +66,7 @@ def lista_cursos(request):
         ('intermediario', 'Intermediário'),
         ('avancado', 'Avançado'),
     ]
-    
+       
     # Aqui seriam as categorias reais do banco de dados
     categorias = [
         ('programacao', 'Programação'),
@@ -75,6 +75,19 @@ def lista_cursos(request):
         ('automacao', 'Automação'),
         ('web', 'Desenvolvimento Web'),
     ]
+    
+    cursos_list = list(cursos_paginados.object_list)
+    if request.user.is_authenticated:
+        for curso_obj in cursos_list:
+            try:
+                inscricao = Inscricao.objects.get(user=request.user, curso=curso_obj)
+                curso_obj.user_progresso = inscricao.progresso
+            except Inscricao.DoesNotExist:
+                curso_obj.user_progresso = 0
+    else:
+        for curso_obj in cursos_list:
+            curso_obj.user_progresso = 0
+    cursos_paginados.object_list = cursos_list    
     
     context = {
         'cursos': cursos_paginados,
@@ -127,13 +140,40 @@ def detalhe_curso(request, curso_slug):
 def trilha_cursos(request, trilha_slug):
     # Buscar a trilha pelo slug
     trilha = get_object_or_404(Trilha, slug=trilha_slug)
+    trilha_curso_items_list = list(trilha.trilhacurso_set.all().select_related('curso'))
     
-    # Obter os cursos associados à trilha
-    trilha_curso_items = trilha.trilhacurso_set.all().select_related('curso')
+    overall_trilha_progresso = 0
+    if request.user.is_authenticated:
+        cursos_na_trilha = trilha.cursos.all()
+        total_cursos_trilha = cursos_na_trilha.count()
+        cursos_concluidos_trilha = 0
+        if total_cursos_trilha > 0:
+            for curso_trilha in cursos_na_trilha:
+                try:
+                    insc = Inscricao.objects.get(user=request.user, curso=curso_trilha)
+                    if insc.progresso == 100:
+                        cursos_concluidos_trilha += 1
+                except Inscricao.DoesNotExist:
+                    pass
+            overall_trilha_progresso = int((cursos_concluidos_trilha / total_cursos_trilha) * 100)
+
+        for item in trilha_curso_items_list:
+            try:
+                inscricao = Inscricao.objects.get(user=request.user, curso=item.curso)
+                item.user_curso_progresso = inscricao.progresso
+            except Inscricao.DoesNotExist:
+                item.user_curso_progresso = 0
+    else:
+        for item in trilha_curso_items_list:
+            item.user_curso_progresso = 0
+    
+    
+    
     
     context = {
         'trilha': trilha,
-        'trilha_curso_items': trilha_curso_items,
+        'trilha_curso_items': trilha_curso_items_list,
+        'overall_trilha_progresso': overall_trilha_progresso,
     }
     
     return render(request, 'cursos/trilha.html', context)
@@ -156,8 +196,31 @@ def lista_trilhas(request):
     if area_selecionada:
         trilhas = trilhas.filter(area=area_selecionada)
     
+    trilhas_list = list(trilhas)
+    
+    if request.user.is_authenticated:
+        for trilha_obj in trilhas_list:
+            cursos_na_trilha = trilha_obj.cursos.all()
+            total_cursos_trilha = cursos_na_trilha.count()
+            cursos_concluidos_trilha = 0
+            if total_cursos_trilha > 0:
+                for curso_trilha in cursos_na_trilha:
+                    try:
+                        insc = Inscricao.objects.get(user=request.user, curso=curso_trilha)
+                        if insc.progresso == 100:
+                            cursos_concluidos_trilha += 1
+                    except Inscricao.DoesNotExist:
+                        pass
+                trilha_obj.user_progresso = int((cursos_concluidos_trilha / total_cursos_trilha) * 100)
+            else:
+                trilha_obj.user_progresso = 0
+    else:
+        for trilha_obj in trilhas_list:
+            trilha_obj.user_progresso = 0
+            
+            
     context = {
-        'trilhas': trilhas,
+        'trilhas': trilhas_list,
         'search': search,
         'area_selecionada': area_selecionada,
         #todo: tornar dinamico as opções da trilhas futuramente
@@ -379,13 +442,32 @@ def aula_view(request, curso_slug, aula_ordem):
     progresso_aula = 0
     aula_esta_concluida = False
     
+    if request.user.is_authenticated:
+        aulas_concluidas_ids = set(
+            AulaConcluida.objects.filter(user=request.user, aula__modulo__curso=curso).values_list('aula_id', flat=True)
+        )
+        try:
+            inscricao = Inscricao.objects.get(user=request.user, curso=curso)
+            progresso_curso = inscricao.progresso
+        except Inscricao.DoesNotExist:
+            if curso.is_free:
+                inscricao = Inscricao.objects.create(user=request.user, curso=curso, status='ativo', progresso=0)
+                inscricao.update_progresso()
+                progresso_curso = inscricao.progresso
+            else:
+                progresso_curso = 0  
+        aula_esta_concluida = AulaConcluida.objects.filter(user=request.user, aula=aula).exists()
+    else:
+        aulas_concluidas_ids = set()
+        
     context = {
         'curso': curso,
         'aula': aula,
         'aula_anterior': aula_anterior,
         'proxima_aula': proxima_aula,
-        'progresso_aula': progresso_aula,
+        'progresso_curso': progresso_curso,
         'aula_concluida': aula_esta_concluida,
+        'aulas_concluidas_ids': aulas_concluidas_ids,
         'is_admin_user': is_admin_user
     }
     
@@ -412,13 +494,23 @@ def inscrever_curso(request, curso_id):
 #TODO: Implementar no database estas informações em uma futura implementação
 @login_required 
 def marcar_aula_concluida(request, aula_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
+
     aula = get_object_or_404(Aula, id=aula_id)
     curso = aula.modulo.curso
     
-    messages.success(request, 'Aula marcada como concluída!')
+    inscricao, created = Inscricao.objects.get_or_create( user=request.user, curso=curso, defaults={'status': 'ativo', 'progresso': 0})
+    
+    if not curso.is_free and not inscricao:
+        messages.error(request, 'Você precisa estar inscrito neste curso.')
+        return redirect('cursos:detalhe', curso_slug=curso.slug)
+    
+    _, aula_concluida_created = AulaConcluida.objects.get_or_create(user=request.user, aula=aula)
+    
+    if aula_concluida_created:
+        messages.success(request, f'Aula "{aula.titulo}" marcada como concluída!')
+        inscricao.update_progresso()
+    else:
+        messages.info(request, f'Aula "{aula.titulo}" já estava concluída.')
     return redirect('cursos:aula', curso_slug=curso.slug, aula_ordem=aula.ordem)
 
 @login_required

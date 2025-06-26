@@ -54,6 +54,15 @@ class Inscricao(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.curso.titulo}"
 
+    def update_progresso(self):
+        total_aulas = self.curso.get_total_aulas()
+        if total_aulas > 0:
+            aulas_concluidas = self.curso.get_aulas_concluidas_count(self.user)
+            self.progresso = int((aulas_concluidas / total_aulas) * 100)
+        else:
+            self.progresso = 0
+        self.save()
+
 @receiver(post_save, sender=User)
 def criar_perfil(sender, instance, created, **kwargs):
     if created:

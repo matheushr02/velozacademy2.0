@@ -155,6 +155,18 @@
                     <div class="card-body p-4">
                         <h5 class="card-title fw-bold mb-3">{{ curso.titulo }}</h5>
                         <p class="card-text text-muted mb-4" style="height: 4.5rem; overflow: hidden;">{{ curso.descricao|truncatechars:120 }}</p>
+                        
+                        {% if user.is_authenticated and curso.user_progresso > 0 %}
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <small class="text-muted">Seu Progresso:</small>
+                                <small class="text-muted fw-bold">{{ curso.user_progresso }}%</small>
+                            </div>
+                            <div class="progress" style="height: 8px;">
+                                <div class="progress-bar" role="progressbar" style="width: {{ curso.user_progresso }}%;" aria-valuenow="{{ curso.user_progresso }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        {% endif %}
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="d-flex align-items-center">

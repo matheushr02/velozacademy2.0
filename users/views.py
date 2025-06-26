@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect('core:home')
         
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -25,7 +25,7 @@ def login_view(request):
             next_url = request.POST.get('next')
             if next_url:
                 return redirect(next_url)
-            return redirect('home')
+            return redirect('core:home')
         else:
             current_non_field_errors = list(form.non_field_errors())
             logger.info(f"DEBUG: Login form non-field errors: {current_non_field_errors}")
@@ -64,7 +64,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect('core:home')
 
 def registro_view(request):
     if request.user.is_authenticated:

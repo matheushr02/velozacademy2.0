@@ -125,6 +125,15 @@
                             <span class="badge bg-primary me-2">{{ trilha.cursos.count }} curso{% if trilha.cursos.count != 1 %}s{% endif %}</span>
                             {#<span class="badge bg-secondary me-2">{{ trilha.total_horas }} horas</span>#}
                         </div>
+                        {% if user.is_authenticated %}
+                        <div class="mb-2">
+                            <div class="progress" style="height: 12px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ trilha.user_progresso }}%;" aria-valuenow="{{ trilha.user_progresso }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ trilha.user_progresso }}%
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="card-footer bg-dark-subtle border-0 pt-0">
                         <div class="d-grid">

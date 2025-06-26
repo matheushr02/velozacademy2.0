@@ -13,6 +13,15 @@
             const savedTheme = localStorage.getItem('theme') || 'dark';
             document.documentElement.setAttribute('data-bs-theme', savedTheme);
             document.documentElement.classList.add('theme-' + savedTheme);
+
+            try {
+                const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+                if (isCollapsed && window.innerWidth >= 1200) {
+                    document.documentElement.classList.add('sidebar-is-collapsed');
+                }
+            } catch (e) {
+                console.error('Could not apply sidebar state from localStorage', e);
+            }
         })();
     </script>
 
@@ -64,7 +73,7 @@
     {% endblock %}
 </head>
 
-<body>
+<body class="preload">
     <!--! AVISO: O base.html é o menu; Ele é o mesmo entre todas as telas-->
     <!--! WARNING: The base.html is the menu; It's the same for all pages-->
     <!--? Botão Mobile Sidebar (visivel apenas em telas pequenas) -->
@@ -81,44 +90,64 @@
             <!--+ Changed menubar to be a sidebar-->
             <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark sidebar">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-3 text-white min-vh-100">
-                    <a href="{% url 'core:home' %}" class="d-flex align-items-center py-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                        <img src="{% static 'images/v3lozacademy-logo.png' %}" alt="VelozAcademy Logo" style="height:120px; width: auto;">
+                    <a href="{% url 'core:home' %}" class="d-flex align-items-center justify-content-center w-100 pt-3 pb-0 mb-md-0 text-white text-decoration-none">
+                        <span id="logo-wrapper">
+                            <img src="{% static 'images/v3lozacademy-logo.png' %}" id="sidebar-logo-expanded" alt="VelozAcademy Logo">
+                            <img src="{% static 'images/velozacademia-logo-icon.png' %}" id="sidebar-logo-collapsed" alt="VelozAcademy Logo">
+                        </span>
                     </a>
-                    <hr class="w-100">
-                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100" id="menu">
-                        <!--? Sidebar links, items de navegação-->
-                        <!--combo*@ remover se redundante-->
-                        <li class="nav-item w-100">
-                            <a href="{% url 'core:home' %}" class="nav-link px-3 align-middle text-white {% if request.path == '/' %}active{% endif %}">
-                                <i class="bi bi-house-door"></i> <span class="ms-2 d-none d-sm-inline">Home</span>
-                            </a>
-                        </li>
 
-                        <li class="nav-item w-100">
-                            <a href="{% url 'cursos:lista_trilhas' %}" class="nav-link px-3 align-middle text-white {% if '/cursos/trilhas/' in request.path %}active{% endif %}">
-                                <i class="bi bi-collection-play"></i> <span class="ms-2 d-none d-sm-inline">Trilhas</span>
-                            </a>
-                        </li>
-                        <li class="nav-item w-100">
-                            <a href="{% url 'cursos:lista' %}" class="nav-link px-3 align-middle text-white {% if '/cursos/' in request.path and not '/cursos/trilhas/' in request.path %}active{% endif %}">
-                                <i class="bi bi-collection-play"></i> <span class="ms-2 d-none d-sm-inline">Cursos</span>
-                            </a>
-                        </li>
-                        <li class="nav-item w-100">
-                            <a href="{% url 'projetos:lista' %}" class="nav-link px-3 align-middle text-white {% if '/projetos/' in request.path %}active{% endif %}">
-                                <i class="bi bi-code-square"></i> <span class="ms-2 d-none d-sm-inline">Projetos</span>
-                            </a>
-                        </li>
-                        <!--* adicionar mais itens de navegação se precisar -->
+                    <!--? seção do meio com scroll -->
+                    <div class="flex-grow-1 w-100">
+                        <hr class="w-100">
+                        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start w-100" id="menu">
+                            <!--? Sidebar links, items de navegação-->
+                            <!--combo*@ remover se redundante-->
+                            <li class="nav-item w-100">
+                                <a href="{% url 'core:home' %}" class="nav-link px-3 align-middle text-white {% if request.path == '/' %}active{% endif %}">
+                                    <i class="bi bi-house-door"></i> <span class="ms-2 d-none d-sm-inline sidebar-text">Home</span>
+                                </a>
+                            </li>
 
-                    </ul>
-                    <hr class="w-100">
+                            <li class="nav-item w-100">
+                                <a href="{% url 'cursos:lista_trilhas' %}" class="nav-link px-3 align-middle text-white {% if '/cursos/trilhas/' in request.path %}active{% endif %}">
+                                    <i class="bi bi-collection-play"></i> <span class="ms-2 d-none d-sm-inline sidebar-text">Trilhas</span>
+                                </a>
+                            </li>
+                            <li class="nav-item w-100">
+                                <a href="{% url 'cursos:lista' %}" class="nav-link px-3 align-middle text-white {% if '/cursos/' in request.path and not '/cursos/trilhas/' in request.path %}active{% endif %}">
+                                    <i class="bi bi-collection-play"></i> <span class="ms-2 d-none d-sm-inline sidebar-text">Cursos</span>
+                                </a>
+                            </li>
+                            <li class="nav-item w-100">
+                                <a href="{% url 'projetos:lista' %}" class="nav-link px-3 align-middle text-white {% if '/projetos/' in request.path %}active{% endif %}">
+                                    <i class="bi bi-code-square"></i> <span class="ms-2 d-none d-sm-inline sidebar-text">Projetos</span>
+                                </a>
+                            </li>
+                            <!--* adicionar mais itens de navegação se precisar -->
+
+                        </ul>
+                        <hr class="w-100">
+                    </div>
+                    
+                    <!--? Botão de calapsar sidebar (Desktop) -->
+                    <div class="w-100 mb-3 d-none d-xl-flex justify-content-center">
+                        <button class="btn btn-outline-secondary w-100" id="sidebar-collapse-toggle" title="Recolher/Expandir Sidebar">
+                            <span class="button-icon-wrapper">
+                                <i class="bi bi-arrows-angle-contract" id="collapse-icon"></i>
+                                <i class="bi bi-arrows-angle-expand" id="expand-icon"></i>
+                            </span>
+                            <span class="ms-2 sidebar-text">Recolher</span>
+                        </button>
+                    </div>
                     <!--? Botão tema / Theme Button -->
                     <div class="w-100 mb-3 d-flex justify-content-center">
                         <button class="btn btn-outline-secondary w-100" id="theme-toggle">
-                            <i class="bi bi-moon-stars" id="dark-theme-icon"></i>
-                            <i class="bi bi-sun d-none" id="light-theme-icon"></i>
-                            <span class="ms-2 d-none d-sm-inline">Alternar Tema</span>
+                            <span class="button-icon-wrapper">
+                                <i class="bi bi-moon-stars" id="dark-theme-icon"></i>
+                                <i class="bi bi-sun" id="light-theme-icon"></i>
+                            </span>
+                            <span class="ms-2 sidebar-text">Alternar Tema</span>
                         </button>
                     </div>
                     <!--? Footer da side bar-->
@@ -132,7 +161,7 @@
                             {% load static %}
                             <img src="{% static 'images/default-avatar.jpg'%}" alt="Default Avatar" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
                             {% endif %}
-                            <span class="d-none d-sm-inline mx-1">{{user.username}}</span>
+                            <span class="d-none d-sm-inline mx-1" id="profile-username">{{user.username}}</span>
 
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
@@ -263,6 +292,61 @@
     <script src="/static/js/main.js"></script>
 
     {% block extra_js %}{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            //- const sidebar = document.querySelector('.sidebar');
+            //- const logoImg = document.getElementById('sidebar-logo-img');
+            const collapseBtn = document.getElementById('sidebar-collapse-toggle');
+            //- const collapseIcon = document.getElementById('collapse-icon');
+            //- const expandIcon = document.getElementById('expand-icon');
+
+            //- const originalLogoSrc = "{% static 'images/v3lozacademy-logo.png' %}";
+            //- const collapsedLogoSrc = "{% static 'images/velozacademia-logo-icon.png' %}";
+
+            //- function applySidebarState(isCollapsed) {
+                //- if (isCollapsed) {
+                    //- logoImg.src = collapsedLogoSrc;
+                    //- logoImg.style.height = '40px';
+                    //- if (collapseIcon) collapseIcon.classList.add('d-none');
+                    //- if (expandIcon) expandIcon.classList.remove('d-none');
+                //- } else {
+                    //- logoImg.src = originalLogoSrc;
+                    //- logoImg.style.height = '74px';
+                    //- if (collapseIcon) collapseIcon.classList.remove('d-none');
+                    //- if (expandIcon) expandIcon.classList.add('d-none');
+                //- }
+            //- }
+
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', function () {
+                    const isCurrentlyCollapsed = document.documentElement.classList.contains('sidebar-is-collapsed');
+                    //- const newState = !isCurrentlyCollapsed;
+                    localStorage.setItem('sidebarCollapsed', !isCurrentlyCollapsed);
+                    document.documentElement.classList.toggle('sidebar-is-collapsed');
+                    //- applySidebarState(newState);
+                });
+            }
+
+            function initializeSidebar() {
+                if (window.innerWidth < 1200) {
+                    document.documentElement.classList.remove('sidebar-is-collapsed');
+                }
+                //- const savedState = document.documentElement.classList.contains('sidebar-is-collapsed');
+                //- applySidebarState(savedState);
+            }
+            
+            initializeSidebar();
+            window.addEventListener('resize', initializeSidebar);
+        })
+    </script>
+
+    <script>
+        setTimeout(function () {
+            document.body.classList.remove('preload');
+        }, 10);
+    </script>
+
 </body>
 
 </html>
