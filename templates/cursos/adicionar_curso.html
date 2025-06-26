@@ -148,7 +148,7 @@
                             </div>
 
                             <!--? Duração da Aula -->
-                            <!--todo: Futuramente reconhecer apenas a duração dos videos de forma automatica -->
+                            <!-- TODO: No futuro, reconhecer apenas a duração dos vídeos de forma automática. -->
                             <div class="mb-3">
                               <label for="{{ aula_form.duracao_minutos.id_for_label }}" class="form-label">Duração (minutos)*</label>
                               {{ aula_form.duracao_minutos|add_class:"form-control bg-dark text-light border-secondary" }}
@@ -355,7 +355,7 @@
       console.log("arquivosInput DOM Element:", arquivosInput);
       console.log("arquivosInput.files:", arquivosInput.files);
     } else {
-      console.log("arquivosInput não encontrado");
+      // console.log("arquivosInput não encontrado");
     }
 
     const hasText = conteudoTextarea && conteudoTextarea.value.trim().length > 0;
@@ -364,7 +364,7 @@
       (videoFileInput && videoFileInput.files && videoFileInput.files.length > 0);
     const hasFiles = arquivosInput && arquivosInput.files && arquivosInput.files.length > 0;
 
-    console.log("Resultados da detecção - hasText:", hasText, "hasVideo:", hasVideo, "hasFiles:", hasFiles);
+    // console.log("Resultados da detecção - hasText:", hasText, "hasVideo:", hasVideo, "hasFiles:", hasFiles);
 
     const textoSpan = aulaFormElement.querySelector(".tipo-texto");
     const videoSpan = aulaFormElement.querySelector(".tipo-video");
@@ -387,7 +387,7 @@
         ? "badge bg-primary tipo-arquivo"
         : "badge bg-secondary tipo-arquivo";
     }
-    console.log("--- Fim de updateContentTypes ---");
+    // console.log("--- Fim de updateContentTypes ---");
   }
 
   function setupContentTypeDetectionForForm(aulaFormElement) {

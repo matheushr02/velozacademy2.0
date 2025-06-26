@@ -94,7 +94,7 @@ class RegistrationForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email).exists():
-            raise forms.ValidationError(f"'{email}' Este email já é cadastrado, use outro porfavor")
+            raise forms.ValidationError(f"'{email}' Este email já é cadastrado, use outro por favor")
         return email
     
     def clean_password2(self):
