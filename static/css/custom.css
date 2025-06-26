@@ -1,3 +1,11 @@
+.preload * {
+    -webkit-transition: none !important;
+    -moz-transition: none !important;
+    -ms-transition: none !important;
+    -o-transition: none !important;
+    transition: none !important;
+}
+
 /* Custom Theme Styles */
 
 /* Estilos específicos para cada tema */
@@ -12,16 +20,27 @@
 }
 
 /* Força transição suave ao trocar temas */
-html, body, header, main, footer,
-.card, .navbar, .dropdown-menu, .btn {
-    transition: background-color 0.4s ease, 
-                color 0.4s ease, 
-                border-color 0.4s ease !important;
+html,
+body,
+header,
+main,
+footer,
+.card,
+.navbar,
+.dropdown-menu,
+.btn,
+.form-control,
+.badge,
+.alert {
+    transition: background-color 0.4s ease,
+        color 0.4s ease,
+        border-color 0.4s ease;
 }
 
 footer {
     position: relative;
-    z-index: 1000; /*+ o footer está acima da sidebar */
+    z-index: 1000;
+    /*+ o footer está acima da sidebar */
 }
 
 /* Animação para entrada de cards */
@@ -64,7 +83,7 @@ footer {
 /* Fix for dropdown menus */
 [data-bs-theme="light"] .dropdown-menu {
     background-color: #fff !important;
-    border-color: rgba(0,0,0,0.15) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
 }
 
 [data-bs-theme="light"] .dropdown-menu .dropdown-item {
@@ -78,7 +97,7 @@ footer {
 
 [data-bs-theme="dark"] .dropdown-menu {
     background-color: #343a40 !important;
-    border-color: rgba(255,255,255,0.15) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 [data-bs-theme="dark"] .dropdown-menu .dropdown-item {
@@ -95,7 +114,12 @@ footer {
 }
 
 /* Theme transition */
-body, .card, .navbar, .dropdown-menu, .btn, .form-control {
+body,
+.card,
+.navbar,
+.dropdown-menu,
+.btn,
+.form-control {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -182,7 +206,31 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
 [data-bs-theme="light"] .navbar {
     background-color: #f8f9fa !important;
     border-color: #dee2e6 !important;
-} 
+}
+
+.sidebar .nav-link,
+.sidebar .btn,
+.sidebar #profileDropdown {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar-text,
+#profile-username {
+    transition: opacity 0.2s ease, max-width 0.25s ease, margin-left 0.25s ease;
+    display: inline-block;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 150px;
+}
+
+#sidebar-logo-expanded,
+#sidebar-logo-collapsed {
+    display: none;
+}
 
 /*combo@* Sidebar Estilo / Sidebar Styling */
 /*todo: colocar uma imagem de fundo no futuro */
@@ -191,8 +239,10 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
     z-index: 1050;
     background-color: #212529;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
-    height: 100vh; /*+ Faz a sidebar ocupar toda altura da tela */
-    overflow-y: auto; /*+ permite rolar verticalmente se exceder a altura da tela */
+    height: 100vh;
+    /*- Faz a sidebar ocupar toda altura da tela */
+    /*-overflow-y: auto;*/
+    /*- permite rolar verticalmente se exceder a altura da tela */
 }
 
 /* Light mode sidebar styling */
@@ -225,10 +275,12 @@ body, .card, .navbar, .dropdown-menu, .btn, .form-control {
 }
 
 .content-wrapper {
-    padding-left: 0;
+    padding-left: 3px;
     padding-top: 0 !important;
-    padding-right: 15px;
-    min-height: calc(100vh - 400px); /*+ Ajusta a altura baseado no footer */ 
+    padding-right: 3px;
+    padding-bottom: 14.5px;
+    min-height: calc(100vh - 400px);
+    /*+ Ajusta a altura baseado no footer */
     /*todo: fazer com que o sidebar fique por cima do conteudo no mobile */
 }
 
@@ -257,18 +309,20 @@ body.sidebar-active .sidebar-overlay {
     top: 10px;
     left: 10px;
     z-index: 1060;
-    transition: left 0.3s cubic-bezier(0.25,0.1, 0.25, 1) !important;
+    transition: left 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
     padding: 6px 10px;
     border-radius: 4px;
 }
 
 body.sidebar-active .sidebar-toggle {
-    left: 220px; /*+ Ajusta a posição quando a sidebar está ativa */
+    left: 220px;
+    /*+ Ajusta a posição quando a sidebar está ativa */
 }
 
 footer {
     position: relative;
-    z-index: 1000; /*+ Mantem o footer acima da sidebar */
+    z-index: 1000;
+    /*+ Mantem o footer acima da sidebar */
 }
 
 /*? Z-index hierarquia para clarificação:*/
@@ -281,21 +335,27 @@ footer {
         position: fixed;
         width: 80px;
         margin-left: -80px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /*+ adiciona sobra para profundidade */
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        /*+ adiciona sobra para profundidade */
         background-color: #212529;
         z-index: 1050;
         height: 100vh;
         transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) !important;
+        /*overflow-y: auto;*/
+    }
+
+    .sidebar-active #sidebar-logo-expanded {
+        display: inline;
     }
 
     .sidebar.active {
         margin-left: 0;
         width: 240px;
-    }    
+    }
 
     /*? Mostra texto quando a sidebar está ativa */
-    .sidebar .d-none.d-sm-inline { 
-        display: none;
+    .sidebar .d-none.d-sm-inline {
+        display: none !important;
     }
 
     .sidebar.active .d-none.d-sm-inline {
@@ -307,16 +367,23 @@ footer {
     }
 
     .content-wrapper {
-        margin-left: 0 !important;
-        padding-right: 0 !important;
+        margin-left: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px !important;
+        padding-left: 0px;
     }
 
     footer {
         z-index: 990;
     }
 
+    footer.mt-5 {
+        margin-top: 0 !important;
+    }
+
     body.sidebar-active .sidebar-toggle .bi-list:before {
-        content: '\f659'; /*+ Muda o ícone para "X" quando a sidebar está ativa */
+        content: '\f659';
+        /*+ Muda o ícone para "X" quando a sidebar está ativa */
     }
 }
 
@@ -326,12 +393,23 @@ footer {
         position: sticky;
         top: 0;
         width: auto;
+        /*overflow-y: auto;*/
+    }
+
+    #sidebar-logo-expanded {
+        display: inline;
+    }
+
+    #sidebar-logo-collapsed {
+        display: none;
     }
 
     .content-wrapper {
         margin-left: 0;
         margin-top: 0;
-        padding-right: 6px;
+        padding-bottom: 0px !important;
+        padding-right: 0px;
+        padding-left: 0px;
     }
 
     footer.mt-5 {
@@ -345,7 +423,116 @@ footer {
         position: sticky;
         top: 0;
         width: auto;
+        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    .sidebar .btn,
+    .sidebar .nav-link {
+        transition: background-color .2s ease, color .2s ease, width 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #logo-wrapper {
+        display: inline-block;
+        height: 74px;
+        transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    #logo-wrapper img {
+        height: 100%;
+        width: auto;
+        object-fit: contain;
+        vertical-align: top;
+    }
+
+    #sidebar-logo-expanded {
+        display: inline;
+    }
+
+    #sidebar-logo-collapsed {
+        display: none;
+    }
+
+    html.sidebar-is-collapsed #logo-wrapper {
+        height: 40px;
+    }
+
+    html.sidebar-is-collapsed #sidebar-logo-expanded {
+        display: none;
+    }
+
+    html.sidebar-is-collapsed #sidebar-logo-collapsed {
+        display: inline;
+    }
+
+    .button-icon-wrapper {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.2em;
+        height: 1em;
+    }
+
+    .button-icon-wrapper .bi {
+        position: absolute;
+    }
+
+    /*-
+    #sidebar-logo-img {
+        height: 74px;
+        transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-is-collapsed #sidebar-logo-img {
+        height: 40px;
+
+    }    
+
+    #sidebar-collapse-toggle {
+        position: absolute;
+    } */
+
+    #sidebar-collapse-toggle .bi {
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    #sidebar-collapse-toggle #expand-icon {
+        opacity: 0;
+    }
+
+    html.sidebar-is-collapsed #sidebar-collapse-toggle #collapse-icon {
+        opacity: 0;
+    }
+
+    html.sidebar-is-collapsed #sidebar-collapse-toggle #expand-icon {
+        opacity: 1;
+    }
+
+    #theme-toggle .bi {
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    [data-bs-theme="dark"] #light-theme-icon {
+        opacity: 0;
+    }
+
+    [data-bs-theme="dark"] #dark-theme-icon {
+        opacity: 1;
+    }
+
+    [data-bs-theme="light"] #light-theme-icon {
+        opacity: 1;
+    }
+
+    [data-bs-theme="light"] #dark-theme-icon {
+        opacity: 0;
+    }
+
+    /*
+    html.sidebar-is-collapsed #sidebar-collapse-toggle .sidebar-text,
+    html.sidebar-is-collapsed #theme-toggle .sidebar-text {
+        display: none;
+    }*/
 
     .content-wrapper {
         margin-left: 0;
@@ -353,5 +540,48 @@ footer {
 
     footer.mt-5 {
         margin-top: 0 !important;
+    }
+
+    /*+ ESTILO PARA BARRA COLAPSADA */
+    html.sidebar-is-collapsed .sidebar {
+        width: 90px;
+    }
+
+    html.sidebar-is-collapsed .sidebar .nav-link,
+    html.sidebar-is-collapsed .sidebar .btn,
+    html.sidebar-is-collapsed .sidebar #profileDropdown {
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
+    }
+
+    html.sidebar-is-collapsed .sidebar #sidebar-collapse-toggle {
+        margin-bottom: 0.75rem;
+    }
+
+    html.sidebar-is-collapsed .sidebar .align-items-sm-start {
+        align-items: center !important;
+    }
+
+    html.sidebar-is-collapsed .sidebar .sidebar-text,
+    html.sidebar-is-collapsed .sidebar #profile-username {
+        opacity: 0;
+        max-width: 0;
+        margin-left: 0 !important;
+    }
+
+    html.sidebar-is-collapsed .sidebar .justify-content-center {
+        justify-content: center !important;
+    }
+
+    html.sidebar-is-collapsed .sidebar .dropdown {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    html.sidebar-is-collapsed .sidebar #profileDropdown .me-2 {
+        margin-right: 0 !important;
     }
 }

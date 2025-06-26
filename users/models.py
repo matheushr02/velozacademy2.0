@@ -4,10 +4,18 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 class Perfil(models.Model):
+    USER_TYPE_CHOICES = (
+        ('visitante', 'Visitante'),
+        ('estudante', 'VelozEstudante'),
+        ('admin', 'Administrador'),
+    )
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
     bio = models.TextField(blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     data_nascimento = models.DateField(blank=True, null=True)
+    tipo_usuario = models.CharField(max_length=15, choices=USER_TYPE_CHOICES, default='visitante')
+    data_assinatura = models.DateField(null=True, blank=True)
     
     class Meta:
         verbose_name = 'Perfil'
@@ -15,6 +23,15 @@ class Perfil(models.Model):
     
     def __str__(self):
         return f"Perfil de {self.user.username}"
+    
+    def is_visitante(self):
+        return self.tipo_usuario == 'visitante'
+    
+    def is_estudante(self):
+        return self.tipo_usuario == 'estudante'
+    
+    def is_admin(self):
+        return self.tipo_usuario == 'admin' or self.user.is_superuser
 
 class Inscricao(models.Model):
     STATUS_CHOICES = (
@@ -37,6 +54,15 @@ class Inscricao(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.curso.titulo}"
 
+    def update_progresso(self):
+        total_aulas = self.curso.get_total_aulas()
+        if total_aulas > 0:
+            aulas_concluidas = self.curso.get_aulas_concluidas_count(self.user)
+            self.progresso = int((aulas_concluidas / total_aulas) * 100)
+        else:
+            self.progresso = 0
+        self.save()
+
 @receiver(post_save, sender=User)
 def criar_perfil(sender, instance, created, **kwargs):
     if created:
@@ -44,4 +70,7 @@ def criar_perfil(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def salvar_perfil(sender, instance, **kwargs):
-    instance.perfil.save()
+    try:
+        instance.perfil.save()
+    except Perfil.DoesNotExist:
+        Perfil.objects.create(user=instance)

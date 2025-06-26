@@ -110,24 +110,34 @@
             <div class="col-lg-4 col-md-6">
                 <div class="card h-100 bg-dark-subtle border-0 shadow-sm hover-zoom">
                     <div class="position-relative">
-                        {% if trilha.imagem %}
-                        <img src="{{ trilha.imagem.url }}" class="card-img-top" alt="{{ trilha.nome }}" style="height: 200px; object-fit: cover;">
+                        {% if trilha.imagem_capa %}
+                        <img src="{{ trilha.imagem_capa.url }}" class="card-img-top" alt="{{ trilha.titulo }}" style="height: 200px; object-fit: cover;">
                         {% else %}
-                        <img src="/static/images/trilhas/{{ trilha.slug }}.jpg" class="card-img-top" alt="{{ trilha.nome }}" style="height: 200px; object-fit: cover;" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
+                        <img src="/static/images/trilhas/{{ trilha.slug }}.jpg" class="card-img-top" alt="{{ trilha.titulo }}" style="height: 200px; object-fit: cover;" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
                         {% endif %}
                     </div>
                     <div class="card-body p-4">
-                        <h5 class="card-title fw-bold mb-3">{{ trilha.nome }}</h5>
+                        <h5 class="card-title fw-bold mb-3"><a href="{% url 'cursos:detalhe_trilha' trilha.slug %}" class="text-decoration-none stretched-link">{{ trilha.titulo }}</a>
+                        </h5>
                         <p class="card-text text-muted mb-4" style="height: 4.5rem; overflow: hidden;">{{ trilha.descricao|truncatechars:120 }}</p>
                         
                         <div class="mb-3">
-                            <span class="badge bg-primary me-2">{{ trilha.total_cursos }} cursos</span>
-                            <span class="badge bg-secondary me-2">{{ trilha.total_horas }} horas</span>
+                            <span class="badge bg-primary me-2">{{ trilha.cursos.count }} curso{% if trilha.cursos.count != 1 %}s{% endif %}</span>
+                            {#<span class="badge bg-secondary me-2">{{ trilha.total_horas }} horas</span>#}
                         </div>
+                        {% if user.is_authenticated %}
+                        <div class="mb-2">
+                            <div class="progress" style="height: 12px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ trilha.user_progresso }}%;" aria-valuenow="{{ trilha.user_progresso }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ trilha.user_progresso }}%
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="card-footer bg-dark-subtle border-0 pt-0">
                         <div class="d-grid">
-                            <a href="{% url 'cursos:trilha' trilha.slug %}" class="btn btn-primary">
+                            <a href="{% url 'cursos:detalhe_trilha' trilha.slug %}" class="btn btn-primary">
                                 Ver Trilha
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>

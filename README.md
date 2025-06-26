@@ -22,14 +22,23 @@ A VelozAcademy é uma plataforma de ensino de programação focada em projetos p
 1. Clone o repositório:
 ```bash
 git clone https://github.com/seu-usuario/velozacademy.git
-cd velozacademy
+```
+no terminal mude para a pasta do projeto
+```bash
+cd velozacademy2.0
 ```
 
-2. Crie um ambiente virtual e ative-o:
+2. Crie um ambiente virtual
 ```bash
 python -m venv venv
-source venv/bin/activate  # Linux/macOS
-venv\Scripts\activate  # Windows
+```
+2.1 Ative seu ambiente virtual
+```bash
+venv\Scripts\activate #CASO FOR WINDOWS
+```
+
+```bash
+source venv/bin/activate #CASO FOR LINUX
 ```
 
 3. Instale as dependências:
@@ -42,7 +51,7 @@ pip install -r requirements.txt
 python manage.py migrate
 ```
 
-5. Crie um superusuário (admin):
+5. Crie um superusuário (admin) (**PULE ESTA ETAPA**):
 ```bash
 python manage.py createsuperuser
 ```
@@ -51,24 +60,13 @@ python manage.py createsuperuser
 ```bash
 # Criar cursos e projetos
 python populate_db.py
-
+```
+```bash
 # Criar trilhas de aprendizado
 python populate_trilhas.py
 ```
 
-7. Adicione imagens para as trilhas:
-   - Crie ou obtenha imagens para representar cada trilha
-   - Coloque-as na pasta `static/images/trilhas/` com os seguintes nomes:
-     - ia.jpg
-     - dashboards.jpg
-     - office.jpg
-     - visao.jpg
-     - data-science.jpg
-     - analise-dados.jpg
-     - trading.jpg
-     - web.jpg
-
-8. Inicie o servidor de desenvolvimento:
+7. Inicie o servidor de desenvolvimento:
 ```bash
 python manage.py runserver
 ```

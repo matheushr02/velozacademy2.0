@@ -12,7 +12,7 @@
                         <h1 class="fw-bold">Login</h1>
                         <p>Acesse sua conta para continuar aprendendo</p>
                     </div>
-                    
+
                     <!-- Messages -->
                     {% if messages %}
                     <div class="mb-4">
@@ -23,9 +23,12 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    
-                    <form method="post">
+
+                    <form method="post" action="{% url 'users:login' %}">
                         {% csrf_token %}
+                        {% if next %}
+                        <input type="hidden" name="next" value="{{ next }}"></input>
+                        {% endif %}
                         <div class="mb-3">
                             <label for="username" class="form-label">Nome de usuário</label>
                             <input type="text" class="form-control" id="username" name="username" required>
@@ -45,9 +48,9 @@
                             <a href="{% url 'users:recuperar_senha' %}" class="text-primary">Esqueci minha senha</a>
                         </div>
                     </form>
-                    
+
                     <hr>
-                    
+
                     <div class="text-center">
                         <p class="mb-3">Ainda não tem uma conta?</p>
                         <a href="{% url 'users:registro' %}" class="btn btn-outline-primary">Criar conta</a>
@@ -57,4 +60,4 @@
         </div>
     </div>
 </section>
-{% endblock %} 
+{% endblock %}

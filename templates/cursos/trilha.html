@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_filters %}
 
-{% block title %}{{ trilha_nome }} | VelozAcademy{% endblock %}
+{% block title %}{{ trilha.titulo }} | VelozAcademy{% endblock %}
 
 {% block content %}
 <section class="py-5 bg-dark border-bottom">
@@ -10,30 +10,40 @@
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none">Home</a></li>
                         <li class="breadcrumb-item"><a href="{% url 'cursos:lista_trilhas' %}" class="text-decoration-none">Trilhas</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">{{ trilha_nome }}</li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ trilha.titulo }}</li>
                     </ol>
                 </nav>
-                <h1 class="display-5 fw-bold mb-3">{{ trilha_nome }}</h1>
-                <p class="lead mb-4">Desenvolva suas habilidades em {{ trilha_nome }} de forma estruturada e eficiente.</p>
+                <h1 class="display-5 fw-bold mb-3">{{ trilha.titulo }}</h1>
+                {% if trilha.descricao %}
+                <p class="lead mb-4">{{ trilha.descricao|truncatewords:30 }}</p>
+                {% else %}
+                <p class="lead mb-4">Explore e Desenvolva suas habilidades em {{ trilha.titulo }} de forma Estruturada e Eficiente.</p>
+                {% endif %}
                 <div class="d-inline-flex align-items-center">
                     <div class="me-4">
                         <span class="d-block fw-bold text-primary">{{ cursos.count }}</span>
                         <small>Cursos</small>
                     </div>
                     <div class="me-4">
-                        <span class="d-block fw-bold text-primary">{{ cursos|length|default:"0" }}</span>
+                        <!--todo: pegar tempo de todos os cursos juntos-->
+                        <span class="d-block fw-bold text-primary">--</span>
                         <small>Horas</small>
                     </div>
                     <div>
-                        <span class="d-block fw-bold text-primary">47</span>
+                        <!--todo: pegar quantidade de alunos fazendo a trilha-->
+                        <span class="d-block fw-bold text-primary">--</span>
                         <small>Alunos</small>
                     </div>
                 </div>
             </div>
             <div class="col-lg-6 text-center">
-                <img src="/static/images/trilhas/{{ trilha_slug }}.jpg" alt="{{ trilha_nome }}" class="img-fluid" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
+                {% if trilha.imagem_capa %}
+                <img src="{{ trilha.imagem_capa.url }}" alt="{{ trilha.titulo }}" class="img-fluid rounded shadow-sm" style="max-height: 300px; object-fit:cover;">
+                {% else %}
+                <img src="/static/images/trilhas/{{ trilha.slug }}.jpg" alt="{{ trilha.titulo }}" class="img-fluid" onerror="this.onerror=null; this.src='/static/images/cursos-hero.svg';">
+                {% endif %}
             </div>
         </div>
     </div>
@@ -45,41 +55,67 @@
             <div class="col-lg-8">
                 <h2 class="fw-bold mb-4">Cursos Incluídos na Trilha</h2>
                 
-                {% if cursos %}
+                {% if trilha_curso_items %}
                 <div class="card bg-dark-subtle border-0 shadow-sm mb-4">
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
                             <div>
-                                <h5 class="mb-1">Progresso Total</h5>
+                                <h5 class="mb-1">Progresso Total da Trilha</h5>
                                 <p class="text-muted mb-0">Conclua todos os cursos para receber seu certificado</p>
                             </div>
                             <div class="progress mt-2 mt-md-0" style="height: 10px; width: 200px;">
-                                <div class="progress-bar" role="progressbar" style="width: 15%;" aria-valuenow="15" aria-valuemin="0" aria-valuemax="100"></div>
+                                <div class="progress-bar" role="progressbar" style="width: {{ overall_trilha_progresso}}%;" aria-valuenow="{{ overall_trilha_progresso }}" aria-valuemin="0" aria-valuemax="100"></div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="list-group shadow-sm mb-4">
-                    {% for curso in cursos %}
-                    <a href="{% url 'cursos:detalhe' curso.slug %}" class="list-group-item list-group-item-action bg-dark-subtle p-4 border-0 mb-3 d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center">
-                            <div class="me-3 fs-4 text-primary fw-bold">{{ forloop.counter }}</div>
-                            <div>
-                                <h5 class="mb-1">{{ curso.titulo }}</h5>
-                                <p class="text-muted mb-0">{{ curso.descricao|truncatechars:120 }}</p>
-                                <div class="mt-2">
-                                    <span class="badge bg-primary me-2">{{ curso.nivel|title }}</span>
-                                    <span class="badge bg-secondary">10 horas</span>
+                {% regroup trilha_curso_items by section_name as section_list %}
+
+                {% for section in section_list %}
+                    {% if section.grouper %}
+                        <h4 class="fw-semibold mt-4 mb-3">{{ section.grouper }}</h4>
+                    {% elif not section_list.0.grouper and forloop.first %}
+                        <h4 class="fw-semibold mt-4 mb-3">Cursos</h4>
+                    {% endif %}
+
+                    <div class="list-group shadow-sm mb-{% if section.grouper %}3{% else %}4{% endif %}">
+                        {% for item in section.list %}
+                        <a href="{% url 'cursos:detalhe' item.curso.slug %}" class="list-group-item list-group-item-action bg-dark-subtle p-4 border-0 mb-3 d-flex flex-column flex-md-row align-items-md-center justify-content-between">
+                            <div class="d-flex align-items-center mb-3 mb-md-0">
+                                <div class="me-3 fs-4 text-primary fw-bold">{{ item.order }}</div>
+                                <div>
+                                    <h5 class="mb-1">{{ item.curso.titulo }}</h5>
+                                    <p class="text-muted mb-0 d-none d-sm-block">{{ item.curso.descricao|truncatechars:120 }}</p>
+                                    <div class="mt-2">
+                                        <span class="badge bg-primary me-2">{{ item.curso.get_nivel_display }}</span>
+                                        {# todo: fazer duração da trilha ser a soma de duração cursos #}
+                                        <span class="badge bg-secondary">
+                                            {% with total_modulos=item.curso.modulos.all|length %}
+                                                {{ total_modulos }} Módulo{{ total_modulos|pluralize }}
+                                            {% endwith %}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="progress ms-3 d-none d-md-block" style="height: 10px; width: 100px;">
-                            <div class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
+                            <div class="ms-md-3 mt-3 ,mt-md-0 text-center text-md-end" style="min-width: 100px;">
+                                {% if user.is_authenticated and item.user_curso_progresso is not None %}
+                                    <div class="mb-1">
+                                        <small class="text-muted {% if item.user_curso_progresso == 100 %}text-success fw-bold{% endif %}">
+                                            {% if item.user_curso_progresso == 100 %}Concluído{% else %}{{ item.user_curso_progresso }}%{% endif %}
+                                        </small>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar {% if item.user_curso_progresso == 100 %}bg-success{% endif %}" role="progressbar" style="width: {{ item.user_curso_progresso }}%;" aria-valuenow="{{ item.user_curso_progresso }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                {% else %}
+                                    <small class="text-muted">Progresso não disponivel</small>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
                 
                 {% else %}
                 <div class="alert bg-dark-subtle p-4 border-0 shadow-sm">
@@ -91,9 +127,9 @@
             
             <div class="col-lg-4">
                 <div class="card bg-dark-subtle border-0 shadow-sm sticky-top" style="top: 20px; z-index: 100;">
-                    <div class="card-body p-4">
+                    <div class="card-body p-4" style="max-height: calc(100vh - 70px); overflow-y: auto;">
                         <h5 class="fw-bold mb-3">Certificação da Trilha</h5>
-                        <p class="mb-4">Conclua todos os cursos para receber seu certificado da trilha {{ trilha_nome }}.</p>
+                        <p class="mb-4">Conclua todos os cursos para receber seu certificado da trilha {{ trilha.titulo }}.</p>
                         
                         <div class="text-center py-4">
                             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-award text-primary" viewBox="0 0 16 16">
@@ -103,9 +139,15 @@
                         </div>
                         
                         <div class="d-grid mb-4">
-                            {% if cursos.first %}
-                            <a href="{% url 'cursos:detalhe' cursos.first.slug %}" class="btn btn-primary py-3">
+                            {% if trilha_curso_items.first %}
+                            <a href="{% url 'cursos:aula' trilha_curso_items.first.curso.slug trilha_curso_items.first.curso.get_primeira_aula_ordem %}" class="btn btn-primary py-3">
+                                {% if overall_trilha_progresso > 0 and overall_trilha_progresso < 100 %}
+                                Continuar Trilha
+                                {% elif overall_trilha_progresso == 100 %}
+                                Revisar Trilha
+                                {% else %}
                                 Iniciar Trilha
+                                {% endif %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right ms-2" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
                                 </svg>
@@ -120,15 +162,15 @@
                         <div class="mb-4">
                             <h6 class="fw-bold mb-3">O que você aprenderá</h6>
                             <ul class="list-group list-group-flush">
-                                {% if trilha_slug == 'aplicacoes-ia' %}
+                                {% if trilha.slug == 'aplicacoes-ia' %}
                                 <li class="list-group-item bg-transparent ps-0 py-2">Conceitos de IA e Machine Learning</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Processamento de linguagem natural</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Desenvolvimento de apps de IA com Python</li>
-                                {% elif trilha_slug == 'python-office' %}
+                                {% elif trilha.slug == 'python-office' %}
                                 <li class="list-group-item bg-transparent ps-0 py-2">Automação de planilhas Excel</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Manipulação de documentos Word e PDF</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Integração com e-mail e calendários</li>
-                                {% elif trilha_slug == 'data-science' %}
+                                {% elif trilha.slug == 'data-science' %}
                                 <li class="list-group-item bg-transparent ps-0 py-2">Análise exploratória de dados</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Machine Learning com scikit-learn</li>
                                 <li class="list-group-item bg-transparent ps-0 py-2">Visualização de dados avançada</li>
