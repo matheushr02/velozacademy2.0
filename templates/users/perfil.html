@@ -14,7 +14,7 @@
                             <p class="lead">Gerencie suas informações pessoais e acompanhe seu progresso</p>
                         </div>
                     </div>
-                    
+
                     <!-- Messages -->
                     {% if messages %}
                     <div class="mb-4">
@@ -25,7 +25,7 @@
                         {% endfor %}
                     </div>
                     {% endif %}
-                    
+
                     <div class="row">
                         <div class="col-md-3 mb-4">
                             <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
@@ -35,7 +35,7 @@
                                 <button class="nav-link mb-2" id="settings-tab" data-bs-toggle="pill" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Configurações</button>
                             </div>
                         </div>
-                        
+
                         <div class="col-md-9">
                             <div class="tab-content">
                                 <!-- Perfil Tab -->
@@ -49,31 +49,54 @@
                                                         {% if user.perfil.avatar %}
                                                         <img src="{{ user.perfil.avatar.url }}" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
                                                         {% else %}
-                                                        <img src="/static/images/default-avatar.jpg" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                                        <img src="/static/images/default-avatar.jpg" alt="{{ user.username }}" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover; object-position: 50% 70%;">
                                                         {% endif %}
                                                     </div>
                                                     <div>
-                                                        <label for="avatar" class="btn btn-outline-primary">Alterar foto</label>
-                                                        <input type="file" id="avatar" name="avatar" class="d-none">
+                                                        <label for="{{ perfil_form.avatar.id_for_label }}" class="btn btn-outline-primary">Alterar foto</label>
+                                                        {{ perfil_form.avatar }}
+                                                        {% for error in perfil_form.avatar.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="row mb-3">
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="first_name" class="form-label">Nome</label>
-                                                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}">
+                                                        <label for="{{ user_form.first_name.id_for_label }}" class="form-label">{{ user_form.first_name.label }}</label>
+                                                        {{ user_form.first_name }}
+                                                        {% for error in user_form.first_name.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
                                                     </div>
                                                     <div class="col-md-6 mb-3">
-                                                        <label for="last_name" class="form-label">Sobrenome</label>
-                                                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}">
+                                                        <label for="{{ user_form.last_name.id_for_label }}" class="form-label">{{ user_form.last_name.label }}</label>
+                                                        {{ user_form.last_name }}
+                                                        {% for error in user_form.last_name.errors %}
+                                                        <div class="invalid-feedback d-block">{{ error }}</div>
+                                                        {% endfor %}
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="mb-3">
-                                                    <label for="bio" class="form-label">Biografia</label>
-                                                    <textarea class="form-control" id="bio" name="bio" rows="4">{{ user.perfil.bio }}</textarea>
+                                                    <label for="{{ perfil_form.bio.id_for_label }}" class="form-label">{{ perfil_form.bio.label }}</label>
+                                                    {{ perfil_form.bio }}
+                                                    {% for error in perfil_form.bio.errors %}
+                                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                                    {% endfor %}
                                                 </div>
-                                                
+
+                                                {% if user_form.non_field_errors or perfil_form.non_field_errors %}
+                                                <div class="alert alert-danger">
+                                                    {% for error in user_form.non_field_errors %}
+                                                    <p>{{ error }}</p>
+                                                    {% endfor %}
+                                                    {% for error in perfil_form.non_field_errors %}
+                                                    <p>{{ error }}</p>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+
                                                 <div class="d-grid">
                                                     <button type="submit" class="btn btn-primary">Salvar Alterações</button>
                                                 </div>
@@ -81,13 +104,13 @@
                                         </div>
                                     </form>
                                 </div>
-                                
+
                                 <!-- Cursos Tab -->
                                 <div class="tab-pane fade" id="courses" role="tabpanel" aria-labelledby="courses-tab">
                                     <div class="card">
                                         <div class="card-body">
                                             <h3 class="card-title fw-bold mb-4">Meus Cursos</h3>
-                                            
+
                                             {% if user.inscricoes.all %}
                                             <div class="row g-4">
                                                 {% for inscricao in user.inscricoes.all %}
@@ -118,13 +141,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Projetos Tab -->
                                 <div class="tab-pane fade" id="projects" role="tabpanel" aria-labelledby="projects-tab">
                                     <div class="card">
                                         <div class="card-body">
                                             <h3 class="card-title fw-bold mb-4">Meus Projetos</h3>
-                                            
+
                                             <div class="text-center">
                                                 <p>Você ainda não iniciou nenhum projeto.</p>
                                                 <a href="{% url 'projetos:lista' %}" class="btn btn-primary">Explorar Projetos</a>
@@ -132,13 +155,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Configurações Tab -->
                                 <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
                                     <div class="card">
                                         <div class="card-body">
                                             <h3 class="card-title fw-bold mb-4">Configurações da Conta</h3>
-                                            
+
                                             <div class="mb-4">
                                                 <h5>Alterar Senha</h5>
                                                 <form>
@@ -157,9 +180,9 @@
                                                     <button type="submit" class="btn btn-primary">Atualizar Senha</button>
                                                 </form>
                                             </div>
-                                            
+
                                             <hr>
-                                            
+
                                             <div>
                                                 <h5 class="text-danger">Zona de Perigo</h5>
                                                 <p>Cuidado! As ações abaixo são irreversíveis.</p>
@@ -188,7 +211,7 @@
             <div class="modal-body">
                 <p>Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.</p>
                 <p>Todos os seus dados serão permanentemente removidos.</p>
-                
+
                 <form>
                     <div class="mb-3">
                         <label for="confirm_delete" class="form-label">Digite "excluir" para confirmar</label>
@@ -208,20 +231,20 @@
 {% block scripts %}
 <script>
     // Script para habilitar o botão de exclusão somente quando o usuário digitar "excluir"
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const confirmInput = document.getElementById('confirm_delete');
         const deleteButton = document.querySelector('.modal-footer .btn-danger');
-        
-        confirmInput.addEventListener('input', function() {
+
+        confirmInput.addEventListener('input', function () {
             deleteButton.disabled = this.value !== 'excluir';
         });
     });
-    
+
     // Preview da imagem de perfil quando um arquivo é selecionado
-    document.getElementById('avatar').addEventListener('change', function(e) {
+    document.getElementById('id_avatar').addEventListener('change', function (e) {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const preview = document.querySelector('#profile .rounded-circle');
                 preview.src = e.target.result;
             }
@@ -229,4 +252,4 @@
         }
     });
 </script>
-{% endblock %} 
+{% endblock %}

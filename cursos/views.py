@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Curso, Trilha, Modulo, Aula, ArquivoAula
-from django.db.models import Q
+from django.urls import reverse
+from users.models import Inscricao
+from .models import Curso, Trilha, Modulo, Aula, ArquivoAula, AulaConcluida
+from django.db.models import Q, Count, Sum
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import CursoForm, AulaForm
 from django.contrib import messages
@@ -9,7 +11,9 @@ from django.forms import formset_factory
 from django.http import Http404
 import logging
 
-# Create your views here.
+#// remover/comentar logger quando em produção
+
+logger = logging.getLogger(__name__)
 
 def lista_cursos(request):
     # Obter parâmetros de filtro
@@ -34,7 +38,7 @@ def lista_cursos(request):
     
     # Ordenação
     if ordenar == 'recentes':
-        cursos = cursos.order_by('-criado_em')
+        cursos = cursos.order_by('-data_criacao')
     elif ordenar == 'populares':
         # Aqui seria ideal ter um campo de popularidade, mas por simplicidade usamos id
         cursos = cursos.order_by('-id')
@@ -62,7 +66,7 @@ def lista_cursos(request):
         ('intermediario', 'Intermediário'),
         ('avancado', 'Avançado'),
     ]
-    
+       
     # Aqui seriam as categorias reais do banco de dados
     categorias = [
         ('programacao', 'Programação'),
@@ -71,6 +75,19 @@ def lista_cursos(request):
         ('automacao', 'Automação'),
         ('web', 'Desenvolvimento Web'),
     ]
+    
+    cursos_list = list(cursos_paginados.object_list)
+    if request.user.is_authenticated:
+        for curso_obj in cursos_list:
+            try:
+                inscricao = Inscricao.objects.get(user=request.user, curso=curso_obj)
+                curso_obj.user_progresso = inscricao.progresso
+            except Inscricao.DoesNotExist:
+                curso_obj.user_progresso = 0
+    else:
+        for curso_obj in cursos_list:
+            curso_obj.user_progresso = 0
+    cursos_paginados.object_list = cursos_list    
     
     context = {
         'cursos': cursos_paginados,
@@ -86,23 +103,36 @@ def lista_cursos(request):
 
 def detalhe_curso(request, curso_slug):
     curso = get_object_or_404(Curso, slug=curso_slug)
+    modulos = curso.modulos.all().order_by('ordem')
     
-    modulos = curso.modulos.all()
-    
-    # Add context variables needed by the template
+    # Valores padrão
     inscrito = False
     progresso = 0
+    first_aula_ordem = None
     
+    for modulo in modulos:
+        primeira_aula_do_modulo = modulo.aulas.all().order_by('ordem').first()
+        if primeira_aula_do_modulo:
+            first_aula_ordem = primeira_aula_do_modulo.ordem
+            break
+
     # Here you would check if the user is enrolled and calculate progress
     # For now we just set defaults
     
     if request.user.is_authenticated:
-        pass
+        try:
+            inscricao = Inscricao.objects.get(user=request.user, curso=curso)
+            inscrito = True
+            progresso = inscricao.progresso
+        except Inscricao.DoesNotExist:
+            pass
     
     context = {
         'curso': curso,
+        'modulos': modulos,
         'inscrito': inscrito,
-        'progresso': progresso
+        'progresso': progresso,
+        'first_aula_ordem': first_aula_ordem
     }
     
     return render(request, 'cursos/detalhe.html', context)
@@ -110,39 +140,92 @@ def detalhe_curso(request, curso_slug):
 def trilha_cursos(request, trilha_slug):
     # Buscar a trilha pelo slug
     trilha = get_object_or_404(Trilha, slug=trilha_slug)
+    trilha_curso_items_list = list(trilha.trilhacurso_set.all().select_related('curso'))
     
-    # Obter os cursos associados à trilha
-    cursos = trilha.cursos.all()
+    overall_trilha_progresso = 0
+    if request.user.is_authenticated:
+        cursos_na_trilha = trilha.cursos.all()
+        total_cursos_trilha = cursos_na_trilha.count()
+        cursos_concluidos_trilha = 0
+        if total_cursos_trilha > 0:
+            for curso_trilha in cursos_na_trilha:
+                try:
+                    insc = Inscricao.objects.get(user=request.user, curso=curso_trilha)
+                    if insc.progresso == 100:
+                        cursos_concluidos_trilha += 1
+                except Inscricao.DoesNotExist:
+                    pass
+            overall_trilha_progresso = int((cursos_concluidos_trilha / total_cursos_trilha) * 100)
+
+        for item in trilha_curso_items_list:
+            try:
+                inscricao = Inscricao.objects.get(user=request.user, curso=item.curso)
+                item.user_curso_progresso = inscricao.progresso
+            except Inscricao.DoesNotExist:
+                item.user_curso_progresso = 0
+    else:
+        for item in trilha_curso_items_list:
+            item.user_curso_progresso = 0
     
-    return render(request, 'cursos/trilha.html', {
-        'trilha_nome': trilha.nome,
-        'trilha_slug': trilha_slug,
-        'cursos': cursos
-    })
+    
+    
+    
+    context = {
+        'trilha': trilha,
+        'trilha_curso_items': trilha_curso_items_list,
+        'overall_trilha_progresso': overall_trilha_progresso,
+    }
+    
+    return render(request, 'cursos/trilha.html', context)
 
 def lista_trilhas(request):
     # Obter parâmetros de filtro
     search = request.GET.get('search', '')
-    area = request.GET.get('area', '')
+    area_selecionada = request.GET.get('area', '')
     
     # Iniciar queryset
-    trilhas = Trilha.objects.all()
+    trilhas = Trilha.objects.filter(publicada=True)
     
     # Aplicar filtros
     if search:
         trilhas = trilhas.filter(
-            Q(nome__icontains=search) | 
+            Q(titulo__icontains=search) | 
             Q(descricao__icontains=search)
         )
     
-    if area:
-        trilhas = trilhas.filter(area=area)
+    if area_selecionada:
+        trilhas = trilhas.filter(area=area_selecionada)
     
-    return render(request, 'cursos/lista_trilhas.html', {
-        'trilhas': trilhas,
+    trilhas_list = list(trilhas)
+    
+    if request.user.is_authenticated:
+        for trilha_obj in trilhas_list:
+            cursos_na_trilha = trilha_obj.cursos.all()
+            total_cursos_trilha = cursos_na_trilha.count()
+            cursos_concluidos_trilha = 0
+            if total_cursos_trilha > 0:
+                for curso_trilha in cursos_na_trilha:
+                    try:
+                        insc = Inscricao.objects.get(user=request.user, curso=curso_trilha)
+                        if insc.progresso == 100:
+                            cursos_concluidos_trilha += 1
+                    except Inscricao.DoesNotExist:
+                        pass
+                trilha_obj.user_progresso = int((cursos_concluidos_trilha / total_cursos_trilha) * 100)
+            else:
+                trilha_obj.user_progresso = 0
+    else:
+        for trilha_obj in trilhas_list:
+            trilha_obj.user_progresso = 0
+            
+            
+    context = {
+        'trilhas': trilhas_list,
         'search': search,
-        'area_selecionada': area
-    })
+        'area_selecionada': area_selecionada,
+        #todo: tornar dinamico as opções da trilhas futuramente
+    }
+    return render(request, 'cursos/lista_trilhas.html', context)
 
 def is_admin(user):
     """Verifica se o usuário é um administrador."""
@@ -152,32 +235,37 @@ def is_admin(user):
 @login_required
 @user_passes_test(is_admin)
 def adicionar_curso(request):
-    AulaFormSet = formset_factory(AulaForm, extra=1)
+    if not request.user.is_authenticated or not request.user.perfil.is_admin():
+        messages.error(request, "Você não tem permissão para acessar esta página.")
+        return redirect('cursos:lista')
+
+    AulaFormSet = formset_factory(AulaForm, extra=1, can_delete=True)
+    
+    current_logger = logging.getLogger(__name__)
     
     if request.method == 'POST':
         form = CursoForm(request.POST, request.FILES)
         aula_formset = AulaFormSet(request.POST, request.FILES, prefix='aulas')
         
-        logger = logging.getLogger(__name__)
-        logger.debug("POST data: %s", request.POST)
-        logger.debug("FILES data: %s", request.FILES)
-        
+        current_logger = logging.getLogger(__name__)
+        current_logger.debug("POST data: %s", request.POST)
+        current_logger.debug("FILES data: %s", request.FILES)
+
         if form.is_valid() and aula_formset.is_valid():
-            logger.debug("Form data is valid, trying to save...")
+            current_logger.debug("Form data is valid, trying to save...")
+            #! continuar aqui debugando
             try:
-                logger.debug("Form cleaned data: %s", form.cleaned_data)
-                logger.debug("FormSet cleaned data: %s", [f.cleaned_data for f in aula_formset])
+                current_logger.debug("Form cleaned data: %s", form.cleaned_data)
+                current_logger.debug("FormSet cleaned data: %s", [f.cleaned_data for f in aula_formset])
                 # Salva o curso
                 curso = form.save()
-                print(f"Couse saved with ID {curso.id} and slug {curso.slug}")
-                
+                print(f"Curso saved with ID {curso.id} and slug {curso.slug}")
+
                 # Cria módulos padrão de aulas
                 modulo = Modulo.objects.create(curso=curso, titulo="Módulo 1", ordem=1)
                 
-                import logging
-                logger = logging.getLogger(__name__)
-                logger.debug(f"Module created with ID {modulo.id}")
-                
+                current_logger.debug(f"Module created with ID {modulo.id}")
+
                 #? Automaticamente verifica o tipo de conteudo dentro da aula do curso
                 has_video = False
                 has_text = False
@@ -191,7 +279,7 @@ def adicionar_curso(request):
                             titulo=aula_form.cleaned_data['titulo'],
                             conteudo=aula_form.cleaned_data.get('conteudo', ''), 
                             duracao_minutos=aula_form.cleaned_data.get('duracao_minutos', 0),
-                            video_url=aula_form.cleaned_data.get('video_url', ''),
+                            video_embed_code=aula_form.cleaned_data.get('video_embed_code', ''),
                             ordem=i+1
                         )
                     
@@ -200,7 +288,7 @@ def adicionar_curso(request):
                         if video_key in request.FILES:
                             aula.video_file = request.FILES[video_key]
                         
-                        if aula.video_url:
+                        if aula.video_file or (aula.video_embed_code and aula.video_embed_code.strip()):
                             has_video = True
                         if aula.conteudo and aula.conteudo.strip():
                             has_text = True
@@ -208,37 +296,14 @@ def adicionar_curso(request):
                         aula.save()
                         
                         # Processamento de arquivos
-                        files = []
-                        for key, value in request.FILES.items():
-                            if key.startswith(f'aulas-{i}-arquivos'):
-                                files.append(value)
+                        arquivos_field_name = f'aulas-{i}-arquivos'
+                        if arquivos_field_name in request.FILES:
+                            uploaded_files_for_aula = request.FILES.getlist(arquivos_field_name)
+                            if uploaded_files_for_aula:
                                 has_files = True
-                                
-                        for arquivo in files:
-                            ArquivoAula.objects.create(aula=aula, arquivo=arquivo, nome=arquivo.name)
-                        #j = 0
-                        #while True:
-                            #file_key = f'aulas-{i}-arquivos-{j}'
-                            #if file_key in request.FILES:
-                                #files.append(request.FILES[file_key])
-                                #j += 1
-                            #else:
-                                #if j == 0 and f'aulas-{i}-arquivos' in request.FILES:
-                                    #break
-                        
-                        # Salva os arquivos da aula
-                
+                                for uploaded_file in uploaded_files_for_aula:
+                                    ArquivoAula.objects.create(aula=aula,arquivo=uploaded_file, nome=uploaded_file.name)
 
-                
-                #for modulo in curso.modulos.all():
-                    #for aula in modulo.aulas.all():
-                        #if aula.video_url:
-                            has_video = True
-                        #if aula.conteudo and aula.conteudo.strip():
-                            #has_text = True
-                        #if ArquivoAula.objects.filter(aula=aula).exists():
-                            #has_files = True
-                
                 if has_video and has_text and has_files:
                     curso.tipo_conteudo = 'completo'
                 elif has_video and has_text:
@@ -277,6 +342,41 @@ def adicionar_curso(request):
                 #messages.success(request, 'Curso adicionado com sucesso!')
                 #return redirect('cursos:detalhe', curso_slug=curso.slug)
         else:
+            current_logger.debug("Form or Formset is invalid.")
+            current_logger.debug("CursoForm errors: %s", form.errors.as_json() if form.errors else "No CursoForm errors")
+            current_logger.debug("AulaFormSet errors: %s", aula_formset.errors if aula_formset.errors else "No AulaFormSet errors")
+            current_logger.debug("AulaFormSet non_form_errors: %s", aula_formset.non_form_errors().as_json() if aula_formset.non_form_errors() else "No AulaFormSet non_form_errors")
+            
+            for field_name, error_list in form.errors.items():
+                label = form.fields[field_name].label if field_name != '__all__' and field_name in form.fields else 'Geral do Curso'
+                for error in error_list:
+                    error_text = error.message if hasattr(error, 'message') else str(error)
+                    messages.error(request, f"Erro em '{label}': {error_text}")
+                
+            if aula_formset.non_form_errors():
+                for error in aula_formset.non_form_errors():
+                    error_text = error.message if hasattr(error, 'message') else str(error)
+                    messages.error(request, f"Erro no conjunto de aulas: {error_text}")
+
+            for i, form_errors_dict in enumerate(aula_formset.errors):
+                if form_errors_dict:
+                    aula_form_instance = aula_formset.forms[i]
+
+                    delete_field_name = aula_form_instance.add_prefix('DELETE')
+                    if request.POST.get(delete_field_name):
+                        #? Log que diz que marca aulas para deletar
+                        current_logger.debug(f"Skipping errors for aula form {i} as it was marked for deletion.")
+                        continue
+                    
+                    for field_name, error_list in form_errors_dict.items():
+                        label = aula_form_instance.fields[field_name].label if field_name != '__all__' and field_name in aula_form_instance.fields else 'Geral da Aula'
+                                                
+                    
+
+            has_aula_errors = any(f.errors for f in aula_formset.forms if not f.cleaned_data.get('DELETE'))
+            if form.errors or has_aula_errors:
+                messages.error(request, "Por favor, corrija os erros no formulário.")
+            
             if 'imagem' in form.errors:
                 messages.error(request, 'Ocorreu um erro com a imagem enviada. Por favor, verifique o formato e tamanho.')        
 
@@ -289,30 +389,92 @@ def adicionar_curso(request):
 def aula_view(request, curso_slug, aula_ordem):
     #? pega o curso por slug    
     curso = get_object_or_404(Curso, slug=curso_slug)
-    try:
-        modulo = Modulo.objects.filter(curso=curso, aulas__ordem=aula_ordem).first()
-        if not modulo:
-            raise Http404("Aula não encontrada")
-        
-        aula = Aula.objects.filter(modulo=modulo, ordem=aula_ordem).first()
-        if not aula:
-            raise Http404("Aula não encontrada")
-    except Exception:
-        raise Http404("Aula não encontrada")
     
+    logger.debug(f"Aula_view: Access attempt by user '{request.user.username if request.user.is_authenticated else 'Anonymous'}', for course: '{curso.slug}', aula_ordem: '{aula_ordem}'")
+    
+    can_access = False
+    is_admin_user = False
+    
+    if request.user.is_authenticated:
+        logger.debug(f"Aula_view: User '{request.user.username}' is authenticated.")
+        if hasattr(request.user, 'perfil') and request.user.perfil.is_admin():
+            can_access = True
+            is_admin_user = True
+            logger.debug(f"Aula_view: User '{request.user.username}' is admin. Access granted.")
+
+        if not can_access:
+            is_enrolled = Inscricao.objects.filter(user=request.user, curso=curso).exists()
+            logger.debug(f"Aula_view: User '{request.user.username}' is enrolled in course '{curso.slug}'? {is_enrolled}")
+            if is_enrolled:
+                can_access = True
+                logger.debug(f"Aula_view: User '{request.user.username}' is enrolled. Access granted.")
+            else:
+                course_is_free = hasattr(curso, 'is_free') and curso.is_free
+                logger.debug(f"Aula_view: Course '{curso.slug}' is free? {course_is_free}")
+                if course_is_free:
+                    can_access = True
+                    logger.debug(f"Aula_view: Course '{curso.slug}' is free. Access granted for user '{request.user.username}'.")
+    else:
+        logger.debug(f"Aula_view: User is not authenticated for this request.")
+
+    logger.info(f"Aula_view: Final access decision for user '{request.user.username if request.user.is_authenticated else 'Anonymous'}' to course '{curso.slug}', aula_ordem '{aula_ordem}': {'Granted' if can_access else 'Denied'}")
+            
+    if not can_access:
+        if not request.user.is_authenticated:
+            messages.warning(request, 'Faça login para poder acessar.')
+            return redirect(f"{reverse('users:login')}?next={request.path}")
+        else:
+            messages.warning(request, 'Você precisa se inscrever neste curso para assistir às aulas. ')
+            return redirect('cursos:detalhe', curso_slug=curso.slug)
+
+    try:
+        aula = None
+        for m in curso.modulos.all().order_by("ordem"):
+            aula_candidata = m.aulas.filter(ordem=aula_ordem).first()
+            if aula_candidata:
+                aula = aula_candidata
+                break
+
+        if not aula:
+            raise Http404("Aula não encontrada neste curso com a ordem especificada.")
+
+    except Exception as e:
+        logger.error(f"Error fetching aula: {e}")
+        raise Http404("Aula não encontrada ou erro ao carregar.")
+
     aula_anterior = Aula.objects.filter(modulo__curso=curso, ordem__lt=aula_ordem).order_by('-ordem').first()
     proxima_aula = Aula.objects.filter(modulo__curso=curso, ordem__gt=aula_ordem).order_by('ordem').first()
     
-    progresso = 0
-    aula_concluida = False
+    progresso_aula = 0
+    aula_esta_concluida = False
     
+    if request.user.is_authenticated:
+        aulas_concluidas_ids = set(
+            AulaConcluida.objects.filter(user=request.user, aula__modulo__curso=curso).values_list('aula_id', flat=True)
+        )
+        try:
+            inscricao = Inscricao.objects.get(user=request.user, curso=curso)
+            progresso_curso = inscricao.progresso
+        except Inscricao.DoesNotExist:
+            if curso.is_free:
+                inscricao = Inscricao.objects.create(user=request.user, curso=curso, status='ativo', progresso=0)
+                inscricao.update_progresso()
+                progresso_curso = inscricao.progresso
+            else:
+                progresso_curso = 0  
+        aula_esta_concluida = AulaConcluida.objects.filter(user=request.user, aula=aula).exists()
+    else:
+        aulas_concluidas_ids = set()
+        
     context = {
         'curso': curso,
         'aula': aula,
         'aula_anterior': aula_anterior,
         'proxima_aula': proxima_aula,
-        'progresso': progresso,
-        'aula_concluida': aula_concluida,
+        'progresso_curso': progresso_curso,
+        'aula_concluida': aula_esta_concluida,
+        'aulas_concluidas_ids': aulas_concluidas_ids,
+        'is_admin_user': is_admin_user
     }
     
     return render(request, 'cursos/aula.html', context)
@@ -321,21 +483,40 @@ def aula_view(request, curso_slug, aula_ordem):
 def inscrever_curso(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     
-    # Normally, you would handle enrollment logic here
-    # For now, just simulate success and redirect back
-    messages.success(request, f'Você foi inscrito com sucesso no curso {curso.titulo}!')
+    if Inscricao.objects.filter(user=request.user, curso=curso).exists():
+        messages.info(request, f'Você já está inscrito no curso {curso.titulo}!')
+    else:
+        Inscricao.objects.create(
+            user=request.user,
+            curso=curso,
+            status='ativo',
+            progresso=0
+        )
+        # Normally, you would handle enrollment logic here
+        # For now, just simulate success and redirect back
+        messages.success(request, f'Você foi inscrito com sucesso no curso {curso.titulo}!')
     return redirect('cursos:detalhe', curso_slug=curso.slug)
 
 #TODO: Implementar no database estas informações em uma futura implementação
 @login_required 
 def marcar_aula_concluida(request, aula_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
+
     aula = get_object_or_404(Aula, id=aula_id)
     curso = aula.modulo.curso
     
-    messages.success(request, 'Aula marcada como concluída!')
+    inscricao, created = Inscricao.objects.get_or_create( user=request.user, curso=curso, defaults={'status': 'ativo', 'progresso': 0})
+    
+    if not curso.is_free and not inscricao:
+        messages.error(request, 'Você precisa estar inscrito neste curso.')
+        return redirect('cursos:detalhe', curso_slug=curso.slug)
+    
+    _, aula_concluida_created = AulaConcluida.objects.get_or_create(user=request.user, aula=aula)
+    
+    if aula_concluida_created:
+        messages.success(request, f'Aula "{aula.titulo}" marcada como concluída!')
+        inscricao.update_progresso()
+    else:
+        messages.info(request, f'Aula "{aula.titulo}" já estava concluída.')
     return redirect('cursos:aula', curso_slug=curso.slug, aula_ordem=aula.ordem)
 
 @login_required

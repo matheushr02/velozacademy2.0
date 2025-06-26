@@ -7,59 +7,108 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-5">
-                <div class="card p-4">
-                    <div class="text-center mb-4">
-                        <h1 class="fw-bold">Criar Conta</h1>
+                <div class="card bg-dark border-secondary shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="card-title fw-bold mb-4 text-center">Criar Conta</h2>
                         <p>Junte-se à comunidade VelozAcademy</p>
-                    </div>
-                    
-                    <!-- Messages -->
-                    {% if messages %}
-                    <div class="mb-4">
+
+                        <!-- Messages -->
+                        {% if messages %}
                         {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}" role="alert">
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
                             {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                         {% endfor %}
-                    </div>
-                    {% endif %}
-                    
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Nome de usuário</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                        {% endif %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                            {% endfor %}
                         </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="password2" class="form-label">Confirmar Senha</label>
-                            <input type="password" class="form-control" id="password2" name="password2" required>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="termos" required>
-                            <label class="form-check-label" for="termos">Concordo com os <a href="#" class="text-primary">termos e condições</a></label>
-                        </div>
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary">Criar Conta</button>
-                        </div>
-                    </form>
-                    
-                    <hr>
-                    
-                    <div class="text-center">
-                        <p class="mb-3">Já tem uma conta?</p>
-                        <a href="{% url 'users:login' %}" class="btn btn-outline-primary">Entrar na conta</a>
+                        {% endif %}
+
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+
+                            <div class="mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }} <span class="text-danger">*</span></label>
+                                {{ form.first_name }}
+                                {% if form.first_name.help_text %}
+                                <div class="form-text">{{ form.first_name.help_text|safe }}</div>
+                                {% endif %}
+                                {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.help_text %}
+                                <div class="form-text">{{ form.last_name.help_text|safe }}</div>
+                                {% endif %}
+                                {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">{{ form.username.label }}<span class="text-danger">*</span></label>
+                                {{ form.username }}
+                                <div class="form-text">Seu usuário deve ser único e não conter espaços.</div>
+                                {% for error in form.username.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}<span class="text-danger">*</span></label>
+                                {{ form.email }}
+                                <div class="form-text">Forneça um e-mail válido.</div>
+                                {% for error in form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.password.id_for_label }}" class="form-label">{{ form.password.label }}<span class="text-danger">*</span></label>
+                                {{ form.password }}
+                                {% for error in form.password.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label">{{ form.password2.label }}<span class="text-danger">*</span></label>
+                                {{ form.password2 }}
+                                {% for error in form.password2.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3 form-check">
+                                {{ form.termos }}
+                                <label for="{{ form.termos.id_for_label }}" class="form-check-label">{{ form.termos.label|safe }}</label>
+                                {% for error in form.termos.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="d-grid mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">Criar Conta</button>
+                            </div>
+
+                            <p class="text-center text-muted small">Já tem uma conta? <a href="{% url 'users:login' %}" class="text-decoration-none">Faça login</a>
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-{% endblock %} 
+
+{% endblock %}

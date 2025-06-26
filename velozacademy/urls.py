@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+#from . import views
+
+#app_name = 'core'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
+    path('', include('core.urls', namespace='core')),
     path('cursos/', include('cursos.urls', namespace='cursos')),
     path('projetos/', include('projetos.urls', namespace='projetos')),
     path('usuarios/', include('users.urls', namespace='users')),
@@ -30,5 +33,5 @@ urlpatterns = [
 
 # Serve static and media files in development
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    #urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
