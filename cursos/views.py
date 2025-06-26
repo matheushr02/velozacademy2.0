@@ -6,7 +6,7 @@ from django.db.models import Q, Count, Sum
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import CursoForm, AulaForm
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.forms import formset_factory
 from django.http import Http404
 import logging
@@ -227,7 +227,13 @@ def lista_trilhas(request):
     }
     return render(request, 'cursos/lista_trilhas.html', context)
 
+def is_admin(user):
+    """Verifica se o usuário é um administrador."""
+    return user.is_staff or user.is_superuser
+
 #+ adicionar_curso refeito
+@login_required
+@user_passes_test(is_admin)
 def adicionar_curso(request):
     if not request.user.is_authenticated or not request.user.perfil.is_admin():
         messages.error(request, "Você não tem permissão para acessar esta página.")

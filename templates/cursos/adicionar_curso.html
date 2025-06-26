@@ -1,4 +1,6 @@
+
 {% extends 'base.html' %} {% load widget_tweaks %} {% block title %}Adicionar Novo Curso | VelozAcademy{% endblock %}
+
 {% block content %}
 <!-- Page Header -->
 <section class="py-5 bg-dark border-bottom">
@@ -93,20 +95,6 @@
                   {% endif %}
                 </div>
               </div>
-
-              <!--- Tipo de Conteúdo 
-                            <div class="mb-4">
-                                <label for="{{ form.tipo_conteudo.id_for_label }}" class="form-label fw-semibold">Tipo de Conteúdo*</label>
-                                {{ form.tipo_conteudo|add_class:"form-select bg-dark text-light border-secondary" }}
-                                <div class="form-text">Selecione os tipos de conteúdo que o curso terá.</div>
-                                {% if form.tipo_conteudo.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.tipo_conteudo.errors }}
-                                </div>
-                                {% endif %}
-                            </div>
-                            -->
-              <!--- Preço e Desconto (removido/removed) -->
 
               <!--? Imagem da capa do curso -->
               <div class="mb-4">
@@ -225,7 +213,6 @@
                       </div>
 
                       <!--? Duração da Aula -->
-                      <!--todo: Futuramente reconhecer apenas a duração dos videos de forma automatica -->
                       <div class="mb-3">
                         <label for="{{ aula_form.duracao_minutos.id_for_label }}" class="form-label">Duração (minutos)*</label>
                         {{ aula_form.duracao_minutos|add_class:"form-control bg-dark text-light border-secondary" }}

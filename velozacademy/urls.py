@@ -28,6 +28,7 @@ urlpatterns = [
     path('cursos/', include('cursos.urls', namespace='cursos')),
     path('projetos/', include('projetos.urls', namespace='projetos')),
     path('usuarios/', include('users.urls', namespace='users')),
+    path('dashboard/', include('dashboard.urls', namespace='dashboard')),
 ]
 
 # Serve static and media files in development
