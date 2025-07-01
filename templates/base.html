@@ -42,6 +42,26 @@
 
     {% block styles %}
     <style>
+        #logo-wrapper #sidebar-logo-expanded, #logo-wrapper #sidebar-logo-collapsed {
+            display: none;
+        }
+
+        @media (max-width: 767.98px) {
+            body.sidebar-active #logo-wrapper #sidebar-logo-expanded { display: inline; }
+        }
+
+        @media (min-width: 768px) and (max-width: 1199.98px) {
+            #logo-wrapper #sidebar-logo-expanded { display: inline; }
+            #logo-wrapper #sidebar-logo-collapsed { display: none; }
+        }
+
+        @media (min-width: 1200px) {
+            #logo-wrapper #sidebar-logo-expanded { display: inline; }
+            #logo-wrapper #sidebar-logo-collapsed { display: none; }
+            html.sidebar-is-collapsed #logo-wrapper #sidebar-logo-expanded { display: none; }
+            html.sidebar-is-collapsed #logo-wrapper #sidebar-logo-collapsed { display: inline; }
+        }
+
         .course-description img {
             max-width: 100%;
             height: auto;

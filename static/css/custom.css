@@ -344,7 +344,7 @@ footer {
         /*overflow-y: auto;*/
     }
 
-    .sidebar-active #sidebar-logo-expanded {
+    body.sidebar-active #sidebar-logo-expanded {
         display: inline;
     }
 
