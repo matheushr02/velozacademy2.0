@@ -158,6 +158,12 @@ class Aula(models.Model):
     def has_video(self):
         return bool(self.video_file) or bool(self.video_embed_code and self.video_embed_code.strip())
     
+    def has_text(self):
+        return bool(self.conteudo and self.conteudo.strip())
+
+    def has_files(self):
+        return self.arquivos.exists()
+    
 #? Adiciona um novo modelo para os arquivos de aula
 class ArquivoAula(models.Model):
     aula = models.ForeignKey(Aula, related_name='arquivos', on_delete=models.CASCADE)

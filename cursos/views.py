@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from users.models import Inscricao
 from .models import Curso, Trilha, Modulo, Aula, ArquivoAula, AulaConcluida
-from django.db.models import Q, Count, Sum
+from django.db.models import Q, Count, Sum, Prefetch
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import CursoForm, AulaForm
 from django.contrib import messages
@@ -102,7 +102,14 @@ def lista_cursos(request):
     return render(request, 'cursos/lista.html', context)
 
 def detalhe_curso(request, curso_slug):
-    curso = get_object_or_404(Curso, slug=curso_slug)
+    curso = get_object_or_404(
+        Curso.objects.prefetch_related(
+            Prefetch('modulos', queryset=Modulo.objects.order_by('ordem').prefetch_related(
+                Prefetch('aulas', queryset=Aula.objects.order_by('ordem').prefetch_related('arquivos'))
+            ))
+        ),
+        slug=curso_slug
+    )
     modulos = curso.modulos.all().order_by('ordem')
     
     # Valores padrão
@@ -380,11 +387,11 @@ def adicionar_curso(request):
         
     return render(request, 'cursos/adicionar_curso.html', {'form': form, 'aula_formset': aula_formset})
 
-def aula_view(request, curso_slug, aula_ordem):
+def aula_view(request, curso_slug, aula_id):
     #? pega o curso por slug    
     curso = get_object_or_404(Curso, slug=curso_slug)
     
-    logger.debug(f"Aula_view: Access attempt by user '{request.user.username if request.user.is_authenticated else 'Anonymous'}', for course: '{curso.slug}', aula_ordem: '{aula_ordem}'")
+    logger.debug(f"Aula_view: Access attempt by user '{request.user.username if request.user.is_authenticated else 'Anonymous'}', for course: '{curso.slug}', aula_id: '{aula_id}'")
     
     can_access = False
     is_admin_user = False
@@ -411,7 +418,7 @@ def aula_view(request, curso_slug, aula_ordem):
     else:
         logger.debug(f"Aula_view: User is not authenticated for this request.")
 
-    logger.info(f"Aula_view: Final access decision for user '{request.user.username if request.user.is_authenticated else 'Anonymous'}' to course '{curso.slug}', aula_ordem '{aula_ordem}': {'Granted' if can_access else 'Denied'}")
+    logger.info(f"Aula_view: Final access decision for user '{request.user.username if request.user.is_authenticated else 'Anonymous'}' to course '{curso.slug}', aula_id '{aula_id}': {'Granted' if can_access else 'Denied'}")
             
     if not can_access:
         if not request.user.is_authenticated:
@@ -422,23 +429,21 @@ def aula_view(request, curso_slug, aula_ordem):
             return redirect('cursos:detalhe', curso_slug=curso.slug)
 
     try:
-        aula = None
-        for m in curso.modulos.all().order_by("ordem"):
-            aula_candidata = m.aulas.filter(ordem=aula_ordem).first()
-            if aula_candidata:
-                aula = aula_candidata
-                break
-
-        if not aula:
-            raise Http404("Aula não encontrada neste curso com a ordem especificada.")
+        aula = get_object_or_404(Aula, id=aula_id, modulo__curso__slug=curso_slug)
 
     except Exception as e:
         logger.error(f"Error fetching aula: {e}")
         raise Http404("Aula não encontrada ou erro ao carregar.")
 
-    aula_anterior = Aula.objects.filter(modulo__curso=curso, ordem__lt=aula_ordem).order_by('-ordem').first()
-    proxima_aula = Aula.objects.filter(modulo__curso=curso, ordem__gt=aula_ordem).order_by('ordem').first()
-    
+    all_aulas_in_course = list(Aula.objects.filter(modulo__curso=curso).order_by('modulo__ordem', 'ordem'))
+    try:
+        current_aula_index = all_aulas_in_course.index(aula)
+        aula_anterior = all_aulas_in_course[current_aula_index - 1] if current_aula_index > 0 else None
+        proxima_aula = all_aulas_in_course[current_aula_index + 1] if current_aula_index < len(all_aulas_in_course) - 1 else None
+    except ValueError:
+        aula_anterior = None
+        proxima_aula = None
+        
     progresso_aula = 0
     aula_esta_concluida = False
     
