@@ -42,14 +42,6 @@
 
     {% block styles %}
     <style>
-        #logo-wrapper #sidebar-logo-expanded, #logo-wrapper #sidebar-logo-collapsed {
-            display: none;
-        }
-
-        @media (max-width: 767.98px) {
-            body.sidebar-active #logo-wrapper #sidebar-logo-expanded { display: inline; }
-        }
-
         @media (min-width: 768px) and (max-width: 1199.98px) {
             #logo-wrapper #sidebar-logo-expanded { display: inline; }
             #logo-wrapper #sidebar-logo-collapsed { display: none; }
@@ -200,9 +192,15 @@
                             <li><a href="{% url 'users:logout' %}" class="dropdown-item">Sair</a></li>
                         </ul>
                         {% else %}
-                        <div class="d-flex flex-column align-items-center align-items-sm-start">
-                            <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-sm mb-2 w-100">Login</a>
-                            <a href="{% url 'users:registro' %}" class="btn btn-primary btn-sm w-100">Registrar</a>
+                        <div class="d-flex flex-column align-items-center">
+                            <a href="{% url 'users:login' %}" class="btn btn-outline-primary btn-sm mb-2 w-100">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                <span class="ms-2 sidebar-text">Login</span>
+                            </a>
+                            <a href="{% url 'users:registro' %}" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-person-plus-fill"></i>
+                                <span class="ms-2 sidebar-text">Registrar</span>
+                            </a>
                         </div>
                         {% endif %}
                     </div>
@@ -224,12 +222,10 @@
         <div class="container">
             <div class="row g-4">
                 <div class="col-lg-4 mb-4">
-                    <h3 class="fw-bold mb-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-lightning-charge-fill me-2 text-primary" viewBox="0 0 16 16">
-                            <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09z" />
-                        </svg>
-                        VelozAcademy
-                    </h3>
+                    <a href="{% url 'core:home' %}" class="d-inline-block mb-3">
+                        <img src="{% static 'images/velozacademia-logo-icon.png' %}" alt="VelozAcademy Logo" style="height: 40px; margin-right: 5px;">
+                        <img src="{% static 'images/velozacademy-logo-letras.png' %}" alt="VelozAcademy Logo" style="height: 20px;">
+                    </a>
                     <p>Plataforma de ensino de programação com foco em projetos práticos e aprendizado interativo.</p>
                     <div class="d-flex gap-3 mt-3">
                         <a href="#" class="link-secondary">

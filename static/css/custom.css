@@ -6,6 +6,11 @@
     transition: none !important;
 }
 
+html {
+    overflow-y: scroll;
+    font-size: 90%;
+}
+
 /* Custom Theme Styles */
 
 /* Estilos específicos para cada tema */
@@ -217,6 +222,15 @@ body,
     overflow: hidden;
 }
 
+.sidebar .dropdown {
+    width: 100%;
+}
+
+.sidebar .dropdown>.d-flex {
+    width: 100%;
+    justify-content: center;
+}
+
 .sidebar-text,
 #profile-username {
     transition: opacity 0.2s ease, max-width 0.25s ease, margin-left 0.25s ease;
@@ -331,6 +345,12 @@ footer {
 /*@ Sidebar comportamento no Mobile / Mobile Sidebar behavior */
 /*combo@? Ajusta tamanho para telas pequenas; Mobile */
 @media (max-width: 767.98px) {
+    #logo-wrapper #sidebar-logo-expanded {
+        display: inline;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
     .sidebar {
         position: fixed;
         width: 80px;
@@ -344,13 +364,18 @@ footer {
         /*overflow-y: auto;*/
     }
 
+    /*-
     body.sidebar-active #sidebar-logo-expanded {
         display: inline;
-    }
+    }*/
 
     .sidebar.active {
         margin-left: 0;
         width: 240px;
+    }
+
+    .sidebar.active #logo-wrapper #sidebar-logo-expanded {
+        opacity: 1;
     }
 
     /*? Mostra texto quando a sidebar está ativa */
